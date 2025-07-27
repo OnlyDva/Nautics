@@ -149,7 +149,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, query, orderBy, addDoc, serverTimestamp, where, writeBatch, onSnapshot, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"; 
     import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-    // IMPORTANTE: Si estás SEGURO de NO usar Firebase Authentication, asegúrate de que la siguiente línea esté COMENTADA:
+    // Si estás SEGURO de NO usar Firebase Authentication, asegúrate de que la siguiente línea esté COMENTADA:
     // import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     
     // Configuración de Firebase para el proyecto Nautics
@@ -166,7 +166,7 @@
     const firebaseApp = initializeApp(firebaseConfig);
     window.db = getFirestore(firebaseApp);
     window.storage = getStorage(firebaseApp);
-    // IMPORTANTE: Si estás SEGURO de NO usar Firebase Authentication, asegúrate de que la siguiente línea esté COMENTADA:
+    // Si estás SEGURO de NO usar Firebase Authentication, asegúrate de que la siguiente línea esté COMENTADA:
     // window.auth = getAuth(firebaseApp);
     
     window.Firebase = {
@@ -450,7 +450,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('contenido').innerHTML = `
                 <div class="max-w-md mx-auto bg-nautics-dark bg-opacity-70 p-8 rounded-lg shadow-lg border-2 border-nautics-secondary-pink">
                     <h2 class="text-3xl font-bold mb-4 text-center text-nautics-text">Acceso Privado - Jefes de Flota</h2>
-                    <input type="text" name="username" value="jefe-nautics" autocomplete="username" style="display: none;">
                     
                     <div class="mb-4">
                         <label class="block mb-2 text-nautics-light">Contraseña de Jefes:</label>
@@ -485,8 +484,8 @@ document.addEventListener('DOMContentLoaded', () => {
                      ${desc}
                    </div>`
                 : `<p class="text-nautics-light text-lg font-bold mt-2">$${productoPrecio}</p>`; // Usa el precio del producto
-            const placeholderSVG = `<svg class="mx-auto mb-2 text-gray-500" width="80" height="80" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"></path></svg>`;
-            const imagenHTML = producto.imagen && !producto.imagen.includes('placeholder') ? `<img src="${producto.imagen}" alt="${producto.nombre}" class="mx-auto mb-2 w-24 h-24 object-cover rounded" onerror="this.src='placeholder.png'"/>` : placeholderSVG;
+            // Eliminada referencia a placeholder.png y placeholderSVG, solo se muestra la imagen o nada.
+            const imagenHTML = producto.imagen ? `<img src="${producto.imagen}" alt="${producto.nombre}" class="mx-auto mb-2 w-24 h-24 object-cover rounded" onerror="this.style.display='none'"/>` : '';
             return `<div class="producto-card bg-nautics-mid rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div>${imagenHTML}<h3 class="text-white font-semibold leading-tight uppercase">${producto.nombre}</h3></div><div>${inputVentasHTML}</div></div>`;
         },
 
@@ -659,7 +658,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Genera los paneles para cada barco con sus formularios de reserva
             this.state.barcos.forEach(boat => { 
                 const estadoActual = this.getEstadoBarco(boat); 
-                const imagenHTML = `<img src="${boat.imagen}" alt="${boat.nombre}" class="barco-img mb-4" onerror="this.src='placeholder.png'"/>`; 
+                const imagenHTML = `<img src="${boat.imagen}" alt="${boat.nombre}" class="barco-img mb-4" onerror="this.style.display='none'"/>`; 
                 html += `<div class="border-2 ${estadoActual.estado === 'disponible' ? 'border-green-600' : 'border-red-600'} p-4 rounded-lg bg-nautics-dark bg-opacity-70 flex flex-col">${imagenHTML}<div class="text-left flex-grow"><h2 class="text-2xl font-bold">${boat.nombre}</h2><p class="text-lg ${estadoActual.estado === 'disponible' ? 'text-green-400' : 'text-red-400'}">${estadoActual.texto}</p><div class="mt-2 text-sm"><p class="font-bold mb-1">Reservas para hoy:</p><ul class="list-disc list-inside space-y-1 h-20 overflow-y-auto text-xs">${boat.reservas.filter(r => new Date(r.inicio.toMillis ? r.inicio.toMillis() : r.inicio).toDateString() === new Date().toDateString()).sort((a,b)=>(a.inicio.toMillis ? a.inicio.toMillis() : a.inicio)-(b.inicio.toMillis ? b.inicio.toMillis() : b.inicio)).map(r => `<li>${new Date(r.inicio.toMillis ? r.inicio.toMillis() : r.inicio).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} - ${new Date(r.fin.toMillis ? r.fin.toMillis() : r.fin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} (${r.cliente})</li>`).join('') || '<li>Ninguna reserva hoy.</li>'}</ul></div></div><div id="form-boat-${boat.id}" class="mt-3 text-left border-t border-nautics-mid pt-3"><h4 class="font-bold mb-2 text-center">Hacer una nueva reserva:</h4><input type="text" id="cliente-boat-${boat.id}" placeholder="Nombre del Alquilador" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><input type="date" id="fecha-boat-${boat.id}" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><input type="time" id="hora-boat-${boat.id}" step="1800" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><select id="duracion-boat-${boat.id}" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><option value="30">30 Minutos (Paseo)</option><option value="45">45 Minutos (Alquiler)</option><option value="60">1 Hora</option><option value="120">2 Horas</option><option value="180">3 Horas</option></select><button class="btn w-full mt-2" onclick="VanillaApp.reservarBarco(${boat.id})">Confirmar Alquiler</button></div></div>`; 
             }); 
             html += `</div><div class="text-center"><button onclick="VanillaApp.mostrarInicio()" class="btn mt-8">Volver al Inicio</button></div></div>`; 
@@ -844,7 +843,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (empleadosElem) {
                     const empleadosFichados = Object.entries(this.state.fichajes).filter(([_, data]) => data.fichado).map(([id, data]) => ({ id, ...data }));
                     if (empleadosFichados.length > 0) {
-                        empleadosElem.innerHTML = empleadosFichados.map(e => `<li class="capitalize text-green-400">${e.id} (Desde: ${new Date(e.inicio).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })})</li>`).join('');
+                        empleadosElem.innerHTML = empleadosFichados.map(e => `<li class="capitalize text-green-400">${e.id} (Desde: ${new Date(e.inicio).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})})</li>`).join('');
                     } else {
                         empleadosElem.innerHTML = '<li class="text-nautics-light">Nadie de guardia.</li>';
                     }
@@ -854,7 +853,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (barcosOcupados.length > 0) {
                         barcosElem.innerHTML = barcosOcupados.map(h => {
                             const estado = this.getEstadoBarco(h); 
-                            const finReserva = new Date(estado.reservaActual.fin.toMillis ? estado.reservaActual.fin.toMillis() : estado.reservaActual.fin).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                            const finReserva = new Date(estado.reservaActual.fin.toMillis ? estado.reservaActual.fin.toMillis() : estado.reservaActual.fin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
                             return `<li class="text-nautics-accent-pink">${h.nombre} - Alquilado por: <span class="capitalize">${estado.reservaActual.cliente}</span> (hasta ${finReserva})</li>`; 
                         }).join('');
                     } else {
@@ -947,20 +946,20 @@ document.addEventListener('DOMContentLoaded', () => {
             sessionStorage.removeItem('currentUser'); // Limpiar el nombre de usuario
             this.mostrarInicio(); 
         },
-        async gestionarReseteoDatos(nombre, esVenta = false) { // Ahora usa el nombre
+        async gestionarReseteoDatos(nombre, esVenta = false) { 
             const ahora = new Date(), hoyStr = ahora.toISOString().split('T')[0], semanaNum = this.getWeekNumber(ahora);
             if (esVenta) {
-                let datosVentaDoc = await Firebase.getDoc(Firebase.doc(db, 'ventas', nombre)); // Usa nombre
+                let datosVentaDoc = await Firebase.getDoc(Firebase.doc(db, 'ventas', nombre)); 
                 let datosV = datosVentaDoc.exists() ? datosVentaDoc.data() : { productos: {}, fecha: '' };
                 if (!datosV.productos) datosV.productos = {};
                 if (datosV.fecha !== hoyStr) {
                     datosV.fecha = hoyStr;
                     Object.keys(datosV.productos).forEach(k => { datosV.productos[k].hoy = 0; });
                 }
-                this.state.ventas[nombre] = datosV; // Usa nombre
+                this.state.ventas[nombre] = datosV; 
                 return datosV;
             } else {
-                let datosFichajeDoc = await Firebase.getDoc(Firebase.doc(db, 'fichajes', nombre)); // Usa nombre
+                let datosFichajeDoc = await Firebase.getDoc(Firebase.doc(db, 'fichajes', nombre)); 
                 let datosF = datosFichajeDoc.exists() ? datosFichajeDoc.data() : { total: 0, hoy: 0, semana: 0, fecha: hoyStr, numSemana: semanaNum, fichado: false, inicio: null };
                 if (datosF.fecha !== hoyStr) {
                     datosF.hoy = 0;
@@ -971,13 +970,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     datosF.semana = 0;
                     datosF.numSemana = semanaNum;
                 }
-                this.state.fichajes[nombre] = datosF; // Usa nombre
+                this.state.fichajes[nombre] = datosF; 
                 return datosF;
             }
         },
         async fichar(nombre) { 
             const currentUser = sessionStorage.getItem('currentUser'); 
-            if (!currentUser) { // Verifica si hay alguien "logueado"
+            if (!currentUser) { 
                 alert("No hay un usuario en sesión. Por favor, inicia sesión.");
                 return;
             }
@@ -1000,7 +999,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         async desfichar(nombre, silent = false) { 
             const currentUser = sessionStorage.getItem('currentUser'); 
-            if (!currentUser) { // Verifica si hay alguien "logueado"
+            if (!currentUser) { 
                 if (!silent) alert("No hay un usuario en sesión. Por favor, inicia sesión.");
                 return;
             }
@@ -1225,7 +1224,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert(`Error al añadir el tripulante: ${error.message}.`);
             }
         },
-        async toggleDirectiva(empleadoNombre) { // Recibe el nombre
+        async toggleDirectiva(empleadoNombre) { 
             const currentUser = sessionStorage.getItem('currentUser');
             if (!currentUser) { alert("No hay usuario en sesión."); return; }
             
@@ -1240,7 +1239,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } 
             } catch (e) { console.error("Error al cambiar directiva:", e); alert("Error al cambiar permiso de directiva: " + e.message); }
         },
-        async cambiarContrasena(nombre) { // Recibe el nombre
+        async cambiarContrasena(nombre) { 
             const currentUser = sessionStorage.getItem('currentUser');
             if (!currentUser) { alert("No hay usuario en sesión."); return; }
 
@@ -1252,7 +1251,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }  catch (e) { console.error("Error al cambiar contraseña:", e); alert("Error al cambiar contraseña: " + e.message); } 
             } 
         },
-        async eliminarEmpleado(nombre) { // Recibe el nombre
+        async eliminarEmpleado(nombre) { 
             const currentUser = sessionStorage.getItem('currentUser');
             if (!currentUser) { alert("No hay usuario en sesión."); return; }
 
@@ -1339,7 +1338,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const currentUser = sessionStorage.getItem('currentUser'); 
             if (!currentUser) { alert("No hay usuario en sesión."); return; }
             
-            this.state.inventoryFiles = [null, null, null]; let uploadBoxesHTML = ''; for (let i = 0; i < 3; i++) { uploadBoxesHTML += `<div id="inventory-box-${i}" class="inventory-upload-box" tabindex="0"><span class="placeholder-text text-nautics-light text-center">Haz clic aquí y pega una imagen con<br/><strong>Ctrl+V</strong></span><img id="inventory-img-${i}" class="hidden"><button id="inventory-remove-${i}" class="remove-btn">&times;</button></div>`; } document.getElementById('contenido').innerHTML = `<div class="max-w-4xl mx-auto p-6 bg-nautics-dark bg-opacity-90 rounded-lg shadow-lg"><div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-bold">Inventario de Provisión</h2><button class="btn" onclick="VanillaApp.mostrarPanelEmpleados('${currentUser}')">Volver al Panel de Tripulación</button></div><div class="bg-nautics-mid p-6 rounded-lg text-center"><h3 class="text-xl font-semibold mb-4">Añadir Nuevo Inventario (hasta 3 imágenes)</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">${uploadBoxesHTML}</div><button id="upload-inventory-btn" class="btn text-lg py-2 px-6" style="background-color: var(--color-nautics-secondary-pink);">Guardar Inventario</button><div id="upload-status" class="mt-4 text-nautics-accent-pink"></div></div></div>`; for (let i = 0; i < 3; i++) { const box = document.getElementById(`inventory-box-${i}`); const img = document.getElementById(`inventory-img-${i}`); const removeBtn = document.getElementById(`inventory-remove-${i}`); const handleFile = (file) => { if (file && file.type.startsWith('image/')) { this.state.inventoryFiles[i] = file; img.src = URL.createObjectURL(file); img.classList.remove('hidden'); box.classList.add('has-image'); }}; box.addEventListener('paste', e => { e.preventDefault(); handleFile(e.clipboardData.files[0]); }); removeBtn.addEventListener('click', e => { e.stopPropagation(); this.state.inventoryFiles[i] = null; img.src = ''; img.classList.add('hidden'); box.classList.remove('has-image'); }); } document.getElementById('upload-inventory-btn').onclick = () => this.subirInventario(); },
+            this.state.inventoryFiles = [null, null, null]; let uploadBoxesHTML = ''; for (let i = 0; i < 3; i++) { uploadBoxesHTML += `<div id="inventory-box-${i}" class="inventory-upload-box" tabindex="0"><span class="placeholder-text text-nautics-light text-center">Haz clic aquí y pega una imagen con<br/><strong>Ctrl+V</strong></span><img id="inventory-img-${i}" class="hidden"></div>`; /* Eliminado remove-btn, si se necesita se puede reintroducir con lógica */ } document.getElementById('contenido').innerHTML = `<div class="max-w-4xl mx-auto p-6 bg-nautics-dark bg-opacity-90 rounded-lg shadow-lg"><div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-bold">Inventario de Provisión</h2><button class="btn" onclick="VanillaApp.mostrarPanelEmpleados('${currentUser}')">Volver al Panel de Tripulación</button></div><div class="bg-nautics-mid p-6 rounded-lg text-center"><h3 class="text-xl font-semibold mb-4">Añadir Nuevo Inventario (hasta 3 imágenes)</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">${uploadBoxesHTML}</div><button id="upload-inventory-btn" class="btn text-lg py-2 px-6" style="background-color: var(--color-nautics-secondary-pink);">Guardar Inventario</button><div id="upload-status" class="mt-4 text-nautics-accent-pink"></div></div></div>`; for (let i = 0; i < 3; i++) { const box = document.getElementById(`inventory-box-${i}`); const img = document.getElementById(`inventory-img-${i}`); const handleFile = (file) => { if (file && file.type.startsWith('image/')) { this.state.inventoryFiles[i] = file; img.src = URL.createObjectURL(file); img.classList.remove('hidden'); box.classList.add('has-image'); }}; box.addEventListener('paste', e => { e.preventDefault(); handleFile(e.clipboardData.files[0]); }); /* Eliminado remove-btn listener */ } document.getElementById('upload-inventory-btn').onclick = () => this.subirInventario(); 
+        },
         async subirInventario() { 
             const currentUser = sessionStorage.getItem('currentUser'); 
             if (!currentUser) { alert("No hay usuario en sesión."); return; }
@@ -1360,8 +1360,8 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         async cargarConvenios(esDirectiva) { 
             const currentUser = sessionStorage.getItem('currentUser');
-            if (!currentUser) { /* No alert, as this might be called in Admin panel where user is authenticated */ return; }
-            const contenedor = document.getElementById('contenedorConvenios'); if (!contenedor) return; contenedor.innerHTML = ''; try { const q = await Firebase.getDocs(Firebase.query(Firebase.collection(db, 'convenios'), Firebase.orderBy('nombre'))); q.forEach(docu => { const c = { id: docu.id, ...docu.data() }; const p = document.createElement('div'); p.className = "bg-nautics-mid p-4 rounded-lg shadow-md flex flex-col"; let panelControls = ''; if (esDirectiva) { panelControls = `<div class="flex justify-between items-center mb-3"><h3 class="text-xl font-semibold mb-0 capitalize">${c.nombre}</h3><div class="flex gap-2"><div class="status-indicator bg-green-500 ${c.status === 'green' ? 'active' : ''}" onclick="VanillaApp.setConvenioStatus('${c.id}', 'green')"></div><div class="status-indicator bg-red-500 ${c.status === 'red' ? 'active' : ''}" onclick="VanillaApp.setConvenioStatus('${c.id}', 'red')"></div></div></div><div class="flex-grow mb-4 bg-nautics-dark bg-opacity-20 rounded min-h-[200px] flex items-center justify-center">${c.imagenURL ? `<img src="${c.imagenURL}" class="panel-image rounded cursor-pointer" onclick="VanillaApp.mostrarImagenAmpliada('${c.imagenURL}')"/>` : '<span class="text-nautics-light text-center">Sin imagen</span>'}</div><label class="btn text-xs py-1 text-center cursor-pointer" style="background-color: var(--color-nautics-secondary-pink);">Subir/Cambiar Imagen<input type="file" class="hidden" accept="image/*" onchange="VanillaApp.subirImagenConvenio('${c.id}', this.files[0])"></label><button onclick="VanillaApp.eliminarConvenio('${c.id}')" class="btn text-xs py-1 mt-2" style="background-color:#dc2626">Romper Acuerdo</button>`; } else { panelControls = `<h3 class="text-xl font-semibold mb-3 capitalize">${c.nombre}</h3><div class="flex-grow mb-4 bg-nautics-dark bg-opacity-20 rounded min-h-[200px] flex items-center justify-center">${c.imagenURL ? `<img src="${c.imagenURL}" class="panel-image rounded cursor-pointer" onclick="VanillaApp.mostrarImagenAmpliada('${c.imagenURL}')"/>` : '<span class="text-nautics-light text-center">Sin imagen</span>'}</div>`; } p.innerHTML = panelControls; contenedor.appendChild(p); }); } catch (e) { console.error("Error al cargar convenios:", e); } 
+            if (!currentUser) { return; } 
+            const contenedor = document.getElementById('contenedorConvenios'); if (!contenedor) return; contenedor.innerHTML = ''; try { const q = await Firebase.getDocs(Firebase.query(Firebase.collection(db, 'convenios'), Firebase.orderBy('nombre'))); q.forEach(docu => { const c = { id: docu.id, ...docu.data() }; const p = document.createElement('div'); p.className = "bg-nautics-mid p-4 rounded-lg shadow-md flex flex-col"; let panelControls = ''; if (esDirectiva) { panelControls = `<div class="flex justify-between items-center mb-3"><h3 class="text-xl font-semibold mb-0 capitalize">${c.nombre}</h3><div class="flex gap-2"><div class="status-indicator bg-green-500 ${c.status === 'green' ? 'active' : ''}" onclick="VanillaApp.setConvenioStatus('${c.id}', 'green')"></div><div class="status-indicator bg-red-500 ${c.status === 'red' ? 'active' : ''}" onclick="VanillaApp.setConvenioStatus('${c.id}', 'red')"></div></div></div><div class="flex-grow mb-4 bg-nautics-dark bg-opacity-20 rounded min-h-[200px] flex items-center justify-center">${c.imagenURL ? `<img src="${c.imagenURL}" class="panel-image rounded cursor-pointer" onclick="VanillaApp.mostrarImagenAmpliada('${c.imagenURL}')"/>` : '<span></span>'}</div><label class="btn text-xs py-1 text-center cursor-pointer" style="background-color: var(--color-nautics-secondary-pink);">Subir/Cambiar Imagen<input type="file" class="hidden" accept="image/*" onchange="VanillaApp.subirImagenConvenio('${c.id}', this.files[0])"></label><button onclick="VanillaApp.eliminarConvenio('${c.id}')" class="btn text-xs py-1 mt-2" style="background-color:#dc2626">Romper Acuerdo</button>`; } else { panelControls = `<h3 class="text-xl font-semibold mb-3 capitalize">${c.nombre}</h3><div class="flex-grow mb-4 bg-nautics-dark bg-opacity-20 rounded min-h-[200px] flex items-center justify-center">${c.imagenURL ? `<img src="${c.imagenURL}" class="panel-image rounded cursor-pointer" onclick="VanillaApp.mostrarImagenAmpliada('${c.imagenURL}')"/>` : '<span></span>'}</div>`; } p.innerHTML = panelControls; contenedor.appendChild(p); }); } catch (e) { console.error("Error al cargar convenios:", e); } 
         },
         async crearConvenio() { 
             const currentUser = sessionStorage.getItem('currentUser');
@@ -1386,7 +1386,7 @@ document.addEventListener('DOMContentLoaded', () => {
         async subirImagenConvenio(id, file) { 
             const currentUser = sessionStorage.getItem('currentUser');
             if (!currentUser) { alert("No hay usuario en sesión."); return; } 
-            if (!file) return; const p = `convenios/${id}/${file.name}`; const s = Firebase.ref(storage, p); try { const docSnap = await Firebase.getDoc(Firebase.doc(db, 'convenios', id)); if (docSnap.exists() && docSnap.data().imagenPath) { try { await Firebase.deleteObject(Firebase.ref(storage, docSnap.data().imagenPath)); } catch (e) { console.warn("La imagen anterior no se pudo borrar:", e.code); } } await Firebase.uploadBytes(s, file); const url = await Firebase.getDownloadURL(s); await Firebase.updateDoc(Firebase.doc(db, 'convenios', id), { imagenURL: url, imagenPath: p }); if (document.getElementById('contenedorConvenios')) this.cargarConvenios(true); } catch (e) { console.error("Error al subir imagen convenio:", e); alert("Error al subir imagen de acuerdo: " + e.message); } 
+            if (!file) return; const p = `convenios/${id}/${file.name}`; const s = Firebase.ref(storage, p); try { const docSnap = await Firebase.getDoc(Firebase.doc(db, 'convenios', id)); if (docSnap.exists() && docSnap.data().imagenPath) { await Firebase.deleteObject(Firebase.ref(storage, docSnap.data().imagenPath)); } await Firebase.uploadBytes(s, file); const url = await Firebase.getDownloadURL(s); await Firebase.updateDoc(Firebase.doc(db, 'convenios', id), { imagenURL: url, imagenPath: p }); if (document.getElementById('contenedorConvenios')) this.cargarConvenios(true); } catch (e) { console.error("Error al subir imagen convenio:", e); alert("Error al subir imagen de acuerdo: " + e.message); } 
         },
         async mostrarListaNegraPublica() { 
             const currentUser = sessionStorage.getItem('currentUser');
@@ -1395,7 +1395,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         async actualizarLibroNegro() { 
             const currentUser = sessionStorage.getItem('currentUser');
-            if (!currentUser) { return; } // No alerta, esto se llama en Admin panel
+            if (!currentUser) { return; } 
             await this.cargarLibroNegro(); const l = document.getElementById('listaLibroNegro'); if (!l) return; l.innerHTML = ''; this.state.libroNegro.forEach(c => { l.innerHTML += `<li class="flex justify-between items-center p-2 bg-nautics-mid rounded"><span><strong class="capitalize">${c.nombre}</strong> (${c.relacion}) - ${c.notas}</span><button onclick="VanillaApp.eliminarDelLibro('${c.docId}')" class="text-red-500 font-bold px-2">X</button></li>`; }); 
         },
         async anadirAlLibroNegro() { 
@@ -1410,7 +1410,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         async actualizarListaNegra() { 
             const currentUser = sessionStorage.getItem('currentUser');
-            if (!currentUser) { return; } // No alerta
+            if (!currentUser) { return; } 
             await this.cargarListaNegra(); const l = document.getElementById('listaDeVetados'); if (!l) return; l.innerHTML = ''; this.state.listaNegra.forEach(p => { l.innerHTML += `<li class="flex justify-between items-center p-2 bg-red-900 bg-opacity-50 rounded"><span><strong class="capitalize">${p.nombre}</strong> - ${p.motivo}</span><button onclick="VanillaApp.eliminarDeListaNegra('${p.docId}')" class="text-white font-bold px-2">X</button></li>`; }); 
         },
         async anadirAListaNegra() { 
@@ -1425,7 +1425,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         async actualizarInventarioLog() { 
             const currentUser = sessionStorage.getItem('currentUser');
-            if (!currentUser) { return; } // No alerta
+            if (!currentUser) { return; } 
             await this.cargarInventarioLog(); const contenedor = document.getElementById('listaInventarioLog'); if (!contenedor) return; contenedor.innerHTML = ''; if (this.state.inventarioLog.length === 0) { contenedor.innerHTML = '<li>No hay registros de inventario de flota.</li>'; return; } this.state.inventarioLog.forEach(log => { const fecha = log.timestamp.toDate().toLocaleString('es-ES'); const imgsHTML = log.imagenes ? log.imagenes.map(url => `<img src="${url}" class="w-24 h-24 object-cover rounded cursor-pointer" onclick="VanillaApp.mostrarImagenAmpliada('${url}')" />`).join('') : ''; contenedor.innerHTML += `<li class="flex items-start gap-4 p-3 bg-nautics-mid rounded"><div class="flex gap-2 flex-wrap">${imgsHTML}</div><div><p>Subido por: <strong class="capitalize">${log.subidoPor}</strong></p><p>Fecha: <strong class="font-mono">${fecha}</strong></p></div></li>`; }); 
         },
         toggleInventarioLog() { const lista = document.getElementById('listaInventarioLog'); if (lista) { lista.style.display = lista.style.display === 'none' ? 'block' : 'none'; } },
@@ -1442,9 +1442,9 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         async handleSendMessage() {
             const chatbotInput = document.getElementById('chatbot-input');
-            const messageText = chatbotInput.value.trim();
+            let messageText = chatbotInput.value.trim(); // No toLowerCase aquí para el regex
             const files = this.state.chatFiles;
-            const currentUser = sessionStorage.getItem('currentUser'); // Esto es el nombre del empleado en minúsculas
+            const currentUser = sessionStorage.getItem('currentUser'); 
 
             if (!messageText && files.length === 0) return; 
 
@@ -1486,19 +1486,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
             setTimeout(async () => {
                 let mockReply = "Lo siento, almirante, mi brújula no me indica esa dirección. ¿Puedes ser más específico?"; 
-                const userMsg = messageText.toLowerCase();
-
-                // Regex para capturar "nombre apellido cantidad cebos/cañas [y cantidad cebos/cañas]"
-                const salesRegex = /(?:vender\s+a\s+|vender\s+|comprar\s+)?([a-z]+\s[a-z]+)\s+(\d+)\s*(cebos|cañas)(?: y (\d+)\s*(cebos|cañas))?/;
-                const match = userMsg.match(salesRegex);
+                const cleanedMessageText = messageText.toLowerCase().replace(/á/g, 'a').replace(/é/g, 'e').replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ú/g, 'u').replace(/ñ/g, 'n'); // Normalizar para coincidencia
+                
+                // Regex para capturar:
+                // Opcional: "vender a ", "vender ", "comprar "
+                // Obligatorio: Nombre y Apellido (dos palabras)
+                // Obligatorio: Cantidad (números)
+                // Obligatorio: Tipo de producto (cebos o cañas)
+                // Opcional: " y Cantidad Tipo"
+                const salesRegex = /(?:vender(?:\s+a)?\s+|comprar\s+)?([a-zñáéíóú]+\s[a-zñáéíóú]+)\s+(\d+)\s*(cebos|cañas)(?:(?:\s+y\s+)(\d+)\s*(cebos|cañas))?/i;
+                const match = cleanedMessageText.match(salesRegex);
 
                 if (match) { 
                     console.log("Patrón de venta detectado:", match);
+                    // match[1] = nombre y apellido del cliente
+                    // match[2] = cantidad del primer artículo
+                    // match[3] = tipo del primer artículo
+                    // match[4] = cantidad del segundo artículo (si existe)
+                    // match[5] = tipo del segundo artículo (si existe)
+
                     const clientName = match[1].trim(); 
-                    const item1Quantity = parseInt(match[2]);
-                    const item1Type = match[3];
-                    const item2Quantity = match[4] ? parseInt(match[4]) : 0;
-                    const item2Type = match[5];
+                    let item1Quantity = parseInt(match[2]);
+                    let item1Type = match[3];
+                    let item2Quantity = match[4] ? parseInt(match[4]) : 0;
+                    let item2Type = match[5];
                     
                     if (!clientName.includes(' ')) { 
                         mockReply = "¡Almirante! Para registrar la venta, necesito el nombre y **apellido** del cliente.";
@@ -1510,15 +1521,23 @@ document.addEventListener('DOMContentLoaded', () => {
                         let ceboSoldToday = false;
                         let responseMessages = [];
 
+                        // Normalize item types to 'cebo' and 'cana' for internal use
+                        item1Type = item1Type === 'cebos' ? 'cebo' : 'cana';
+                        if (item2Type) {
+                            item2Type = item2Type === 'cebos' ? 'cebo' : 'cana';
+                        }
+                        
                         // Process first item
-                        if (item1Type === 'cebos') {
+                        if (item1Type === 'cebo') {
                             const clientDocRef = Firebase.doc(db, 'clientesVentas', clientName);
                             const clientDoc = await Firebase.getDoc(clientDocRef);
                             const clientData = clientDoc.exists() ? clientDoc.data() : { ultimaCompraCebos: null, compras: [] };
                             
-                            const lastCeboPurchaseDate = clientData.ultimaCompraCebos ? 
-                                new Date(clientData.ultimaCompraCebos.toDate ? clientData.ultimaCompraCebos.toDate() : clientData.ultimaCompraCebos).toDateString() : null;
+                            // Comparar solo la fecha (día, mes, año)
+                            const lastCeboPurchaseDate = clientData.ultimaCompraCebos && typeof clientData.ultimaCompraCebos.toDate === 'function' ? clientData.ultimaCompraCebos.toDate().toDateString() : null;
                             const todayDate = new Date().toDateString();
+
+                            console.log(`Cliente: ${clientName}, Última compra cebos: ${lastCeboPurchaseDate}, Hoy: ${todayDate}`);
 
                             if (lastCeboPurchaseDate === todayDate) {
                                 responseMessages.push(`¡Almirante! El cliente ${clientName} ya compró cebos hoy. No podemos venderle más hasta mañana.`);
@@ -1535,11 +1554,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                 }, { merge: true }));
                                 responseMessages.push(`¡${item1Quantity} cebos registrados para ${clientName}!`);
                             }
-                        } else if (item1Type === 'cañas') {
+                        } else if (item1Type === 'cana') {
                             const clientDocRef = Firebase.doc(db, 'clientesVentas', clientName);
                             salesPromises.push(Firebase.setDoc(clientDocRef, {
                                 compras: Firebase.arrayUnion({ 
-                                    producto: 'caña',
+                                    producto: 'cana',
                                     cantidad: item1Quantity,
                                     timestamp: Firebase.serverTimestamp(),
                                     empleado: currentUser
@@ -1548,22 +1567,21 @@ document.addEventListener('DOMContentLoaded', () => {
                             responseMessages.push(`¡${item1Quantity} cañas registradas para ${clientName}!`);
                         }
 
-                        // Process second item if present and not a cebo already sold (if the first was cebos)
+                        // Process second item if present
                         if (item2Quantity > 0 && item2Type) {
-                            if (item2Type === 'cebos') {
+                            if (item2Type === 'cebo') {
                                 if (ceboSoldToday) { 
-                                    responseMessages.push(`¡Atención! ${clientName} ya compró cebos hoy, no puedo registrar más cebos.`);
+                                    responseMessages.push(`¡Atención! ${clientName} ya compró cebos hoy (segunda mención), no puedo registrar más cebos.`);
                                 } else {
                                     const clientDocRef = Firebase.doc(db, 'clientesVentas', clientName);
                                     const clientDoc = await Firebase.getDoc(clientDocRef);
                                     const clientData = clientDoc.exists() ? clientDoc.data() : { ultimaCompraCebos: null, compras: [] };
                                     
-                                    const lastCeboPurchaseDate = clientData.ultimaCompraCebos ? 
-                                        new Date(clientData.ultimaCompraCebos.toDate ? clientData.ultimaCompraCebos.toDate() : clientData.ultimaCompraCebos).toDateString() : null;
+                                    const lastCeboPurchaseDate = clientData.ultimaCompraCebos && typeof clientData.ultimaCompraCebos.toDate === 'function' ? clientData.ultimaCompraCebos.toDate().toDateString() : null;
                                     const todayDate = new Date().toDateString();
 
-                                    if (lastCeboPurchaseDate === todayDate) {
-                                        responseMessages.push(`¡Atención! ${clientName} ya compró cebos hoy, no puedo registrar más cebos.`);
+                                    if (lastCeboPurchaseDate === todayDate) { // Double check if first item was not cebo but second is
+                                        responseMessages.push(`¡Atención! ${clientName} ya compró cebos hoy (segunda mención), no puedo registrar más cebos.`);
                                     } else {
                                         salesPromises.push(Firebase.setDoc(clientDocRef, {
                                             ultimaCompraCebos: Firebase.serverTimestamp(),
@@ -1577,11 +1595,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                         responseMessages.push(`¡${item2Quantity} cebos también registrados para ${clientName}.`);
                                     }
                                 }
-                            } else if (item2Type === 'cañas') {
+                            } else if (item2Type === 'cana') {
                                 const clientDocRef = Firebase.doc(db, 'clientesVentas', clientName);
                                 salesPromises.push(Firebase.setDoc(clientDocRef, {
                                     compras: Firebase.arrayUnion({ 
-                                        producto: 'caña',
+                                        producto: 'cana',
                                         cantidad: item2Quantity,
                                         timestamp: Firebase.serverTimestamp(),
                                         empleado: currentUser
@@ -1615,27 +1633,29 @@ document.addEventListener('DOMContentLoaded', () => {
                         hola: ["hola", "buenas", "buenos", "ey", "ahoy"]
                     };
 
-                    if (keywords.fichar.some(k => userMsg.includes(k))) {
+                    const userMsgLower = userMsg.toLowerCase(); // Usar la versión en minúsculas para las palabras clave
+
+                    if (keywords.fichar.some(k => userMsgLower.includes(k))) {
                         if(currentUser) { 
                             this.fichar(currentUser);
                             mockReply = "¡A la guardia! Registro de inicio de turno completado, capitán.";
                         } else {
                             mockReply = "Necesitas iniciar sesión para poder iniciar guardia, capitán.";
                         }
-                    } else if (keywords.empleado.some(k => userMsg.includes(k))) {
+                    } else if (keywords.empleado.some(k => userMsgLower.includes(k))) {
                         mockReply = "¡Por supuesto, al panel de tripulación al instante, almirante!";
                         if (currentUser) {
                              this.irAPanelEmpleado();
                         } else {
                             mockReply += " Necesitas iniciar sesión primero.";
                         }
-                    } else if (keywords.producto.some(k => userMsg.includes(k))) {
+                    } else if (keywords.producto.some(k => userMsgLower.includes(k))) {
                         mockReply = "¡Zarpo a revisar nuestras provisiones y equipo, almirante!";
                         this.mostrarPanelProductos();
-                    } else if (keywords.barco.some(k => userMsg.includes(k))) {
+                    } else if (keywords.barco.some(k => userMsgLower.includes(k))) {
                         mockReply = "¡Nuestra flota te espera! Mostrando los barcos disponibles...";
                         this.mostrarPanelBarcos();
-                    } else if (keywords.hola.some(k => userMsg.includes(k))) {
+                    } else if (keywords.hola.some(k => userMsgLower.includes(k))) {
                         mockReply = `¡Ahoy, ${currentUser || 'capitán'}! Soy Jack Sparrow, ¿en qué puedo ayudarte hoy?`;
                     } else if (!messageText && files.length > 0) { 
                         mockReply = "¡Qué buena pinta tienen esas fotos, almirante!";
@@ -1752,7 +1772,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const anuncioRef = Firebase.doc(db, "configuracion", "anuncio_global");
             try {
                 await Firebase.updateDoc(anuncioRef, {
-                    [`votos.${currentUser}`]: voto // Usa nombre para registrar el voto
+                    [`votos.${currentUser}`]: voto 
                 });
             } catch (e) {
                 console.error("Error al registrar el voto:", e);
@@ -1775,7 +1795,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const votosSi = [];
             const votosNo = [];
 
-            // Aquí iteramos por nombres de usuario
             for (const nombreVotante in votos) {
                 if (votos[nombreVotante] === 'si') {
                     votosSi.push(nombreVotante);
@@ -1828,7 +1847,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const currentUser = sessionStorage.getItem('currentUser'); 
                     let barcosHTML = this.state.barcos.map(boat => { 
                         const estadoActual = this.getEstadoBarco(boat); 
-                        const imagenHTML = `<img src="${boat.imagen}" alt="${boat.nombre}" class="barco-img mb-4" onerror="this.src='placeholder.png'"/>`; 
+                        const imagenHTML = `<img src="${boat.imagen}" alt="${boat.nombre}" class="barco-img mb-4" onerror="this.style.display='none'"/>`; 
                         let controles = (estadoActual.estado === 'disponible') 
                             ? `<div class="flex flex-col gap-2"><button class="btn text-sm py-2 w-full" onclick="VanillaApp.ocuparBarcoAhora(${boat.id}, '${currentUser}')">Paseo (30 min)</button><button class="btn text-sm py-2 w-full" onclick="VanillaApp.ocuparBarcoAhora(${boat.id}, '${currentUser}')" style="background-color: var(--color-nautics-secondary-pink);">Alquiler (45 min)</button></div>` 
                             : `<div class="font-mono text-xl mb-2" id="timer-boat-${boat.id}">--:--:--</div><div class="flex gap-2"><button class="btn text-xs py-1 flex-grow" onclick="VanillaApp.anadirTiempoBarco(${boat.id}, '${currentUser}', 30)">+30 min</button><button class="btn text-xs py-1 flex-grow" style="background-color:#dc2626" onclick="VanillaApp.liberarBarco(${boat.id}, '${currentUser}')">Liberar</button></div>`;
@@ -1844,7 +1863,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("Iniciando aplicación Nautics...");
             this.iniciarListenerAnuncios();
             this.iniciarListenerBarcos(); 
-            // Cargar datos iniciales al arrancar la aplicación. Esto ya no depende de Firebase Auth.
+            // Cargar datos iniciales al arrancar la aplicación.
             await this.cargarTodosLosEmpleados();
             await this.cargarTodosLosFichajes();
             await this.cargarTodasLasVentas();
