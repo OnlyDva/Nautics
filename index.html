@@ -147,10 +147,8 @@
 </style>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, query, orderBy, addDoc, serverTimestamp, where, writeBatch, onSnapshot, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"; 
+    import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, query, orderBy, addDoc, serverTimestamp, where, writeBatch, onSnapshot, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"; // Added arrayUnion
     import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-    // IMPORTANTE: Si usas Firebase Authentication, DESCOMENTA la siguiente línea:
-    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     
     // Configuración de Firebase para el proyecto Nautics
     const firebaseConfig = {
@@ -166,11 +164,8 @@
     const firebaseApp = initializeApp(firebaseConfig);
     window.db = getFirestore(firebaseApp);
     window.storage = getStorage(firebaseApp);
-    // IMPORTANTE: Si usas Firebase Authentication, DESCOMENTA la siguiente línea:
-    window.auth = getAuth(firebaseApp);
-    
     window.Firebase = {
-        collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, query, orderBy, addDoc, serverTimestamp, where, writeBatch, onSnapshot, arrayUnion
+        collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, query, orderBy, addDoc, serverTimestamp, where, writeBatch, onSnapshot, arrayUnion // Export arrayUnion
     };
 </script>
 </head>
@@ -365,14 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
-        async irAPanelEmpleado() { 
-            const currentUser = sessionStorage.getItem('currentUser'); 
-            if (currentUser) { 
-                await this.mostrarPanelEmpleados(currentUser); 
-            } else { 
-                this.mostrarLoginVIP(); 
-            }
-        },
+        async irAPanelEmpleado() { const currentUser = sessionStorage.getItem('currentUser'); if (currentUser) { await this.mostrarPanelEmpleados(currentUser); } else { this.mostrarLoginVIP(); }},
         mostrarInicio() { 
             this.stopAllTimers(); 
             if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); } 
@@ -429,8 +417,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="max-w-md mx-auto bg-nautics-dark bg-opacity-70 p-8 rounded-lg shadow-lg border-2 border-nautics-mid">
                     <h2 class="text-2xl font-bold mb-4 text-center text-nautics-text">Acceso de la Tripulación</h2>
                     <div class="mb-4">
-                        <label class="block mb-2 text-nautics-light">Correo electrónico:</label>
-                        <input id="emailInput" type="email" class="w-full px-3 py-2 text-gray-900 rounded bg-nautics-light" placeholder="email@dominio.com" autocomplete="email" />
+                        <label class="block mb-2 text-nautics-light">Nombre completo:</label>
+                        <input id="nombreInput" type="text" class="w-full px-3 py-2 text-gray-900 rounded bg-nautics-light" placeholder="nombre y apellido en minúsculas" autocomplete="username" />
                     </div>
                     <div class="mb-4">
                         <label class="block mb-2 text-nautics-light">Contraseña:</label>
@@ -451,8 +439,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="max-w-md mx-auto bg-nautics-dark bg-opacity-70 p-8 rounded-lg shadow-lg border-2 border-nautics-secondary-pink">
                     <h2 class="text-3xl font-bold mb-4 text-center text-nautics-text">Acceso Privado - Jefes de Flota</h2>
                     <input type="text" name="username" value="jefe-nautics" autocomplete="username" style="display: none;">
-                    <label class="block mb-2 text-nautics-light">Correo electrónico de Jefe:</label>
-                    <input id="adminEmailInput" type="email" class="w-full px-3 py-2 text-gray-900 rounded bg-nautics-light" placeholder="jefe@nautics.com" autocomplete="email" />
                     <label class="block mb-2 text-nautics-light">Contraseña de Jefes:</label>
                     <input id="adminPassInput" type="password" class="w-full px-3 py-2 text-gray-900 rounded bg-nautics-light" autocomplete="current-password" />
                     <div class="flex justify-between mt-6">
@@ -673,7 +659,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.ajustarPosicionChatbot(false);
             // Asegurarse de recargar los datos del empleado para ver posibles ausencias actualizadas
             await this.cargarTodosLosEmpleados(); 
-            const empleadoData = this.state.empleados.find(emp => emp.id === nombre) || {};
+            const empleadoDoc = this.state.empleados.find(emp => emp.id === nombre) || {};
             
             const datosFichaje = await this.gestionarReseteoDatos(nombre); await this.gestionarReseteoDatos(nombre, true);
             let tiempoHoy = datosFichaje.hoy || 0, tiempoSemana = datosFichaje.semana || 0, tiempoTotal = datosFichaje.total || 0;
@@ -688,7 +674,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return `<div class="bg-nautics-mid p-4 rounded-lg text-center flex flex-col justify-between"><div><p class="font-bold text-lg">${boat.nombre}</p><p class="text-sm ${estadoActual.estado === 'ocupada' ? 'text-red-400' : 'text-green-400'} mb-2">${estadoActual.texto}</p></div><div>${controles}</div></div>`;
             }).join('');
 
-            const botonConveniosHTML = `<button onclick="VanillaApp.mostrarPanelConvenios(${empleadoData.directiva || false})" class="btn text-xs py-1">Convenios Navales</button>`;
+            const botonConveniosHTML = `<button onclick="VanillaApp.mostrarPanelConvenios(${empleadoDoc.directiva || false})" class="btn text-xs py-1">Convenios Navales</button>`;
             const botonesAccionHTML = `<button onclick="VanillaApp.mostrarModalAusencias('${nombre}')" class="btn text-xs py-1">Permisos de Ausencia</button>${botonConveniosHTML}<button onclick="VanillaApp.mostrarPanelInventario()" class="btn text-xs py-1">Inventario de Flota</button><button onclick="VanillaApp.mostrarListaNegraPublica()" class="btn text-xs py-1">Ver Piratas Vetados</button><button class="btn" style="background-color: #dc2626;" onclick="VanillaApp.cerrarSesion()">Abandonar Barco</button>`; 
             const hoyStr = new Date().toISOString().split('T')[0]; const packRecibido = datosFichaje.ultimoPackDiario === hoyStr;
             const controlHTML = `<div class="bg-nautics-mid bg-opacity-50 p-4 rounded-lg mb-6 text-center border border-nautics-primary-blue"><h3 class="text-lg font-semibold mb-4">Control de Operaciones de Flota</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div class="bg-nautics-dark bg-opacity-50 p-4 rounded-lg flex flex-col justify-center items-center"><p class="text-base font-bold mb-2">ESTADO DE LA FLOTA</p><div class="flex justify-center items-center gap-4"><button id="abrirLocalBtn" class="btn bg-green-600 hover:bg-green-700">Flota Lista (Abrir)</button><button id="cerrarLocalBtn" class="btn bg-red-600 hover:bg-red-700">Flota Inactiva (Cerrar)</button></div><div class="mt-3"><p id="tiempoAbiertoLocal" class="font-mono text-2xl text-nautics-accent-pink">00:00:00</p><div id="ultimoCierreInfo" class="text-xs text-nautics-light mt-1"></div></div></div><div class="bg-nautics-dark bg-opacity-50 p-4 rounded-lg"><p class="text-base font-bold mb-2">REGISTRO DE GUARDIA</p><div class="grid grid-cols-2 gap-2 text-center h-full"><div class="p-1 rounded-lg bg-nautics-mid flex flex-col justify-center"><p class="text-xs text-nautics-light">GUARDIA</p><p id="tiempoSesion" class="font-mono text-lg">${this.formatearTiempo(0)}</p></div><div class="p-1 rounded-lg bg-nautics-mid flex flex-col justify-center"><p class="text-xs text-nautics-light">HOY</p><p id="tiempoHoy" class="font-mono text-lg">${this.formatearTiempo(tiempoHoy)}</p></div><div class="p-1 rounded-lg bg-nautics-mid flex flex-col justify-center"><p class="text-xs text-nautics-light">SEMANA</p><p id="tiempoSemana" class="font-mono text-lg">${this.formatearTiempo(tiempoSemana)}</p></div><div class="p-1 rounded-lg bg-nautics-mid flex flex-col justify-center"><p class="text-xs text-nautics-light">TOTAL</p><p id="tiempoTotal" class="font-mono text-lg">${this.formatearTiempo(tiempoTotal)}</p></div></div></div></div><div class="mt-6 flex justify-center items-center gap-4 border-t border-nautics-mid pt-4"><button class="btn text-lg px-6 py-3" onclick="VanillaApp.fichar('${nombre}')">Iniciar Guardia</button><button class="btn text-lg px-6 py-3" onclick="VanillaApp.desfichar('${nombre}')">Finalizar Guardia</button><button id="packDiarioBtn" class="btn text-base px-4 py-2" style="background-color: ${packRecibido ? 'var(--color-nautics-mid)' : 'var(--color-nautics-secondary-pink)'};" onclick="VanillaApp.darPackDiarioVentas('${nombre}')" ${packRecibido ? 'disabled' : ''}>${packRecibido ? 'Raciones del día recibidas' : 'Raciones Diarias (Venta)'}</button></div></div>`;
@@ -756,15 +742,13 @@ document.addEventListener('DOMContentLoaded', () => {
             this.ajustarPosicionChatbot(false);
 
             // Asegurarse de recargar TODOS los datos necesarios para el panel de admin
-            console.log("Cargando todos los datos para el panel de Administrador...");
             await this.cargarTodosLosEmpleados(); 
             await this.cargarTodosLosFichajes(); 
             await this.cargarTodasLasVentas(); 
             await this.cargarInventarioLog(); 
             await this.cargarLibroNegro(); 
             await this.cargarListaNegra(); 
-            await this.cargarClienteVentas(); 
-            console.log("Todos los datos cargados para el panel de Administrador.");
+            await this.cargarClienteVentas(); // Asegúrate de que esto se cargue también
 
             const dashboardHTML = `<div class="mb-8 p-6 bg-nautics-mid bg-opacity-50 rounded-lg border border-nautics-primary-blue"><h2 class="text-2xl font-bold mb-4">Dashboard de Flota en Tiempo Real</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div><h3 class="font-semibold mb-2 text-nautics-light">Tripulación de Guardia</h3><ul id="dashboard-empleados" class="space-y-1 text-sm"><li>Cargando...</li></ul></div><div><h3 class="font-semibold mb-2 text-nautics-light">Barcos Ocupados</h3><ul id="dashboard-barcos" class="space-y-1 text-sm"><li>Cargando...</li></ul></div></div></div>`; 
             const anunciosHTML = `
@@ -812,7 +796,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 tablaEmpleadosHTML += `<tr class="border-b border-nautics-mid hover:bg-nautics-mid ${filaClass}"><td class="p-3 capitalize">${e.id}</td><td class="p-3 font-mono">${this.formatearTiempo(f.hoy)}</td><td class="p-3 font-mono">${this.formatearTiempo(f.semana)}</td><td class="p-3 font-mono">${this.formatearTiempo(f.total)}</td><td class="p-3 font-mono text-center">${vH}</td><td class="p-3 font-mono text-center">${vT}</td><td class="p-3 text-center flex gap-1 justify-center">${accionesJefeHTML}</td></tr>`; 
             });
 
-            const gestionHTML = `<div class="mb-8 p-6 bg-nautics-mid bg-opacity-50 rounded-lg border border-nautics-primary-blue"><h2 class="text-2xl font-bold mb-4">Gestión de Tripulación</h2><div class="flex flex-col md:flex-row gap-4"><input type="email" id="newEmployeeEmail" class="flex-grow px-3 py-2 text-gray-900 rounded bg-nautics-light" placeholder="Correo electrónico del nuevo tripulante..."><input type="text" id="newEmployeeName" class="flex-grow px-3 py-2 text-gray-900 rounded bg-nautics-light" placeholder="Nombre y Apellido del nuevo tripulante..."><input type="password" id="newEmployeePass" class="flex-grow px-3 py-2 text-gray-900 rounded bg-nautics-light" placeholder="Contraseña de acceso..."><button onclick="VanillaApp.anadirEmpleado()" class="btn">Añadir Tripulante</button></div></div>`;
+            const gestionHTML = `<div class="mb-8 p-6 bg-nautics-mid bg-opacity-50 rounded-lg border border-nautics-primary-blue"><h2 class="text-2xl font-bold mb-4">Gestión de Tripulación</h2><div class="flex flex-col md:flex-row gap-4"><input type="text" id="newEmployeeName" class="flex-grow px-3 py-2 text-gray-900 rounded bg-nautics-light" placeholder="Nombre y Apellido del nuevo tripulante..."><input type="password" id="newEmployeePass" class="flex-grow px-3 py-2 text-gray-900 rounded bg-nautics-light" placeholder="Contraseña de acceso..."><button onclick="VanillaApp.anadirEmpleado()" class="btn">Añadir Tripulante</button></div></div>`;
             const tablaHTML = `<div class="overflow-x-auto bg-nautics-dark bg-opacity-80 rounded-lg shadow-xl border border-nautics-primary-blue"><table class="w-full text-left text-nautics-text"><thead class="bg-nautics-mid text-nautics-light uppercase text-sm"><tr><th class="p-3">Tripulante</th><th class="p-3">Hoy</th><th class="p-3">Semana</th><th class="p-3">Total</th><th class="p-3 text-center">Trans. Hoy</th><th class="p-3 text-center">Trans. Total</th><th class="p-3 text-center">Acciones de Mando</th></tr></thead><tbody>${tablaEmpleadosHTML}</tbody></table></div>`;
             const libroNegroHTML = `<div class="mb-8 p-6 bg-nautics-mid bg-opacity-50 rounded-lg border border-nautics-primary-blue"><h2 class="text-2xl font-bold mb-4">Bitácora de Contactos Clave</h2><div class="flex flex-col md:flex-row gap-4 mb-4"><input type="text" id="libroNombre" class="flex-grow px-3 py-2 text-gray-900 rounded bg-nautics-light" placeholder="Nombre del contacto..."><select id="libroRelacion" class="px-3 py-2 text-gray-900 rounded bg-nautics-light"><option value="Aliado">Aliado</option><option value="Rival">Rival</option><option value="Neutral">Neutral</option></select><input type="text" id="libroNotas" class="flex-grow px-3 py-2 text-gray-900 rounded bg-nautics-light" placeholder="Notas..."><button onclick="VanillaApp.anadirAlLibroNegro()" class="btn">Registrar</button></div><ul id="listaLibroNegro" class="space-y-2 text-nautics-light"></ul></div>`;
             const listaNegraHTML = `<div class="mb-8 p-6 bg-nautics-mid bg-opacity-50 rounded-lg border border-nautics-primary-blue"><h2 class="text-2xl font-bold mb-4">Lista de Piratas Vetados</h2><div class="flex flex-col md:flex-row gap-4 mb-4"><input type="text" id="vetadoNombre" class="flex-grow px-3 py-2 text-gray-900 rounded bg-nautics-light" placeholder="Nombre del pirata..."><input type="text" id="vetadoMotivo" class="flex-grow px-3 py-2 text-gray-900 rounded bg-nautics-light" placeholder="Motivo del veto..."><button onclick="VanillaApp.anadirAListaNegra()" class="btn" style="background-color: var(--color-nautics-secondary-pink);">Vetar</button></div><ul id="listaDeVetados" class="space-y-2 text-nautics-light"></ul></div>`;
@@ -828,18 +812,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             document.getElementById('contenido').innerHTML = `<div class="max-w-7xl mx-auto"><h1 class="text-4xl font-bold text-center mb-8">Panel de Jefes de Flota</h1>${dashboardHTML}${anunciosHTML}${gestionHTML}${tablaHTML}${informesHTML}${libroNegroHTML}${listaNegraHTML}${inventarioLogHTML}<div class="text-center mt-8"><button onclick="VanillaApp.cerrarSesion()" class="btn">Regresar a Puerto Base</button></div></div>`;
             this.actualizarLibroNegro(); this.actualizarListaNegra(); this.actualizarInventarioLog();
-            this.startDashboardTimer(); // Iniciar/reiniciar el temporizador del dashboard
+            this.startDashboardTimer();
         },
         
         async actualizarDashboard() {
             try {
-                // Asegúrate de cargar todos los empleados para que el dashboard tenga la lista completa
-                await this.cargarTodosLosEmpleados();
-                await this.cargarTodosLosFichajes(); // También refresca los fichajes
-
+                await this.cargarTodosLosFichajes();
                 const empleadosElem = document.getElementById('dashboard-empleados');
                 const barcosElem = document.getElementById('dashboard-barcos'); 
                 if (empleadosElem) {
+                    // Cargar empleados también para asegurar que la lista de nombres es completa
+                    await this.cargarTodosLosEmpleados();
                     const empleadosFichados = Object.entries(this.state.fichajes).filter(([_, data]) => data.fichado).map(([id, data]) => ({ id, ...data }));
                     if (empleadosFichados.length > 0) {
                         empleadosElem.innerHTML = empleadosFichados.map(e => `<li class="capitalize text-green-400">${e.id} (Desde: ${new Date(e.inicio).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })})</li>`).join('');
@@ -861,116 +844,66 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch(e) { console.error("Error actualizando el dashboard:", e); }
         },
-        // Cambiado para usar Firebase Authentication
         async verificarAccesoAdmin() { 
-            const adminEmail = document.getElementById('adminEmailInput')?.value.trim();
-            const adminPass = document.getElementById('adminPassInput')?.value;
-
-            if (!adminEmail || !adminPass) {
-                alert("Correo electrónico y contraseña son requeridos para el acceso de jefes.");
-                return;
-            }
-
-            try {
-                console.log("Intentando iniciar sesión de jefe:", adminEmail);
-                const userCredential = await signInWithEmailAndPassword(auth, adminEmail, adminPass);
-                const user = userCredential.user;
-                console.log("Jefe autenticado con UID:", user.uid);
-
-                // Almacenar el UID en sessionStorage para que el resto de la app lo use
-                // IMPORTANTE: Asegúrate de que el ID del documento del empleado en Firestore sea este user.uid
-                sessionStorage.setItem('currentUserUID', user.uid); // Guardamos el UID real
-                // Opcional: También podrías guardar el nombre si lo necesitas para mostrarlo
-                // const empleadoDoc = await Firebase.getDoc(Firebase.doc(db, 'empleados', user.uid));
-                // if (empleadoDoc.exists()) {
-                //     sessionStorage.setItem('currentUserName', empleadoDoc.data().nombre);
-                // }
-
-                // Cargar todos los datos antes de mostrar el panel de administración
-                console.log("Verificando acceso Admin y cargando todos los datos...");
-                await this.cargarTodosLosEmpleados(); 
-                await this.cargarTodosLosFichajes(); 
-                await this.cargarTodasLasVentas(); 
-                await this.cargarInventarioLog(); 
-                await this.cargarLibroNegro(); 
-                await this.cargarListaNegra(); 
-                await this.cargarClienteVentas(); 
-                console.log("Datos cargados. Mostrando panel Admin.");
-                await this.mostrarPanelAdmin(); 
-            } catch (error) {
-                console.error("Error en el acceso de jefe:", error.code, error.message);
-                alert(`Error de acceso para jefes: ${error.message}. Verifica las credenciales y los permisos.`);
-            }
+            // Cargar todos los datos antes de mostrar el panel de administración
+            console.log("Verificando acceso Admin y cargando todos los datos...");
+            await this.cargarTodosLosEmpleados(); 
+            await this.cargarTodosLosFichajes(); 
+            await this.cargarTodasLasVentas(); 
+            await this.cargarInventarioLog(); 
+            await this.cargarLibroNegro(); 
+            await this.cargarListaNegra(); 
+            await this.cargarClienteVentas(); 
+            console.log("Datos cargados. Mostrando panel Admin.");
+            await this.mostrarPanelAdmin(); 
         }, 
-        // Cambiado para usar Firebase Authentication
         async verificarAccesoVIP() { 
-            const email = document.getElementById('emailInput')?.value.trim();
+            const nombre = document.getElementById('nombreInput')?.value.trim().toLowerCase(); 
             const pass = document.getElementById('passInput')?.value; 
-            
-            if (!email || !pass) {
-                alert("Correo electrónico y contraseña son requeridos.");
+            if (!nombre || !pass) {
+                alert("Nombre y contraseña son requeridos.");
                 return;
             }
-            
+            console.log("Intentando verificar acceso VIP para:", nombre); 
             try { 
-                console.log("Intentando iniciar sesión VIP para:", email); 
-                const userCredential = await signInWithEmailAndPassword(auth, email, pass);
-                const user = userCredential.user;
-                console.log("Empleado autenticado con UID:", user.uid);
+                // Al iniciar sesión, siempre recargar la lista de empleados
+                await this.cargarTodosLosEmpleados(); 
+                const empleadoDoc = this.state.empleados.find(e => e.id === nombre);
 
-                // Almacenar el UID en sessionStorage
-                sessionStorage.setItem('currentUserUID', user.uid); 
-
-                // Intentar obtener el nombre del empleado del documento con el UID
-                const empleadoDoc = await Firebase.getDoc(Firebase.doc(db, 'empleados', user.uid)); 
-                if (empleadoDoc.exists()) { 
-                    const empleadoData = empleadoDoc.data();
-                    const nombreEmpleado = empleadoData.nombre; // Asumimos que el documento tiene un campo 'nombre'
-                    sessionStorage.setItem('currentUserName', nombreEmpleado); // Guarda el nombre real del empleado
-                    console.log("Acceso VIP exitoso para", nombreEmpleado, "mostrando panel."); 
-                    await this.mostrarPanelEmpleados(nombreEmpleado); 
-                } else {
-                    console.warn("Documento de empleado no encontrado para UID:", user.uid);
-                    alert('Acceso exitoso, pero no se encontró su perfil de empleado. Contacte a un jefe de flota.');
-                    // Considerar cerrar sesión si el perfil de empleado no existe en Firestore
-                    await signOut(auth);
-                    sessionStorage.removeItem('currentUserUID');
-                    sessionStorage.removeItem('currentUserName');
-                    this.mostrarLoginVIP();
-                }
-            } catch(error) { 
-                console.error("Error en el acceso VIP:", error.code, error.message); 
-                alert(`Error al iniciar sesión: ${error.message}. Verifica tus credenciales.`); 
+                if (empleadoDoc) { 
+                    console.log("Empleado encontrado:", empleadoDoc.nombre); 
+                    if (this.hashPassword(pass) === empleadoDoc.passHash) { 
+                        sessionStorage.setItem('currentUser', nombre); 
+                        console.log("Acceso VIP exitoso, mostrando panel."); 
+                        await this.mostrarPanelEmpleados(nombre); 
+                    } else { 
+                        alert('Contraseña incorrecta.'); 
+                        console.warn("Contraseña incorrecta para:", nombre); 
+                    } 
+                } else { 
+                    alert('Nombre de tripulante no encontrado.'); 
+                    console.warn("Nombre de usuario no encontrado:", nombre); 
+                } 
+            } catch(e) { 
+                console.error("Error en el acceso VIP:", e); 
+                alert("Error al verificar acceso: " + e.message);
             } 
         },
-        // Cerrar sesión con Firebase Authentication
-        cerrarSesion() { 
-            signOut(auth).then(() => {
-                console.log("Sesión de Firebase cerrada.");
-                this.stopAllTimers(); 
-                if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); } 
-                sessionStorage.removeItem('currentUserUID'); // Limpiar el UID
-                sessionStorage.removeItem('currentUserName'); // Limpiar el nombre
-                this.mostrarInicio(); 
-            }).catch((error) => {
-                console.error("Error al cerrar sesión:", error);
-                alert("Error al cerrar sesión: " + error.message);
-            });
-        },
-        async gestionarReseteoDatos(uid, esVenta = false) { // Ahora recibe UID
+        cerrarSesion() { this.stopAllTimers(); if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); } sessionStorage.removeItem('currentUser'); this.mostrarInicio(); },
+        async gestionarReseteoDatos(nombre, esVenta = false) {
             const ahora = new Date(), hoyStr = ahora.toISOString().split('T')[0], semanaNum = this.getWeekNumber(ahora);
             if (esVenta) {
-                let datosVentaDoc = await Firebase.getDoc(Firebase.doc(db, 'ventas', uid)); // Usa UID
+                let datosVentaDoc = await Firebase.getDoc(Firebase.doc(db, 'ventas', nombre));
                 let datosV = datosVentaDoc.exists() ? datosVentaDoc.data() : { productos: {}, fecha: '' };
                 if (!datosV.productos) datosV.productos = {};
                 if (datosV.fecha !== hoyStr) {
                     datosV.fecha = hoyStr;
                     Object.keys(datosV.productos).forEach(k => { datosV.productos[k].hoy = 0; });
                 }
-                this.state.ventas[uid] = datosV; // Usa UID
+                this.state.ventas[nombre] = datosV;
                 return datosV;
             } else {
-                let datosFichajeDoc = await Firebase.getDoc(Firebase.doc(db, 'fichajes', uid)); // Usa UID
+                let datosFichajeDoc = await Firebase.getDoc(Firebase.doc(db, 'fichajes', nombre));
                 let datosF = datosFichajeDoc.exists() ? datosFichajeDoc.data() : { total: 0, hoy: 0, semana: 0, fecha: hoyStr, numSemana: semanaNum, fichado: false, inicio: null };
                 if (datosF.fecha !== hoyStr) {
                     datosF.hoy = 0;
@@ -981,25 +914,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     datosF.semana = 0;
                     datosF.numSemana = semanaNum;
                 }
-                this.state.fichajes[uid] = datosF; // Usa UID
+                this.state.fichajes[nombre] = datosF;
                 return datosF;
             }
         },
-        async fichar(nombreEmpleado) { // Recibe el nombre del empleado
-            const currentUserUID = sessionStorage.getItem('currentUserUID'); // Obtener el UID real
-            if (!currentUserUID) {
-                alert("No hay un usuario autenticado. Por favor, inicia sesión.");
-                return;
-            }
-
-            console.log("Fichando UID:", currentUserUID); 
-            let d = await this.gestionarReseteoDatos(currentUserUID); 
+        async fichar(nombre) { 
+            console.log("Fichando:", nombre); 
+            let d = await this.gestionarReseteoDatos(nombre); 
             if (!d.fichado) { 
-                d.fichado = true; d.inicio = Date.now(); this.state.fichajes[currentUserUID] = d; 
+                d.fichado = true; d.inicio = Date.now(); this.state.fichajes[nombre] = d; 
                 try { 
-                    await Firebase.setDoc(Firebase.doc(db, 'fichajes', currentUserUID), d, { merge: true }); 
+                    await Firebase.setDoc(Firebase.doc(db, 'fichajes', nombre), d, { merge: true }); 
                     console.log("Fichaje guardado en Firebase."); 
-                    await this.mostrarPanelEmpleados(nombreEmpleado); // Mostrar el panel con el nombre de usuario
+                    await this.mostrarPanelEmpleados(nombre); 
                 } catch (e) { 
                     console.error("Error al fichar:", e); 
                     alert("Error al fichar: " + e.message); 
@@ -1008,24 +935,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert("Ya estás de guardia."); 
             }
         },
-        async desfichar(nombreEmpleado, silent = false) { // Recibe el nombre del empleado
-            const currentUserUID = sessionStorage.getItem('currentUserUID'); // Obtener el UID real
-            if (!currentUserUID) {
-                if (!silent) alert("No hay un usuario autenticado. Por favor, inicia sesión.");
-                return;
-            }
-
-            console.log("Desfichando UID:", currentUserUID); 
+        async desfichar(nombre, silent = false) { 
+            console.log("Desfichando:", nombre); 
             this.stopPanelTimers(); 
-            let d = await this.gestionarReseteoDatos(currentUserUID); 
+            let d = await this.gestionarReseteoDatos(nombre); 
             if (d.fichado) { 
                 const t = Date.now() - d.inicio; 
                 d.hoy = (d.hoy || 0) + t; d.semana = (d.semana || 0) + t; d.total = (d.total || 0) + t; 
-                d.fichado = false; d.inicio = null; this.state.fichajes[currentUserUID] = d; 
+                d.fichado = false; d.inicio = null; this.state.fichajes[nombre] = d; 
                 try { 
-                    await Firebase.setDoc(Firebase.doc(db, 'fichajes', currentUserUID), d, { merge: true }); 
+                    await Firebase.setDoc(Firebase.doc(db, 'fichajes', nombre), d, { merge: true }); 
                     console.log("Desfichaje guardado en Firebase."); 
-                    if (!silent) await this.mostrarPanelEmpleados(nombreEmpleado); 
+                    if (!silent) await this.mostrarPanelEmpleados(nombre); 
                 } catch (e) { 
                     console.error("Error al desfichar:", e); 
                     alert("Error al desfichar: " + e.message); 
@@ -1035,46 +956,37 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
         
-        async solicitarAusencia(nombreEmpleado) { // Recibe el nombre
-            const currentUserUID = sessionStorage.getItem('currentUserUID'); // Obtener el UID
-            if (!currentUserUID) { alert("No hay usuario autenticado."); return; }
-
+        async solicitarAusencia(nombreEmpleado) {
             const inicioStr = document.getElementById('ausenciaInicio').value; const finStr = document.getElementById('ausenciaFin').value;
             if (!inicioStr) return alert('Debes seleccionar una fecha de inicio.');
             const inicio = new Date(inicioStr + 'T00:00:00Z'); const fin = new Date((finStr || inicioStr) + 'T23:59:59Z');
             if (inicio > fin) return alert('La fecha de fin no puede ser anterior a la de inicio.');
             const nuevoPeriodo = { inicio: inicio.getTime(), fin: fin.getTime() };
-            const empleadoRef = Firebase.doc(db, 'empleados', currentUserUID); // Usa UID aquí
+            const empleadoRef = Firebase.doc(db, 'empleados', nombreEmpleado);
             try {
                 const empleadoDoc = await Firebase.getDoc(empleadoRef);
                 const ausenciasActuales = (empleadoDoc.exists() && Array.isArray(empleadoDoc.data().ausencias)) ? empleadoDoc.data().ausencias : [];
                 ausenciasActuales.push(nuevoPeriodo);
                 await Firebase.updateDoc(empleadoRef, { ausencias: ausenciasActuales });
-                alert('Permiso de ausencia registrado.'); this.mostrarModalAusencias(nombreEmpleado); // Pasa el nombre para la UI
+                alert('Permiso de ausencia registrado.'); this.mostrarModalAusencias(nombreEmpleado);
             } catch (e) { console.error("Error:", e); alert('Hubo un error al registrar el permiso de ausencia: ' + e.message); }
         },
-        async eliminarAusencia(nombreEmpleado, index, esJefe) { // Recibe el nombre
-            const currentUserUID = sessionStorage.getItem('currentUserUID'); // Obtener el UID
-            if (!currentUserUID) { alert("No hay usuario autenticado."); return; }
-
+        async eliminarAusencia(nombreEmpleado, index, esJefe) {
             if (!confirm('¿Seguro?')) return;
-            const empleadoRef = Firebase.doc(db, 'empleados', currentUserUID); // Usa UID aquí
+            const empleadoRef = Firebase.doc(db, 'empleados', nombreEmpleado);
             try {
                 const empleadoDoc = await Firebase.getDoc(empleadoRef);
                 const ausenciasActuales = (empleadoDoc.exists() && Array.isArray(empleadoDoc.data().ausencias)) ? empleadoDoc.data().ausencias : [];
                 if(index >= 0 && index < ausenciasActuales.length) {
                     ausenciasActuales.splice(index, 1);
                     await Firebase.updateDoc(empleadoRef, { ausencias: ausenciasActuales });
-                    alert('Permiso de ausencia revocado.'); this.mostrarModalAusencias(nombreEmpleado, esJefe); // Pasa el nombre para la UI
+                    alert('Permiso de ausencia revocado.'); this.mostrarModalAusencias(nombreEmpleado, esJefe);
                 }
             } catch(e) { console.error("Error:", e); alert('Hubo un error al revocar el permiso de ausencia: ' + e.message); }
         },
-        async modificarVenta(productoId, nombreEmpleado, cantidad) { // Recibe el nombre del empleado
-            const currentUserUID = sessionStorage.getItem('currentUserUID'); // Obtener el UID
-            if (!currentUserUID) { alert("No hay usuario autenticado."); return; }
-
+        async modificarVenta(productoId, nombreEmpleado, cantidad) {
             const cantNum = parseInt(cantidad); if (isNaN(cantNum)) return;
-            let datosVenta = await this.gestionarReseteoDatos(currentUserUID, true); // Usa UID
+            let datosVenta = await this.gestionarReseteoDatos(nombreEmpleado, true);
             const producto = this.state.productos.find(p => p.id === productoId);
             const precioProducto = producto ? producto.precio : 50; 
 
@@ -1084,9 +996,9 @@ document.addEventListener('DOMContentLoaded', () => {
             datosVenta.productos[productoId].total += cantNum;
             datosVenta.productos[productoId].valorHoy = (datosVenta.productos[productoId].valorHoy || 0) + (cantNum * precioProducto); 
             datosVenta.productos[productoId].valorTotal = (datosVenta.productos[productoId].valorTotal || 0) + (cantNum * precioProducto); 
-            this.state.ventas[currentUserUID] = datosVenta; // Usa UID
+            this.state.ventas[nombreEmpleado] = datosVenta;
             try {
-                await Firebase.setDoc(Firebase.doc(db, 'ventas', currentUserUID), datosVenta); // Usa UID
+                await Firebase.setDoc(Firebase.doc(db, 'ventas', nombreEmpleado), datosVenta);
                 if(document.getElementById('productosVenta')) {
                     const descElem = document.getElementById(`desc-${productoId}`);
                     const totalHoyElem = document.getElementById(`ventas-hoy-${productoId}`);
@@ -1095,29 +1007,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (e) { console.error("Error al modificar venta:", e); alert("Error al modificar venta: " + e.message); }
         },
-        async darPackDiarioVentas(nombreEmpleado) { 
-            const currentUserUID = sessionStorage.getItem('currentUserUID'); // Obtener el UID
-            if (!currentUserUID) { alert("No hay usuario autenticado."); return; }
-
-            const hoyStr = new Date().toISOString().split('T')[0]; 
-            const fichajeRef = Firebase.doc(db, 'fichajes', currentUserUID); // Usa UID
-            try { 
-                const fichajeDoc = await Firebase.getDoc(fichajeRef); 
-                if (fichajeDoc.exists() && fichajeDoc.data().ultimoPackDiario === hoyStr) { 
-                    alert('Ya has recibido las raciones del día.'); 
-                    return; 
-                } 
-                await this.modificarVenta('golosinas_picantes', nombreEmpleado, 5); // Pasa el nombre para la UI
-                await this.modificarVenta('refresco_manzana', nombreEmpleado, 5); // Pasa el nombre para la UI
-                await Firebase.updateDoc(fichajeRef, { ultimoPackDiario: hoyStr }); 
-                const packBtn = document.getElementById('packDiarioBtn'); 
-                if(packBtn){ packBtn.disabled = true; packBtn.textContent = 'Raciones del día recibidas'; packBtn.style.backgroundColor = 'var(--color-nautics-mid)'; } 
-            } catch(e) { console.error("Error al dar pack diario:", e); alert("Error al dar pack diario: " + e.message); }
-        },
+        async darPackDiarioVentas(nombre) { const hoyStr = new Date().toISOString().split('T')[0]; const fichajeRef = Firebase.doc(db, 'fichajes', nombre); try { const fichajeDoc = await Firebase.getDoc(fichajeRef); if (fichajeDoc.exists() && fichajeDoc.data().ultimoPackDiario === hoyStr) { alert('Ya has recibido las raciones del día.'); return; } await this.modificarVenta('golosinas_picantes', nombre, 5); await this.modificarVenta('refresco_manzana', nombre, 5); await Firebase.updateDoc(fichajeRef, { ultimoPackDiario: hoyStr }); const packBtn = document.getElementById('packDiarioBtn'); if(packBtn){ packBtn.disabled = true; packBtn.textContent = 'Raciones del día recibidas'; packBtn.style.backgroundColor = 'var(--color-nautics-mid)'; } } catch(e) { console.error("Error al dar pack diario:", e); alert("Error al dar pack diario: " + e.message); }},
         async ocuparBarcoAhora(id, nombreEmpleado, durationMinutes) { 
-            const currentUserUID = sessionStorage.getItem('currentUserUID'); // Obtener el UID
-            if (!currentUserUID) { alert("No hay usuario autenticado."); return; }
-
             console.log(`Intentando alquilar barco ${id} por ${durationMinutes} minutos:`, nombreEmpleado); 
             const boat = this.state.barcos.find(h => h.id === id); 
             if (boat && this.getEstadoBarco(boat).estado === 'disponible') { 
@@ -1135,9 +1026,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }, 
         async anadirTiempoBarco(id, nombreEmpleado, addMinutes) { 
-            const currentUserUID = sessionStorage.getItem('currentUserUID'); // Obtener el UID
-            if (!currentUserUID) { alert("No hay usuario autenticado."); return; }
-            
             console.log(`Intentando añadir ${addMinutes} minutos al barco:`, id); 
             const boat = this.state.barcos.find(h => h.id === id); 
             const r = boat.reservas.find(res => Date.now() >= (res.inicio.toMillis ? res.inicio.toMillis() : res.inicio) && Date.now() < (res.fin.toMillis ? res.fin.toMillis() : res.fin)); 
@@ -1155,9 +1043,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }, 
         async liberarBarco(id, nombreEmpleado) { 
-            const currentUserUID = sessionStorage.getItem('currentUserUID'); // Obtener el UID
-            if (!currentUserUID) { alert("No hay usuario autenticado."); return; }
-            
             console.log("Intentando liberar barco:", id); 
             const boat = this.state.barcos.find(h => h.id === id); 
             const index = boat.reservas.findIndex(r => Date.now() >= (r.inicio.toMillis ? r.inicio.toMillis() : r.inicio) && Date.now() < (r.fin.toMillis ? r.fin.toMillis() : r.fin)); 
@@ -1204,241 +1089,58 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert("Error al reservar barco: " + e.message);
             } 
         }, 
-        // Modificado para usar Firebase Authentication
         async anadirEmpleado() { 
-            const newEmployeeEmail = document.getElementById('newEmployeeEmail')?.value.trim();
-            const newEmployeeName = document.getElementById('newEmployeeName')?.value.trim().toLowerCase(); 
-            const newEmployeePass = document.getElementById('newEmployeePass')?.value; 
+            const nombreInput = document.getElementById('newEmployeeName'); 
+            const passInput = document.getElementById('newEmployeePass'); 
+            const nombre = nombreInput.value.trim().toLowerCase(); 
+            const pass = passInput.value; 
             
-            if (!newEmployeeEmail || !newEmployeeName || !newEmployeePass) { 
-                return alert('Todos los campos (correo, nombre y contraseña) son obligatorios.'); 
+            if (!nombre || !pass) { 
+                return alert('El nombre y la contraseña del tripulante son obligatorios.'); 
             } 
-            
-            // Primero, crear el usuario en Firebase Authentication
-            try {
-                console.log("Intentando crear usuario en Firebase Auth:", newEmployeeEmail);
-                const userCredential = await createUserWithEmailAndPassword(auth, newEmployeeEmail, newEmployeePass);
-                const user = userCredential.user;
-                const userUID = user.uid; // Este es el UID real que usaremos como ID de documento
-
-                // Luego, guardar los datos del empleado en Firestore, usando el UID como ID de documento
-                console.log("Guardando datos de empleado en Firestore para UID:", userUID);
-                await Firebase.setDoc(Firebase.doc(db, 'empleados', userUID), { 
-                    nombre: newEmployeeName, 
-                    email: newEmployeeEmail, // Guarda el email para referencia
-                    passHash: this.hashPassword(newEmployeePass), // Opcional si confías solo en Firebase Auth
+            console.log("Intentando añadir tripulante:", nombre); 
+            try { 
+                await Firebase.setDoc(Firebase.doc(db, 'empleados', nombre), { 
+                    nombre: nombre, 
+                    passHash: this.hashPassword(pass), 
                     directiva: false, 
                     ausencias: [] 
                 }); 
-                alert(`Tripulante ${newEmployeeName} añadido correctamente y cuenta creada.`); 
-                
-                // Limpiar campos y refrescar el panel
-                document.getElementById('newEmployeeEmail').value = '';
-                document.getElementById('newEmployeeName').value = ''; 
-                document.getElementById('newEmployeePass').value = ''; 
-                await this.cargarTodosLosEmpleados(); 
+                alert(`Tripulante ${nombre} añadido correctamente.`); 
+                nombreInput.value = ''; 
+                passInput.value = ''; 
+                await this.cargarTodosLosEmpleados(); // Recargar la lista de empleados
                 await this.mostrarPanelAdmin(); 
-            } catch (error) {
-                console.error("Error al añadir empleado/crear usuario:", error.code, error.message);
-                alert(`Error al añadir el tripulante: ${error.message}.`);
-            }
-        },
-        async toggleDirectiva(empleadoUID) { // Recibe UID
-            const empleadoRef = Firebase.doc(db, 'empleados', empleadoUID); 
-            try { 
-                const empleadoDoc = await Firebase.getDoc(empleadoRef); 
-                if (empleadoDoc.exists()) { 
-                    const currentStatus = empleadoDoc.data().directiva || false; 
-                    await Firebase.updateDoc(empleadoRef, { directiva: !currentStatus }); 
-                    await this.cargarTodosLosEmpleados(); 
-                    await this.mostrarPanelAdmin(); 
-                } 
-            } catch (e) { console.error("Error al cambiar directiva:", e); alert("Error al cambiar permiso de directiva: " + e.message); }
-        },
-        async cambiarContrasena(empleadoUID) { // Recibe UID
-            const newPassword = prompt(`Introduce la nueva contraseña para el empleado (UID: ${empleadoUID}):`); 
-            if (newPassword) { 
-                try { 
-                    // Esto solo actualizará el passHash en Firestore, no la contraseña real de Firebase Auth
-                    // Si quieres cambiar la contraseña de Firebase Auth, necesitas una función de Admin SDK (server-side)
-                    // o que el usuario esté actualmente logueado y use updatePassword(user, newPassword)
-                    // Para simplificar aquí, solo actualizamos el hash para la lógica interna si aún la usas.
-                    await Firebase.updateDoc(Firebase.doc(db, 'empleados', empleadoUID), { passHash: this.hashPassword(newPassword) }); 
-                    alert(`Contraseña (hash) de ${empleadoUID} actualizada. Recuerda que esto no cambia la contraseña de login de Firebase Auth.`); 
-                }  catch (e) { console.error("Error al cambiar contraseña:", e); alert("Error al cambiar contraseña: " + e.message); } 
+            } catch (e) { 
+                console.error("Error al añadir empleado:", e); 
+                alert('Error al añadir el tripulante: ' + e.message); 
             } 
         },
-        async eliminarEmpleado(empleadoUID) { // Recibe UID
-            if (confirm(`¿Estás SEGURO de que quieres eliminar a este empleado (UID: ${empleadoUID}) y su cuenta de la tripulación? Esta acción es irreversible.`)) { 
-                try { 
-                    // NOTA: Para eliminar completamente al usuario de Firebase Auth, necesitarías usar
-                    // Firebase Admin SDK en un entorno de servidor. Desde el cliente no es directo.
-                    // Esto solo elimina el documento del empleado de Firestore.
-
-                    await Firebase.deleteDoc(Firebase.doc(db, 'empleados', empleadoUID)); 
-                    await Firebase.deleteDoc(Firebase.doc(db, 'fichajes', empleadoUID)); 
-                    await Firebase.deleteDoc(Firebase.doc(db, 'ventas', empleadoUID)); 
-                    // Opcional: Eliminar compras de clientes si se vinculan por UID
-                    // const clienteVentasDoc = await Firebase.getDoc(Firebase.doc(db, 'clientesVentas', empleadoUID));
-                    // if (clienteVentasDoc.exists()) { await Firebase.deleteDoc(clienteVentasDoc.ref); }
-
-                    alert(`Empleado (UID: ${empleadoUID}) ha sido eliminado de la tripulación y sus registros.`); 
-                    await this.cargarTodosLosEmpleados(); 
-                    await this.cargarTodosLosFichajes(); 
-                    await this.cargarTodasLasVentas(); 
-                    await this.mostrarPanelAdmin(); 
-                } catch (e) { console.error("Error al eliminar empleado:", e); alert("Error al eliminar el tripulante: " + e.message); } 
-            } 
-        },
-        async actualizarControlesLocal() { 
-            // Esto no necesita UID de empleado, pero necesita que el usuario esté autenticado para leer control_local
-            const abrirBtn = document.getElementById('abrirLocalBtn'); 
-            const cerrarBtn = document.getElementById('cerrarLocalBtn'); 
-            const tiempoElem = document.getElementById('tiempoAbiertoLocal'); 
-            const ultimoCierreInfo = document.getElementById('ultimoCierreInfo'); 
-            if (!abrirBtn) return; 
-            try { 
-                const docSnap = await Firebase.getDoc(Firebase.doc(db, "control_local", "estado")); 
-                if (docSnap.exists()) { 
-                    const estado = docSnap.data(); 
-                    if (estado.abierto) { 
-                        abrirBtn.disabled = true; 
-                        cerrarBtn.disabled = false; 
-                        this.startLocalOpenTimer(estado.inicioApertura.toMillis()); 
-                        ultimoCierreInfo.innerHTML = ''; 
-                    } else { 
-                        abrirBtn.disabled = false; 
-                        cerrarBtn.disabled = true; 
-                        if(this.state.timers.localOpen) clearInterval(this.state.timers.localOpen); 
-                        this.state.timers.localOpen = null; 
-                        tiempoElem.textContent = "00:00:00"; 
-                        let infoHTML = ''; 
-                        if (estado.ultimoCierre) { infoHTML += `<div>Último cierre: ${estado.ultimoCierre.toDate().toLocaleString('es-ES')}</div>`; } 
-                        if (estado.duracionUltimaApertura) { infoHTML += `<div class="mt-1">Duración: ${this.formatearTiempoHorasDecimal(estado.duracionUltimaApertura)} horas</div>`; } 
-                        ultimoCierreInfo.innerHTML = infoHTML; 
-                    } 
-                } else { 
-                    abrirBtn.disabled = false; 
-                    cerrarBtn.disabled = true; 
-                } 
-            } catch (e) { console.error("Error al actualizar controles local:", e); alert("Error al actualizar controles de local: " + e.message); } 
-        },
-        async abrirLocal() { 
-            const currentUserUID = sessionStorage.getItem('currentUserUID');
-            if (!currentUserUID) { alert("No hay usuario autenticado."); return; } // Requiere autenticación
-            try { 
-                await Firebase.setDoc(Firebase.doc(db, "control_local", "estado"), { abierto: true, inicioApertura: Firebase.serverTimestamp(), }, { merge: true }); 
-                await this.actualizarControlesLocal(); 
-            } catch (e) { console.error("Error al abrir local:", e); alert("Error al abrir la flota: " + e.message); }
-        },
-        async cerrarLocal() { 
-            const currentUserUID = sessionStorage.getItem('currentUserUID');
-            if (!currentUserUID) { alert("No hay usuario autenticado."); return; } // Requiere autenticación
-            try { 
-                const controlDoc = await Firebase.getDoc(Firebase.doc(db, "control_local", "estado")); 
-                let duracion = 0; 
-                if (controlDoc.exists() && controlDoc.data().inicioApertura) { duracion = Date.now() - controlDoc.data().inicioApertura.toMillis(); } 
-                await this.cargarTodosLosFichajes(); 
-                for (const uid in this.state.fichajes) { // Itera sobre UIDs
-                    if (this.state.fichajes[uid].fichado) { 
-                        await this.desfichar(this.state.empleados.find(e => e.id === uid)?.nombre || uid, true); // Pasa el nombre para la UI
-                    } 
-                } 
-                await Firebase.setDoc(Firebase.doc(db, "control_local", "estado"), { abierto: false, ultimoCierre: Firebase.serverTimestamp(), duracionUltimaApertura: duracion }, { merge: true }); 
-                await this.actualizarControlesLocal(); 
-            } catch (e) { console.error("Error al cerrar local:", e); alert("Error al cerrar la flota: " + e.message); }
-        },
-        async mostrarPanelInventario() { 
-            this.stopAllTimers(); this.ajustarPosicionChatbot(false); 
-            const currentUserUID = sessionStorage.getItem('currentUserUID');
-            const currentUserName = sessionStorage.getItem('currentUserName');
-            if (!currentUserUID) { alert("No hay usuario autenticado."); return; } // Requiere autenticación
-            
-            this.state.inventoryFiles = [null, null, null]; let uploadBoxesHTML = ''; for (let i = 0; i < 3; i++) { uploadBoxesHTML += `<div id="inventory-box-${i}" class="inventory-upload-box" tabindex="0"><span class="placeholder-text text-nautics-light text-center">Haz clic aquí y pega una imagen con<br/><strong>Ctrl+V</strong></span><img id="inventory-img-${i}" class="hidden"><button id="inventory-remove-${i}" class="remove-btn">&times;</button></div>`; } document.getElementById('contenido').innerHTML = `<div class="max-w-4xl mx-auto p-6 bg-nautics-dark bg-opacity-90 rounded-lg shadow-lg"><div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-bold">Inventario de Provisión</h2><button class="btn" onclick="VanillaApp.mostrarPanelEmpleados('${currentUserName}')">Volver al Panel de Tripulación</button></div><div class="bg-nautics-mid p-6 rounded-lg text-center"><h3 class="text-xl font-semibold mb-4">Añadir Nuevo Inventario (hasta 3 imágenes)</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">${uploadBoxesHTML}</div><button id="upload-inventory-btn" class="btn text-lg py-2 px-6" style="background-color: var(--color-nautics-secondary-pink);">Guardar Inventario</button><div id="upload-status" class="mt-4 text-nautics-accent-pink"></div></div></div>`; for (let i = 0; i < 3; i++) { const box = document.getElementById(`inventory-box-${i}`); const img = document.getElementById(`inventory-img-${i}`); const removeBtn = document.getElementById(`inventory-remove-${i}`); const handleFile = (file) => { if (file && file.type.startsWith('image/')) { this.state.inventoryFiles[i] = file; img.src = URL.createObjectURL(file); img.classList.remove('hidden'); box.classList.add('has-image'); }}; box.addEventListener('paste', e => { e.preventDefault(); handleFile(e.clipboardData.files[0]); }); removeBtn.addEventListener('click', e => { e.stopPropagation(); this.state.inventoryFiles[i] = null; img.src = ''; img.classList.add('hidden'); box.classList.remove('has-image'); }); } document.getElementById('upload-inventory-btn').onclick = () => this.subirInventario(); },
-        async subirInventario() { 
-            const currentUserUID = sessionStorage.getItem('currentUserUID'); // Usar UID
-            if (!currentUserUID) { alert("No hay usuario autenticado."); return; }
-            const filesToUpload = this.state.inventoryFiles.filter(f => f !== null); 
-            const statusElem = document.getElementById('upload-status'); 
-            const uploadBtn = document.getElementById('upload-inventory-btn'); 
-            if (filesToUpload.length === 0 || !currentUserUID) { statusElem.textContent = "Añade al menos una imagen."; return; } 
-            statusElem.textContent = `Subiendo ${filesToUpload.length} imagen(es)...`; uploadBtn.disabled = true; try { const uploadPromises = filesToUpload.map(file => { const filePath = `inventario/${Date.now()}_${file.name}`; const storageRef = Firebase.ref(storage, filePath); return Firebase.uploadBytes(storageRef, file).then(snapshot => Firebase.getDownloadURL(snapshot.ref)); }); const imageUrls = await Promise.all(uploadPromises); const datosInventario = { imagenes: imageUrls, subidoPor: sessionStorage.getItem('currentUserName') || currentUserUID, timestamp: Firebase.serverTimestamp() }; await Firebase.setDoc(Firebase.doc(db, "inventario_actual", "estado"), datosInventario); await Firebase.addDoc(Firebase.collection(db, "inventario_log"), datosInventario); statusElem.textContent = "¡Inventario guardado!"; setTimeout(() => { if (document.getElementById('upload-status')) this.mostrarPanelInventario(); }, 2000); } catch (e) { console.error("Error al subir inventario:", e); statusElem.textContent = "Error al subir: " + e.message; uploadBtn.disabled = false; } 
-        },
+        async toggleDirectiva(empleadoId) { const empleadoRef = Firebase.doc(db, 'empleados', empleadoId); try { const empleadoDoc = await Firebase.getDoc(empleadoRef); if (empleadoDoc.exists()) { const currentStatus = empleadoDoc.data().directiva || false; await Firebase.updateDoc(empleadoRef, { directiva: !currentStatus }); await this.cargarTodosLosEmpleados(); await this.mostrarPanelAdmin(); } } catch (e) { console.error("Error al cambiar directiva:", e); alert("Error al cambiar permiso de directiva: " + e.message); }},
+        async cambiarContrasena(nombre) { const nuevaPass = prompt(`Introduce la nueva contraseña para ${nombre}:`); if (nuevaPass) { try { await Firebase.updateDoc(Firebase.doc(db, 'empleados', nombre), { passHash: this.hashPassword(nuevaPass) }); alert(`Contraseña de ${nombre} actualizada.`); }  catch (e) { console.error("Error al cambiar contraseña:", e); alert("Error al cambiar contraseña: " + e.message); } } },
+        async eliminarEmpleado(nombre) { if (confirm(`¿Estás SEGURO de que quieres eliminar a ${nombre} de la tripulación? Esta acción es irreversible.`)) { try { await Firebase.deleteDoc(Firebase.doc(db, 'empleados', nombre)); await Firebase.deleteDoc(Firebase.doc(db, 'fichajes', nombre)); await Firebase.deleteDoc(Firebase.doc(db, 'ventas', nombre)); alert(`${nombre} ha sido eliminado de la tripulación.`); await this.cargarTodosLosEmpleados(); await this.cargarTodosLosFichajes(); await this.cargarTodasLasVentas(); await this.mostrarPanelAdmin(); } catch (e) { console.error("Error al eliminar empleado:", e); alert("Error al eliminar el tripulante: " + e.message); } } },
+        async actualizarControlesLocal() { const abrirBtn = document.getElementById('abrirLocalBtn'); const cerrarBtn = document.getElementById('cerrarLocalBtn'); const tiempoElem = document.getElementById('tiempoAbiertoLocal'); const ultimoCierreInfo = document.getElementById('ultimoCierreInfo'); if (!abrirBtn) return; try { const docSnap = await Firebase.getDoc(Firebase.doc(db, "control_local", "estado")); if (docSnap.exists()) { const estado = docSnap.data(); if (estado.abierto) { abrirBtn.disabled = true; cerrarBtn.disabled = false; this.startLocalOpenTimer(estado.inicioApertura.toMillis()); ultimoCierreInfo.innerHTML = ''; } else { abrirBtn.disabled = false; cerrarBtn.disabled = true; if(this.state.timers.localOpen) clearInterval(this.state.timers.localOpen); this.state.timers.localOpen = null; tiempoElem.textContent = "00:00:00"; let infoHTML = ''; if (estado.ultimoCierre) { infoHTML += `<div>Último cierre: ${estado.ultimoCierre.toDate().toLocaleString('es-ES')}</div>`; } if (estado.duracionUltimaApertura) { infoHTML += `<div class="mt-1">Duración: ${this.formatearTiempoHorasDecimal(estado.duracionUltimaApertura)} horas</div>`; } ultimoCierreInfo.innerHTML = infoHTML; } } else { abrirBtn.disabled = false; cerrarBtn.disabled = true; } } catch (e) { console.error("Error al actualizar controles local:", e); alert("Error al actualizar controles de local: " + e.message); } },
+        async abrirLocal() { try { await Firebase.setDoc(Firebase.doc(db, "control_local", "estado"), { abierto: true, inicioApertura: Firebase.serverTimestamp(), }, { merge: true }); await this.actualizarControlesLocal(); } catch (e) { console.error("Error al abrir local:", e); alert("Error al abrir la flota: " + e.message); }},
+        async cerrarLocal() { try { const controlDoc = await Firebase.getDoc(Firebase.doc(db, "control_local", "estado")); let duracion = 0; if (controlDoc.exists() && controlDoc.data().inicioApertura) { duracion = Date.now() - controlDoc.data().inicioApertura.toMillis(); } await this.cargarTodosLosFichajes(); for (const nombre in this.state.fichajes) { if (this.state.fichajes[nombre].fichado) { await this.desfichar(nombre, true); } } await Firebase.setDoc(Firebase.doc(db, "control_local", "estado"), { abierto: false, ultimoCierre: Firebase.serverTimestamp(), duracionUltimaApertura: duracion }, { merge: true }); await this.actualizarControlesLocal(); } catch (e) { console.error("Error al cerrar local:", e); alert("Error al cerrar la flota: " + e.message); } },
+        async mostrarPanelInventario() { this.stopAllTimers(); this.ajustarPosicionChatbot(false); const nombreEmpleado = sessionStorage.getItem('currentUser'); this.state.inventoryFiles = [null, null, null]; let uploadBoxesHTML = ''; for (let i = 0; i < 3; i++) { uploadBoxesHTML += `<div id="inventory-box-${i}" class="inventory-upload-box" tabindex="0"><span class="placeholder-text text-nautics-light text-center">Haz clic aquí y pega una imagen con<br/><strong>Ctrl+V</strong></span><img id="inventory-img-${i}" class="hidden"><button id="inventory-remove-${i}" class="remove-btn">&times;</button></div>`; } document.getElementById('contenido').innerHTML = `<div class="max-w-4xl mx-auto p-6 bg-nautics-dark bg-opacity-90 rounded-lg shadow-lg"><div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-bold">Inventario de Provisión</h2><button class="btn" onclick="VanillaApp.mostrarPanelEmpleados('${nombreEmpleado}')">Volver al Panel de Tripulación</button></div><div class="bg-nautics-mid p-6 rounded-lg text-center"><h3 class="text-xl font-semibold mb-4">Añadir Nuevo Inventario (hasta 3 imágenes)</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">${uploadBoxesHTML}</div><button id="upload-inventory-btn" class="btn text-lg py-2 px-6" style="background-color: var(--color-nautics-secondary-pink);">Guardar Inventario</button><div id="upload-status" class="mt-4 text-nautics-accent-pink"></div></div></div>`; for (let i = 0; i < 3; i++) { const box = document.getElementById(`inventory-box-${i}`); const img = document.getElementById(`inventory-img-${i}`); const removeBtn = document.getElementById(`inventory-remove-${i}`); const handleFile = (file) => { if (file && file.type.startsWith('image/')) { this.state.inventoryFiles[i] = file; img.src = URL.createObjectURL(file); img.classList.remove('hidden'); box.classList.add('has-image'); }}; box.addEventListener('paste', e => { e.preventDefault(); handleFile(e.clipboardData.files[0]); }); removeBtn.addEventListener('click', e => { e.stopPropagation(); this.state.inventoryFiles[i] = null; img.src = ''; img.classList.add('hidden'); box.classList.remove('has-image'); }); } document.getElementById('upload-inventory-btn').onclick = () => this.subirInventario(); },
+        async subirInventario() { const empleado = sessionStorage.getItem('currentUser'); const filesToUpload = this.state.inventoryFiles.filter(f => f !== null); const statusElem = document.getElementById('upload-status'); const uploadBtn = document.getElementById('upload-inventory-btn'); if (filesToUpload.length === 0 || !empleado) { statusElem.textContent = "Añade al menos una imagen."; return; } statusElem.textContent = `Subiendo ${filesToUpload.length} imagen(es)...`; uploadBtn.disabled = true; try { const uploadPromises = filesToUpload.map(file => { const filePath = `inventario/${Date.now()}_${file.name}`; const storageRef = Firebase.ref(storage, filePath); return Firebase.uploadBytes(storageRef, file).then(snapshot => Firebase.getDownloadURL(snapshot.ref)); }); const imageUrls = await Promise.all(uploadPromises); const datosInventario = { imagenes: imageUrls, subidoPor: empleado, timestamp: Firebase.serverTimestamp() }; await Firebase.setDoc(Firebase.doc(db, "inventario_actual", "estado"), datosInventario); await Firebase.addDoc(Firebase.collection(db, "inventario_log"), datosInventario); statusElem.textContent = "¡Inventario guardado!"; setTimeout(() => { if (document.getElementById('upload-status')) this.mostrarPanelInventario(); }, 2000); } catch (e) { console.error("Error al subir inventario:", e); statusElem.textContent = "Error al subir: " + e.message; uploadBtn.disabled = false; } },
         toggleInventarioLog() { const lista = document.getElementById('listaInventarioLog'); if (lista) { lista.style.display = lista.style.display === 'none' ? 'block' : 'none'; } },
         mostrarImagenAmpliada(imageUrl) { const overlay = document.getElementById('image-overlay'); const overlayImage = document.getElementById('overlay-image'); if(overlay && overlayImage) { overlayImage.src = imageUrl; overlay.style.display = 'flex'; }},
-        async mostrarPanelConvenios(esDirectiva) { 
-            this.stopAllTimers(); 
-            const currentUserName = sessionStorage.getItem('currentUserName');
-            if (!sessionStorage.getItem('currentUserUID')) { alert("No hay usuario autenticado."); return; } // Requiere autenticación
-            
-            const adminControls = esDirectiva ? `<div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-bold">Gestión de Acuerdos Navales</h2><div><button class="btn" style="background-color: #dc2626;" onclick="VanillaApp.setTodosConveniosRojo()">Marcar Todos como Hostiles</button><button class="btn" onclick="VanillaApp.mostrarPanelEmpleados('${currentUserName}')">Volver a Panel de Tripulación</button></div></div><div class="bg-nautics-mid p-4 rounded-lg mb-6 flex flex-col md:flex-row gap-4"><input id="convenioNombreInput" class="flex-grow px-3 py-2 text-gray-900 rounded bg-nautics-light" placeholder="Nombre del nuevo acuerdo naval"/><button onclick="VanillaApp.crearConvenio()" class="btn" style="background-color: var(--color-nautics-secondary-pink);">Establecer Nuevo Acuerdo</button></div>` : `<div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-bold">Acuerdos Navales</h2><button class="btn" onclick="VanillaApp.mostrarPanelEmpleados('${currentUserName}')">Volver a Panel de Tripulación</button></div>`; document.getElementById('contenido').innerHTML = `<div class="max-w-7xl mx-auto p-6 bg-nautics-dark bg-opacity-90 rounded-lg shadow-lg">${adminControls}<div id="contenedorConvenios" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div></div>`; await this.cargarConvenios(esDirectiva); 
-        },
+        async mostrarPanelConvenios(esDirectiva) { this.stopAllTimers(); const nombreEmpleado = sessionStorage.getItem('currentUser'); const adminControls = esDirectiva ? `<div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-bold">Gestión de Acuerdos Navales</h2><div><button class="btn" style="background-color: #dc2626;" onclick="VanillaApp.setTodosConveniosRojo()">Marcar Todos como Hostiles</button><button class="btn" onclick="VanillaApp.mostrarPanelEmpleados('${nombreEmpleado}')">Volver a Panel de Tripulación</button></div></div><div class="bg-nautics-mid p-4 rounded-lg mb-6 flex flex-col md:flex-row gap-4"><input id="convenioNombreInput" class="flex-grow px-3 py-2 text-gray-900 rounded bg-nautics-light" placeholder="Nombre del nuevo acuerdo naval"/><button onclick="VanillaApp.crearConvenio()" class="btn" style="background-color: var(--color-nautics-secondary-pink);">Establecer Nuevo Acuerdo</button></div>` : `<div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-bold">Acuerdos Navales</h2><button class="btn" onclick="VanillaApp.mostrarPanelEmpleados('${nombreEmpleado}')">Volver a Panel de Tripulación</button></div>`; document.getElementById('contenido').innerHTML = `<div class="max-w-7xl mx-auto p-6 bg-nautics-dark bg-opacity-90 rounded-lg shadow-lg">${adminControls}<div id="contenedorConvenios" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div></div>`; await this.cargarConvenios(esDirectiva); },
         async cargarConvenios(esDirectiva) { const contenedor = document.getElementById('contenedorConvenios'); if (!contenedor) return; contenedor.innerHTML = ''; try { const q = await Firebase.getDocs(Firebase.query(Firebase.collection(db, 'convenios'), Firebase.orderBy('nombre'))); q.forEach(docu => { const c = { id: docu.id, ...docu.data() }; const p = document.createElement('div'); p.className = "bg-nautics-mid p-4 rounded-lg shadow-md flex flex-col"; let panelControls = ''; if (esDirectiva) { panelControls = `<div class="flex justify-between items-center mb-3"><h3 class="text-xl font-semibold mb-0 capitalize">${c.nombre}</h3><div class="flex gap-2"><div class="status-indicator bg-green-500 ${c.status === 'green' ? 'active' : ''}" onclick="VanillaApp.setConvenioStatus('${c.id}', 'green')"></div><div class="status-indicator bg-red-500 ${c.status === 'red' ? 'active' : ''}" onclick="VanillaApp.setConvenioStatus('${c.id}', 'red')"></div></div></div><div class="flex-grow mb-4 bg-nautics-dark bg-opacity-20 rounded min-h-[200px] flex items-center justify-center">${c.imagenURL ? `<img src="${c.imagenURL}" class="panel-image rounded cursor-pointer" onclick="VanillaApp.mostrarImagenAmpliada('${c.imagenURL}')"/>` : '<span class="text-nautics-light text-center">Sin imagen</span>'}</div><label class="btn text-xs py-1 text-center cursor-pointer" style="background-color: var(--color-nautics-secondary-pink);">Subir/Cambiar Imagen<input type="file" class="hidden" accept="image/*" onchange="VanillaApp.subirImagenConvenio('${c.id}', this.files[0])"></label><button onclick="VanillaApp.eliminarConvenio('${c.id}')" class="btn text-xs py-1 mt-2" style="background-color:#dc2626">Romper Acuerdo</button>`; } else { panelControls = `<h3 class="text-xl font-semibold mb-3 capitalize">${c.nombre}</h3><div class="flex-grow mb-4 bg-nautics-dark bg-opacity-20 rounded min-h-[200px] flex items-center justify-center">${c.imagenURL ? `<img src="${c.imagenURL}" class="panel-image rounded cursor-pointer" onclick="VanillaApp.mostrarImagenAmpliada('${c.imagenURL}')"/>` : '<span class="text-nautics-light text-center">Sin imagen</span>'}</div>`; } p.innerHTML = panelControls; contenedor.appendChild(p); }); } catch (e) { console.error("Error al cargar convenios:", e); } },
-        async crearConvenio() { 
-            const currentUserUID = sessionStorage.getItem('currentUserUID');
-            if (!currentUserUID) { alert("No hay usuario autenticado."); return; } // Requiere autenticación
-            const i = document.getElementById('convenioNombreInput'); const n = i.value.trim(); if (!n) return; try { await Firebase.addDoc(Firebase.collection(db, 'convenios'), { nombre: n, imagenURL: null, imagenPath: null, status: 'neutral' }); i.value = ''; await this.cargarConvenios(true); } catch (e) { console.error("Error al crear convenio:", e); alert("Error al crear acuerdo naval: " + e.message); } 
-        },
-        async eliminarConvenio(id) { 
-            const currentUserUID = sessionStorage.getItem('currentUserUID');
-            if (!currentUserUID) { alert("No hay usuario autenticado."); return; } // Requiere autenticación
-            if (confirm("¿Seguro que quieres romper este acuerdo?")) { try { const d = await Firebase.getDoc(Firebase.doc(db, 'convenios', id)); if (d.exists() && d.data().imagenPath) { await Firebase.deleteObject(Firebase.ref(storage, d.data().imagenPath)); } await Firebase.deleteDoc(Firebase.doc(db, 'convenios', id)); await this.cargarConvenios(true); } catch (e) { console.error("Error al eliminar convenio:", e); alert("Error al romper acuerdo naval: " + e.message); } } 
-        },
-        async setConvenioStatus(convenioId, newStatus) { 
-            const currentUserUID = sessionStorage.getItem('currentUserUID');
-            if (!currentUserUID) { alert("No hay usuario autenticado."); return; } // Requiere autenticación
-            try { await Firebase.updateDoc(Firebase.doc(db, 'convenios', convenioId), { status: newStatus }); await this.cargarConvenios(true); } catch (e) { console.error("Error al establecer status de convenio:", e); alert("Error al establecer estado de acuerdo: " + e.message); }
-        },
-        async setTodosConveniosRojo() { 
-            const currentUserUID = sessionStorage.getItem('currentUserUID');
-            if (!currentUserUID) { alert("No hay usuario autenticado."); return; } // Requiere autenticación
-            if (!confirm("¿Marcar TODOS los acuerdos como hostiles (rojo)?")) return; const batch = Firebase.writeBatch(db); try { const conveniosSnapshot = await Firebase.getDocs(Firebase.collection(db, 'convenios')); conveniosSnapshot.forEach(doc => { batch.update(doc.ref, { status: 'red' }); }); await batch.commit(); await this.cargarConvenios(true); alert("Acuerdos actualizados a hostiles."); } catch (e) { console.error("Error al establecer todos los convenios a rojo:", e); alert("Error al marcar acuerdos como hostiles: " + e.message); } 
-        },
-        async subirImagenConvenio(id, file) { 
-            const currentUserUID = sessionStorage.getItem('currentUserUID');
-            if (!currentUserUID) { alert("No hay usuario autenticado."); return; } // Requiere autenticación
-            if (!file) return; const p = `convenios/${id}/${file.name}`; const s = Firebase.ref(storage, p); try { const docSnap = await Firebase.getDoc(Firebase.doc(db, 'convenios', id)); if (docSnap.exists() && docSnap.data().imagenPath) { try { await Firebase.deleteObject(Firebase.ref(storage, docSnap.data().imagenPath)); } catch (e) { console.warn("La imagen anterior no se pudo borrar:", e.code); } } await Firebase.uploadBytes(s, file); const url = await Firebase.getDownloadURL(s); await Firebase.updateDoc(Firebase.doc(db, 'convenios', id), { imagenURL: url, imagenPath: p }); if (document.getElementById('contenedorConvenios')) this.cargarConvenios(true); } catch (e) { console.error("Error al subir imagen convenio:", e); alert("Error al subir imagen de acuerdo: " + e.message); } 
-        },
-        async mostrarListaNegraPublica() { 
-            const currentUserUID = sessionStorage.getItem('currentUserUID');
-            if (!currentUserUID) { alert("No hay usuario autenticado."); return; } // Requiere autenticación
-            await this.cargarListaNegra(); let msg = "--- LISTA NEGRA DE PIRATAS ---\n\n"; this.state.listaNegra.length === 0 ? msg += "Nadie vetado de los mares." : this.state.listaNegra.forEach(p => { msg += `- ${p.nombre} (Motivo: ${p.motivo})\n`; }); alert(msg); 
-        },
-        async actualizarLibroNegro() { 
-            const currentUserUID = sessionStorage.getItem('currentUserUID');
-            if (!currentUserUID) { /* No alert, as this might be called in Admin panel where user is authenticated */ return; } // Requiere autenticación para leer
-            await this.cargarLibroNegro(); const l = document.getElementById('listaLibroNegro'); if (!l) return; l.innerHTML = ''; this.state.libroNegro.forEach(c => { l.innerHTML += `<li class="flex justify-between items-center p-2 bg-nautics-mid rounded"><span><strong class="capitalize">${c.nombre}</strong> (${c.relacion}) - ${c.notas}</span><button onclick="VanillaApp.eliminarDelLibro('${c.docId}')" class="text-red-500 font-bold px-2">X</button></li>`; }); 
-        },
-        async anadirAlLibroNegro() { 
-            const currentUserUID = sessionStorage.getItem('currentUserUID');
-            if (!currentUserUID) { alert("No hay usuario autenticado."); return; } // Requiere autenticación
-            const n = document.getElementById('libroNombre').value.trim(), r = document.getElementById('libroRelacion').value, o = document.getElementById('libroNotas').value.trim(); if (n) { try { const newDoc = await Firebase.addDoc(Firebase.collection(db, 'libroNegro'), { nombre: n, relacion: r, notas: o }); this.state.libroNegro.push({ docId: newDoc.id, nombre: n, relacion: r, notas: o }); this.actualizarLibroNegro(); document.getElementById('libroNombre').value = ''; document.getElementById('libroNotas').value = ''; } catch(e) { console.error("Error al añadir al libro negro:", e); alert("Error al añadir a la bitácora: " + e.message); } } 
-        },
-        async eliminarDelLibro(docId) { 
-            const currentUserUID = sessionStorage.getItem('currentUserUID');
-            if (!currentUserUID) { alert("No hay usuario autenticado."); return; } // Requiere autenticación
-            try { await Firebase.deleteDoc(Firebase.doc(db, 'libroNegro', docId)); this.state.libroNegro = this.state.libroNegro.filter(c => c.docId !== docId); this.actualizarLibroNegro(); } catch(e) { console.error("Error al eliminar del libro negro:", e); alert("Error al eliminar de la bitácora: " + e.message); } 
-        },
-        async actualizarListaNegra() { 
-            const currentUserUID = sessionStorage.getItem('currentUserUID');
-            if (!currentUserUID) { /* No alert, as this might be called in Admin panel where user is authenticated */ return; } // Requiere autenticación para leer
-            await this.cargarListaNegra(); const l = document.getElementById('listaDeVetados'); if (!l) return; l.innerHTML = ''; this.state.listaNegra.forEach(p => { l.innerHTML += `<li class="flex justify-between items-center p-2 bg-red-900 bg-opacity-50 rounded"><span><strong class="capitalize">${p.nombre}</strong> - ${p.motivo}</span><button onclick="VanillaApp.eliminarDeListaNegra('${p.docId}')" class="text-white font-bold px-2">X</button></li>`; }); 
-        },
-        async anadirAListaNegra() { 
-            const currentUserUID = sessionStorage.getItem('currentUserUID');
-            if (!currentUserUID) { alert("No hay usuario autenticado."); return; } // Requiere autenticación
-            const n = document.getElementById('vetadoNombre').value.trim(), m = document.getElementById('vetadoMotivo').value.trim(); if (n && m) { try { const newDoc = await Firebase.addDoc(Firebase.collection(db, 'listaNegra'), { nombre: n, motivo: m }); this.state.listaNegra.push({ docId: newDoc.id, nombre: n, motivo: m }); this.actualizarListaNegra(); document.getElementById('vetadoNombre').value = ''; document.getElementById('vetadoMotivo').value = ''; } catch(e) { console.error("Error al añadir a lista negra:", e); alert("Error al vetar pirata: " + e.message); } } 
-        },
-        async eliminarDeListaNegra(docId) { 
-            const currentUserUID = sessionStorage.getItem('currentUserUID');
-            if (!currentUserUID) { alert("No hay usuario autenticado."); return; } // Requiere autenticación
-            try { await Firebase.deleteDoc(Firebase.doc(db, 'listaNegra', docId)); this.state.listaNegra = this.state.listaNegra.filter(p => p.docId !== docId); this.actualizarListaNegra(); } catch(e) { console.error("Error al eliminar de lista negra:", e); alert("Error al desvetar pirata: " + e.message); } 
-        },
-        async actualizarInventarioLog() { 
-            const currentUserUID = sessionStorage.getItem('currentUserUID');
-            if (!currentUserUID) { /* No alert, as this might be called in Admin panel where user is authenticated */ return; } // Requiere autenticación para leer
-            await this.cargarInventarioLog(); const contenedor = document.getElementById('listaInventarioLog'); if (!contenedor) return; contenedor.innerHTML = ''; if (this.state.inventarioLog.length === 0) { contenedor.innerHTML = '<li>No hay registros de inventario de flota.</li>'; return; } this.state.inventarioLog.forEach(log => { const fecha = log.timestamp.toDate().toLocaleString('es-ES'); const imgsHTML = log.imagenes ? log.imagenes.map(url => `<img src="${url}" class="w-24 h-24 object-cover rounded cursor-pointer" onclick="VanillaApp.mostrarImagenAmpliada('${url}')" />`).join('') : ''; contenedor.innerHTML += `<li class="flex items-start gap-4 p-3 bg-nautics-mid rounded"><div class="flex gap-2 flex-wrap">${imgsHTML}</div><div><p>Subido por: <strong class="capitalize">${log.subidoPor}</strong></p><p>Fecha: <strong class="font-mono">${fecha}</strong></p></div></li>`; }); 
-        },
+        async crearConvenio() { const i = document.getElementById('convenioNombreInput'); const n = i.value.trim(); if (!n) return; try { await Firebase.addDoc(Firebase.collection(db, 'convenios'), { nombre: n, imagenURL: null, imagenPath: null, status: 'neutral' }); i.value = ''; await this.cargarConvenios(true); } catch (e) { console.error("Error al crear convenio:", e); alert("Error al crear acuerdo naval: " + e.message); } },
+        async eliminarConvenio(id) { if (confirm("¿Seguro que quieres romper este acuerdo?")) { try { const d = await Firebase.getDoc(Firebase.doc(db, 'convenios', id)); if (d.exists() && d.data().imagenPath) { await Firebase.deleteObject(Firebase.ref(storage, d.data().imagenPath)); } await Firebase.deleteDoc(Firebase.doc(db, 'convenios', id)); await this.cargarConvenios(true); } catch (e) { console.error("Error al eliminar convenio:", e); alert("Error al romper acuerdo naval: " + e.message); } } },
+        async setConvenioStatus(convenioId, newStatus) { try { await Firebase.updateDoc(Firebase.doc(db, 'convenios', convenioId), { status: newStatus }); await this.cargarConvenios(true); } catch (e) { console.error("Error al establecer status de convenio:", e); alert("Error al establecer estado de acuerdo: " + e.message); }},
+        async setTodosConveniosRojo() { if (!confirm("¿Marcar TODOS los acuerdos como hostiles (rojo)?")) return; const batch = Firebase.writeBatch(db); try { const conveniosSnapshot = await Firebase.getDocs(Firebase.collection(db, 'convenios')); conveniosSnapshot.forEach(doc => { batch.update(doc.ref, { status: 'red' }); }); await batch.commit(); await this.cargarConvenios(true); alert("Acuerdos actualizados a hostiles."); } catch (e) { console.error("Error al establecer todos los convenios a rojo:", e); alert("Error al marcar acuerdos como hostiles: " + e.message); } },
+        async subirImagenConvenio(id, file) { if (!file) return; const p = `convenios/${id}/${file.name}`; const s = Firebase.ref(storage, p); try { const docSnap = await Firebase.getDoc(Firebase.doc(db, 'convenios', id)); if (docSnap.exists() && docSnap.data().imagenPath) { try { await Firebase.deleteObject(Firebase.ref(storage, docSnap.data().imagenPath)); } catch (e) { console.warn("La imagen anterior no se pudo borrar:", e.code); } } await Firebase.uploadBytes(s, file); const url = await Firebase.getDownloadURL(s); await Firebase.updateDoc(Firebase.doc(db, 'convenios', id), { imagenURL: url, imagenPath: p }); if (document.getElementById('contenedorConvenios')) this.cargarConvenios(true); } catch (e) { console.error("Error al subir imagen convenio:", e); alert("Error al subir imagen de acuerdo: " + e.message); } },
+        async mostrarListaNegraPublica() { await this.cargarListaNegra(); let msg = "--- LISTA NEGRA DE PIRATAS ---\n\n"; this.state.listaNegra.length === 0 ? msg += "Nadie vetado de los mares." : this.state.listaNegra.forEach(p => { msg += `- ${p.nombre} (Motivo: ${p.motivo})\n`; }); alert(msg); },
+        async actualizarLibroNegro() { await this.cargarLibroNegro(); const l = document.getElementById('listaLibroNegro'); if (!l) return; l.innerHTML = ''; this.state.libroNegro.forEach(c => { l.innerHTML += `<li class="flex justify-between items-center p-2 bg-nautics-mid rounded"><span><strong class="capitalize">${c.nombre}</strong> (${c.relacion}) - ${c.notas}</span><button onclick="VanillaApp.eliminarDelLibro('${c.docId}')" class="text-red-500 font-bold px-2">X</button></li>`; }); },
+        async anadirAlLibroNegro() { const n = document.getElementById('libroNombre').value.trim(), r = document.getElementById('libroRelacion').value, o = document.getElementById('libroNotas').value.trim(); if (n) { try { const newDoc = await Firebase.addDoc(Firebase.collection(db, 'libroNegro'), { nombre: n, relacion: r, notas: o }); this.state.libroNegro.push({ docId: newDoc.id, nombre: n, relacion: r, notas: o }); this.actualizarLibroNegro(); document.getElementById('libroNombre').value = ''; document.getElementById('libroNotas').value = ''; } catch(e) { console.error("Error al añadir al libro negro:", e); alert("Error al añadir a la bitácora: " + e.message); } } },
+        async eliminarDelLibro(docId) { try { await Firebase.deleteDoc(Firebase.doc(db, 'libroNegro', docId)); this.state.libroNegro = this.state.libroNegro.filter(c => c.docId !== docId); this.actualizarLibroNegro(); } catch(e) { console.error("Error al eliminar del libro negro:", e); alert("Error al eliminar de la bitácora: " + e.message); } },
+        async actualizarListaNegra() { await this.cargarListaNegra(); const l = document.getElementById('listaDeVetados'); if (!l) return; l.innerHTML = ''; this.state.listaNegra.forEach(p => { l.innerHTML += `<li class="flex justify-between items-center p-2 bg-red-900 bg-opacity-50 rounded"><span><strong class="capitalize">${p.nombre}</strong> - ${p.motivo}</span><button onclick="VanillaApp.eliminarDeListaNegra('${p.docId}')" class="text-white font-bold px-2">X</button></li>`; }); },
+        async anadirAListaNegra() { const n = document.getElementById('vetadoNombre').value.trim(), m = document.getElementById('vetadoMotivo').value.trim(); if (n && m) { try { const newDoc = await Firebase.addDoc(Firebase.collection(db, 'listaNegra'), { nombre: n, motivo: m }); this.state.listaNegra.push({ docId: newDoc.id, nombre: n, motivo: m }); this.actualizarListaNegra(); document.getElementById('vetadoNombre').value = ''; document.getElementById('vetadoMotivo').value = ''; } catch(e) { console.error("Error al añadir a lista negra:", e); alert("Error al vetar pirata: " + e.message); } } },
+        async eliminarDeListaNegra(docId) { try { await Firebase.deleteDoc(Firebase.doc(db, 'listaNegra', docId)); this.state.listaNegra = this.state.listaNegra.filter(p => p.docId !== docId); this.actualizarListaNegra(); } catch(e) { console.error("Error al eliminar de lista negra:", e); alert("Error al desvetar pirata: " + e.message); } },
+        async actualizarInventarioLog() { await this.cargarInventarioLog(); const contenedor = document.getElementById('listaInventarioLog'); if (!contenedor) return; contenedor.innerHTML = ''; if (this.state.inventarioLog.length === 0) { contenedor.innerHTML = '<li>No hay registros de inventario de flota.</li>'; return; } this.state.inventarioLog.forEach(log => { const fecha = log.timestamp.toDate().toLocaleString('es-ES'); const imgsHTML = log.imagenes ? log.imagenes.map(url => `<img src="${url}" class="w-24 h-24 object-cover rounded cursor-pointer" onclick="VanillaApp.mostrarImagenAmpliada('${url}')" />`).join('') : ''; contenedor.innerHTML += `<li class="flex items-start gap-4 p-3 bg-nautics-mid rounded"><div class="flex gap-2 flex-wrap">${imgsHTML}</div><div><p>Subido por: <strong class="capitalize">${log.subidoPor}</strong></p><p>Fecha: <strong class="font-mono">${fecha}</strong></p></div></li>`; }); },
         toggleInventarioLog() { const lista = document.getElementById('listaInventarioLog'); if (lista) { lista.style.display = lista.style.display === 'none' ? 'block' : 'none'; } },
         
         addMessageToChat(content, sender) {
@@ -1455,9 +1157,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const chatbotInput = document.getElementById('chatbot-input');
             const messageText = chatbotInput.value.trim();
             const files = this.state.chatFiles;
-            const currentUserUID = sessionStorage.getItem('currentUserUID'); // Obtener el UID actual
-            const currentUserName = sessionStorage.getItem('currentUserName'); // Obtener el nombre para mensajes
-            const currentUser = currentUserName || currentUserUID; // Usar el nombre si está disponible, sino el UID
+            const currentUser = sessionStorage.getItem('currentUser');
 
             if (!messageText && files.length === 0) return; 
 
@@ -1503,21 +1203,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Regex para capturar "nombre apellido cantidad cebos/cañas [y cantidad cebos/cañas]"
                 // Más flexible: puede empezar con "vender a", "vender" o directamente con el nombre.
-                // IMPORTANTE: El nombre y apellido deben ser dos palabras
+                // Ajustado para capturar la palabra "vender" o "comprar" al inicio o antes del nombre.
                 const salesRegex = /(?:vender\s+a\s+|vender\s+|comprar\s+)?([a-z]+\s[a-z]+)\s+(\d+)\s*(cebos|cañas)(?: y (\d+)\s*(cebos|cañas))?/;
                 const match = userMsg.match(salesRegex);
 
                 if (match) { // If a sales pattern is detected
                     console.log("Patrón de venta detectado:", match);
-                    const clientName = match[1].trim(); // Nombre y apellido del cliente
+                    const clientName = match[1].trim();
                     const item1Quantity = parseInt(match[2]);
                     const item1Type = match[3];
                     const item2Quantity = match[4] ? parseInt(match[4]) : 0;
                     const item2Type = match[5];
                     
-                    if (!clientName.includes(' ')) { 
+                    if (!clientName.includes(' ')) { // Basic check for full name (name and surname)
                         mockReply = "¡Almirante! Para registrar la venta, necesito el nombre y **apellido** del cliente.";
-                    } else if (!currentUserUID) { // Verifica el UID para operaciones de escritura
+                    } else if (!currentUser) {
                         mockReply = "¡Capitán, solo la tripulación autorizada puede registrar ventas! Por favor, inicia sesión.";
                     }
                     else {
@@ -1527,38 +1227,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         // Process first item
                         if (item1Type === 'cebos') {
-                            const clientDocRef = Firebase.doc(db, 'clientesVentas', clientName);
-                            const clientDoc = await Firebase.getDoc(clientDocRef);
+                            const clientDoc = await Firebase.getDoc(Firebase.doc(db, 'clientesVentas', clientName));
                             const clientData = clientDoc.exists() ? clientDoc.data() : { ultimaCompraCebos: null, compras: [] };
-                            
-                            // Get date of last cebo purchase
-                            const lastCeboPurchaseDate = clientData.ultimaCompraCebos ? 
-                                new Date(clientData.ultimaCompraCebos.toDate ? clientData.ultimaCompraCebos.toDate() : clientData.ultimaCompraCebos).toDateString() : null;
+                            const lastCeboPurchaseDate = clientData.ultimaCompraCebos ? new Date(clientData.ultimaCompraCebos.toDate()).toDateString() : null;
                             const todayDate = new Date().toDateString();
 
                             if (lastCeboPurchaseDate === todayDate) {
                                 responseMessages.push(`¡Almirante! El cliente ${clientName} ya compró cebos hoy. No podemos venderle más hasta mañana.`);
                                 ceboSoldToday = true;
                             } else {
-                                salesPromises.push(Firebase.setDoc(clientDocRef, {
+                                salesPromises.push(Firebase.setDoc(Firebase.doc(db, 'clientesVentas', clientName), {
                                     ultimaCompraCebos: Firebase.serverTimestamp(),
-                                    compras: Firebase.arrayUnion({ 
+                                    compras: Firebase.arrayUnion({ // Corrected: Use Firebase.arrayUnion
                                         producto: 'cebo',
                                         cantidad: item1Quantity,
                                         timestamp: Firebase.serverTimestamp(),
-                                        empleado: currentUserName || currentUserUID // Usa el nombre si está, sino el UID
+                                        empleado: currentUser
                                     })
                                 }, { merge: true }));
                                 responseMessages.push(`¡${item1Quantity} cebos registrados para ${clientName}!`);
                             }
                         } else if (item1Type === 'cañas') {
-                            const clientDocRef = Firebase.doc(db, 'clientesVentas', clientName);
-                            salesPromises.push(Firebase.setDoc(clientDocRef, {
-                                compras: Firebase.arrayUnion({ 
+                            salesPromises.push(Firebase.setDoc(Firebase.doc(db, 'clientesVentas', clientName), {
+                                compras: Firebase.arrayUnion({ // Corrected: Use Firebase.arrayUnion
                                     producto: 'caña',
                                     cantidad: item1Quantity,
                                     timestamp: Firebase.serverTimestamp(),
-                                    empleado: currentUserName || currentUserUID
+                                    empleado: currentUser
                                 })
                             }, { merge: true }));
                             responseMessages.push(`¡${item1Quantity} cañas registradas para ${clientName}!`);
@@ -1567,40 +1262,36 @@ document.addEventListener('DOMContentLoaded', () => {
                         // Process second item if present and not a cebo already sold (if the first was cebos)
                         if (item2Quantity > 0 && item2Type) {
                             if (item2Type === 'cebos') {
-                                if (ceboSoldToday) { 
+                                if (ceboSoldToday) { // If cebos already sold in the first part, don't sell again
                                     responseMessages.push(`¡Atención! ${clientName} ya compró cebos hoy, no puedo registrar más cebos.`);
                                 } else {
-                                    const clientDocRef = Firebase.doc(db, 'clientesVentas', clientName);
-                                    const clientDoc = await Firebase.getDoc(clientDocRef);
+                                    const clientDoc = await Firebase.getDoc(Firebase.doc(db, 'clientesVentas', clientName));
                                     const clientData = clientDoc.exists() ? clientDoc.data() : { ultimaCompraCebos: null, compras: [] };
-                                    
-                                    const lastCeboPurchaseDate = clientData.ultimaCompraCebos ? 
-                                        new Date(clientData.ultimaCompraCebos.toDate ? clientData.ultimaCompraCebos.toDate() : clientData.ultimaCompraCebos).toDateString() : null;
+                                    const lastCeboPurchaseDate = clientData.ultimaCompraCebos ? new Date(clientData.ultimaCompraCebos.toDate()).toDateString() : null;
                                     const todayDate = new Date().toDateString();
 
                                     if (lastCeboPurchaseDate === todayDate) {
                                         responseMessages.push(`¡Atención! ${clientName} ya compró cebos hoy, no puedo registrar más cebos.`);
                                     } else {
-                                        salesPromises.push(Firebase.setDoc(clientDocRef, {
+                                        salesPromises.push(Firebase.setDoc(Firebase.doc(db, 'clientesVentas', clientName), {
                                             ultimaCompraCebos: Firebase.serverTimestamp(),
-                                            compras: Firebase.arrayUnion({ 
+                                            compras: Firebase.arrayUnion({ // Corrected: Use Firebase.arrayUnion
                                                 producto: 'cebo',
                                                 cantidad: item2Quantity,
                                                 timestamp: Firebase.serverTimestamp(),
-                                                empleado: currentUserName || currentUserUID
+                                                empleado: currentUser
                                             })
                                         }, { merge: true }));
                                         responseMessages.push(`¡${item2Quantity} cebos también registrados para ${clientName}.`);
                                     }
                                 }
                             } else if (item2Type === 'cañas') {
-                                const clientDocRef = Firebase.doc(db, 'clientesVentas', clientName);
-                                salesPromises.push(Firebase.setDoc(clientDocRef, {
-                                    compras: Firebase.arrayUnion({ 
+                                salesPromises.push(Firebase.setDoc(Firebase.doc(db, 'clientesVentas', clientName), {
+                                    compras: Firebase.arrayUnion({ // Corrected: Use Firebase.arrayUnion
                                         producto: 'caña',
                                         cantidad: item2Quantity,
                                         timestamp: Firebase.serverTimestamp(),
-                                        empleado: currentUserName || currentUserUID
+                                        empleado: currentUser
                                     })
                                 }, { merge: true }));
                                 responseMessages.push(`¡${item2Quantity} cañas también registradas para ${clientName}.`);
@@ -1613,7 +1304,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 mockReply = responseMessages.join(" ");
                                 this.cargarClienteVentas(); // Refresh client sales data
                             } else {
-                                mockReply = responseMessages.join(" "); 
+                                mockReply = responseMessages.join(" "); // If no sales were processed due to restrictions, still show the message.
                             }
                         } catch (e) {
                             console.error("Error al registrar venta de cliente:", e);
@@ -1632,20 +1323,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     };
 
                     if (keywords.fichar.some(k => userMsg.includes(k))) {
-                        if(currentUserName) { // Usamos currentUserName para la UI
-                            this.fichar(currentUserName);
+                        if(currentUser) {
+                            this.fichar(currentUser);
                             mockReply = "¡A la guardia! Registro de inicio de turno completado, capitán.";
                         } else {
                             mockReply = "Necesitas iniciar sesión para poder iniciar guardia, capitán.";
                         }
                     } else if (keywords.empleado.some(k => userMsg.includes(k))) {
                         mockReply = "¡Por supuesto, al panel de tripulación al instante, almirante!";
-                        // Aquí, si no hay currentUser, debería redirigir al login
-                        if (currentUserName) {
-                             this.irAPanelEmpleado();
-                        } else {
-                            mockReply += " Necesitas iniciar sesión primero.";
-                        }
+                        this.irAPanelEmpleado();
                     } else if (keywords.producto.some(k => userMsg.includes(k))) {
                         mockReply = "¡Zarpo a revisar nuestras provisiones y equipo, almirante!";
                         this.mostrarPanelProductos();
@@ -1653,8 +1339,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         mockReply = "¡Nuestra flota te espera! Mostrando los barcos disponibles...";
                         this.mostrarPanelBarcos();
                     } else if (keywords.hola.some(k => userMsg.includes(k))) {
-                        mockReply = `¡Ahoy, ${currentUserName || 'capitán'}! Soy Jack Sparrow, ¿en qué puedo ayudarte hoy?`;
-                    } else if (!messageText && files.length > 0) { 
+                        mockReply = `¡Ahoy, ${currentUser || 'capitán'}! Soy Jack Sparrow, ¿en qué puedo ayudarte hoy?`;
+                    } else if (!messageText && files.length > 0) { // Keep this last for image-only messages
                         mockReply = "¡Qué buena pinta tienen esas fotos, almirante!";
                     }
                 }
@@ -1699,8 +1385,6 @@ document.addEventListener('DOMContentLoaded', () => {
         ajustarPosicionChatbot(visible) { const bubble = document.getElementById('chatbot-bubble'); if (bubble) { if (visible) bubble.classList.add('visible'); else bubble.classList.remove('visible'); } },
 
         async publicarAnuncio() {
-            const currentUserUID = sessionStorage.getItem('currentUserUID');
-            if (!currentUserUID) { alert("No hay usuario autenticado."); return; } // Requiere autenticación
             const texto = document.getElementById('anuncioTexto').value;
             const duracionHoras = parseInt(document.getElementById('anuncioDuracion').value);
             const esEncuesta = document.getElementById('anuncioEsEncuesta').checked;
@@ -1724,7 +1408,6 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         iniciarListenerAnuncios() {
             const anuncioRef = Firebase.doc(db, "configuracion", "anuncio_global");
-            // No se requiere autenticación para INICIAR el listener, pero sí para acceder a los datos si las reglas lo exigen.
             Firebase.onSnapshot(anuncioRef, (doc) => {
                 const container = document.getElementById('anuncio-panel-lateral');
                 if (doc.exists()) {
@@ -1732,10 +1415,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     const ahora = Date.now();
                     
                     if (anuncio.expiraEn > ahora) {
-                        const currentUser = sessionStorage.getItem('currentUserName') || sessionStorage.getItem('currentUserUID'); // Usar el nombre si está, sino el UID
+                        const currentUser = sessionStorage.getItem('currentUser');
                         let contenidoHTML = `<h3 class="text-xl text-nautics-light border-b-2 border-nautics-mid pb-2 mb-4">Anuncio de la Flota</h3><p class="text-base flex-grow">${anuncio.texto}</p>`;
                         if (anuncio.esEncuesta) {
-                            // La votación requiere que el currentUser esté autenticado para que la regla de seguridad funcione
                             const haVotado = currentUser && anuncio.votos && anuncio.votos[currentUser];
                             contenidoHTML += `
                                 <div class="mt-4">
@@ -1765,13 +1447,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         },
         async votarEnAnuncio(voto) {
-            const currentUserUID = sessionStorage.getItem('currentUserUID');
-            if (!currentUserUID) return alert("Debes iniciar sesión para poder votar, tripulante.");
+            const currentUser = sessionStorage.getItem('currentUser');
+            if (!currentUser) return alert("Debes iniciar sesión para poder votar, tripulante.");
             
             const anuncioRef = Firebase.doc(db, "configuracion", "anuncio_global");
             try {
                 await Firebase.updateDoc(anuncioRef, {
-                    [`votos.${currentUserUID}`]: voto // Usa UID para registrar el voto
+                    [`votos.${currentUser}`]: voto
                 });
             } catch (e) {
                 console.error("Error al registrar el voto:", e);
@@ -1779,8 +1461,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
         async mostrarResultadosEncuesta() {
-            const currentUserUID = sessionStorage.getItem('currentUserUID');
-            if (!currentUserUID) { alert("No hay usuario autenticado."); return; } // Requiere autenticación para leer
             const anuncioRef = Firebase.doc(db, "configuracion", "anuncio_global");
             const docSnap = await Firebase.getDoc(anuncioRef);
 
@@ -1793,16 +1473,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const votosSi = [];
             const votosNo = [];
 
-            // Aquí iteramos por UIDs, y si quieres mostrar nombres, necesitarías hacer un lookup
-            // Simplificando, podemos mostrar los UIDs o solo el conteo.
-            // Para mostrar nombres, deberías precargar los nombres de los empleados por sus UIDs.
-            for (const uid in votos) {
-                if (votos[uid] === 'si') {
-                    const empleado = this.state.empleados.find(e => e.id === uid);
-                    votosSi.push(empleado ? empleado.nombre : `(UID: ${uid})`);
+            for (const empleado in votos) {
+                if (votos[empleado] === 'si') {
+                    votosSi.push(empleado);
                 } else {
-                    const empleado = this.state.empleados.find(e => e.id === uid);
-                    votosNo.push(empleado ? empleado.nombre : `(UID: ${uid})`);
+                    votosNo.push(empleado);
                 }
             }
 
@@ -1832,7 +1507,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         iniciarListenerBarcos() { 
             const q = Firebase.query(Firebase.collection(db, "barcos"), Firebase.orderBy("id")); 
-            // No se requiere autenticación para INICIAR el listener, pero sí para acceder a los datos si las reglas lo exigen.
             this.state.unsubscribeBarcos = Firebase.onSnapshot(q, (snapshot) => { 
                 const barcosNuevos = []; 
                 snapshot.forEach(doc => {
@@ -1848,13 +1522,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const panelBarcos = document.getElementById('panel-barcos'); 
                 if (panelBarcos) {
-                    const currentUserName = sessionStorage.getItem('currentUserName'); // Usar nombre para la UI
+                    const currentUser = sessionStorage.getItem('currentUser');
                     let barcosHTML = this.state.barcos.map(boat => { 
                         const estadoActual = this.getEstadoBarco(boat); 
                         const imagenHTML = `<img src="${boat.imagen}" alt="${boat.nombre}" class="barco-img mb-4" onerror="this.style.display='none'">`; 
                         let controles = (estadoActual.estado === 'disponible') 
-                            ? `<div class="flex flex-col gap-2"><button class="btn text-sm py-2 w-full" onclick="VanillaApp.ocuparBarcoAhora(${boat.id}, '${currentUserName}')">Paseo (30 min)</button><button class="btn text-sm py-2 w-full" onclick="VanillaApp.ocuparBarcoAhora(${boat.id}, '${currentUserName}')" style="background-color: var(--color-nautics-secondary-pink);">Alquiler (45 min)</button></div>` 
-                            : `<div class="font-mono text-xl mb-2" id="timer-boat-${boat.id}">--:--:--</div><div class="flex gap-2"><button class="btn text-xs py-1 flex-grow" onclick="VanillaApp.anadirTiempoBarco(${boat.id}, '${currentUserName}', 30)">+30 min</button><button class="btn text-xs py-1 flex-grow" style="background-color:#dc2626" onclick="VanillaApp.liberarBarco(${boat.id}, '${currentUserName}')">Liberar</button></div>`;
+                            ? `<div class="flex flex-col gap-2"><button class="btn text-sm py-2 w-full" onclick="VanillaApp.ocuparBarcoAhora(${boat.id}, '${currentUser}', 30)">Paseo (30 min)</button><button class="btn text-sm py-2 w-full" onclick="VanillaApp.ocuparBarcoAhora(${boat.id}, '${currentUser}', 45)" style="background-color: var(--color-nautics-secondary-pink);">Alquiler (45 min)</button></div>` 
+                            : `<div class="font-mono text-xl mb-2" id="timer-boat-${boat.id}">--:--:--</div><div class="flex gap-2"><button class="btn text-xs py-1 flex-grow" onclick="VanillaApp.anadirTiempoBarco(${boat.id}, '${currentUser}', 30)">+30 min</button><button class="btn text-xs py-1 flex-grow" style="background-color:#dc2626" onclick="VanillaApp.liberarBarco(${boat.id}, '${currentUser}')">Liberar</button></div>`;
                         return `<div class="bg-nautics-mid p-4 rounded-lg text-center flex flex-col justify-between"><div><p class="font-bold text-lg">${boat.nombre}</p><p class="text-sm ${estadoActual.estado === 'ocupada' ? 'text-red-400' : 'text-green-400'} mb-2">${estadoActual.texto}</p></div><div>${controles}</div></div>`;
                     }).join('');
                     panelBarcos.innerHTML = barcosHTML; 
@@ -1868,54 +1542,10 @@ document.addEventListener('DOMContentLoaded', () => {
             this.iniciarListenerAnuncios();
             this.iniciarListenerBarcos(); 
             // Cargar datos iniciales al arrancar la aplicación
-            // NOTA: Estas cargas ahora dependen de la autenticación de Firebase si las reglas lo requieren.
-            // La función onAuthStateChanged se encargará de mostrar los paneles una vez autenticado.
-            
-            // Listener para el estado de autenticación de Firebase
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    // Usuario autenticado
-                    console.log("Usuario Firebase autenticado:", user.uid);
-                    // Guarda el UID en sessionStorage
-                    sessionStorage.setItem('currentUserUID', user.uid);
-                    // Recupera el nombre del empleado para la UI
-                    const empleadoDoc = await Firebase.getDoc(Firebase.doc(db, 'empleados', user.uid));
-                    if (empleadoDoc.exists()) {
-                        sessionStorage.setItem('currentUserName', empleadoDoc.data().nombre);
-                    } else {
-                        // Si el documento de empleado no existe para este UID, es un problema
-                        console.warn("No se encontró documento de empleado para el UID autenticado:", user.uid);
-                        sessionStorage.removeItem('currentUserName'); // Limpiar para evitar mostrar UID en la UI
-                    }
-
-                    // Ahora que estamos autenticados, podemos cargar los datos que dependen de ello
-                    await this.cargarTodosLosEmpleados();
-                    await this.cargarTodosLosFichajes();
-                    await this.cargarTodasLasVentas();
-                    await this.cargarClienteVentas(); 
-
-                    // Redirigir al panel apropiado
-                    const currentUserName = sessionStorage.getItem('currentUserName');
-                    if (currentUserName) { // Si tenemos el nombre del empleado
-                         // Comprobar si es un jefe para ir al panel de admin
-                        const empleado = this.state.empleados.find(e => e.id === user.uid); // Buscar por UID ahora
-                        if (empleado && empleado.directiva === true) {
-                            this.mostrarPanelAdmin();
-                        } else {
-                            this.irAPanelEmpleado(); // Ir al panel de empleado regular
-                        }
-                    } else {
-                        this.mostrarInicio(); // Volver al inicio si no se encontró el nombre
-                    }
-                } else {
-                    // No hay usuario autenticado o la sesión terminó
-                    console.log("No hay usuario Firebase autenticado.");
-                    sessionStorage.removeItem('currentUserUID');
-                    sessionStorage.removeItem('currentUserName');
-                    this.mostrarInicio(); // Asegurarse de que se muestre la pantalla de inicio o login
-                }
-            });
-
+            await this.cargarTodosLosEmpleados();
+            await this.cargarTodosLosFichajes();
+            await this.cargarTodasLasVentas();
+            await this.cargarClienteVentas(); 
 
             const chatButtonWrapper = document.getElementById('chatbot-button-wrapper');
             const chatContainer = document.getElementById('chatbot-container');
@@ -1952,6 +1582,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (chatbotInputContainer) chatbotInputContainer.addEventListener('paste', (e) => this.handleChatPaste(e));
 
             this.addMessageToChat('¡Ahoy! Soy Jack Sparrow, tu asistente en Nautics. ¿En qué puedo ayudarte?', 'bot'); 
+
+            const currentUser = sessionStorage.getItem('currentUser');
+            if (currentUser) {
+                await this.irAPanelEmpleado();
+            } else {
+                this.mostrarInicio();
+            }
 
             // Set up interval to reset cebo purchase restrictions daily
             setInterval(async () => {
@@ -2000,14 +1637,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const datosVentas = [];
-            for (const empleadoUID in this.state.ventas) { // Iterar por UID
-                // Encontrar el nombre del empleado a partir del UID si es necesario para el informe
-                const empleado = this.state.empleados.find(e => e.id === empleadoUID);
-                const empleadoNombre = empleado ? empleado.nombre : empleadoUID; // Mostrar nombre o UID
-
-                for (const productoId in this.state.ventas[empleadoUID].productos) {
+            for (const empleado in this.state.ventas) {
+                for (const productoId in this.state.ventas[empleado].productos) {
                     const productoInfo = this.state.productos.find(p => p.id === productoId);
-                    datosVentas.push({ Empleado: empleadoNombre, Producto: productoInfo ? productoInfo.nombre : productoId, Ventas_Hoy: this.state.ventas[empleadoUID].productos[productoId].hoy || 0, Ventas_Total: this.state.ventas[empleadoUID].productos[productoId].total || 0 });
+                    datosVentas.push({ Empleado: empleado, Producto: productoInfo ? productoInfo.nombre : productoId, Ventas_Hoy: this.state.ventas[empleado].productos[productoId].hoy || 0, Ventas_Total: this.state.ventas[empleado].productos[productoId].total || 0 });
                 }
             }
             if (datosVentas.length > 0) {
@@ -2084,7 +1717,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.VanillaApp = VanillaApp;
-    // Esto inicia Firebase y luego, a través de onAuthStateChanged, cargará los datos y mostrará el panel.
     VanillaApp.init();
 
 });
