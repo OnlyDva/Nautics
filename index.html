@@ -147,7 +147,7 @@
 </style>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, query, orderBy, addDoc, serverTimestamp, where, writeBatch, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, query, orderBy, addDoc, serverTimestamp, where, writeBatch, onSnapshot, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"; // Added arrayUnion
     import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
     
     // Configuración de Firebase para el proyecto Nautics
@@ -165,7 +165,7 @@
     window.db = getFirestore(firebaseApp);
     window.storage = getStorage(firebaseApp);
     window.Firebase = {
-        collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, query, orderBy, addDoc, serverTimestamp, where, writeBatch, onSnapshot
+        collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, query, orderBy, addDoc, serverTimestamp, where, writeBatch, onSnapshot, arrayUnion // Export arrayUnion
     };
 </script>
 </head>
@@ -288,20 +288,73 @@ document.addEventListener('DOMContentLoaded', () => {
             );
         },
 
-        async cargarTodosLosEmpleados() { try { const snapshot = await Firebase.getDocs(Firebase.query(Firebase.collection(db, 'empleados'), Firebase.orderBy('nombre'))); this.state.empleados = []; snapshot.forEach(doc => this.state.empleados.push({ id: doc.id, ...doc.data() })); } catch (e) { console.error("Error cargando empleados:", e); } },
-        async cargarTodosLosFichajes() { try { const snapshot = await Firebase.getDocs(Firebase.collection(db, 'fichajes')); let fichajesData = {}; snapshot.forEach(doc => { fichajesData[doc.id] = doc.data(); }); this.state.fichajes = fichajesData; } catch (e) { console.error("Error cargando fichajes:", e); } },
-        async cargarTodasLasVentas() { try { const snapshot = await Firebase.getDocs(Firebase.collection(db, 'ventas')); this.state.ventas = {}; snapshot.forEach(doc => { this.state.ventas[doc.id] = doc.data(); }); this.state.productos.forEach(p => { for(const emp in this.state.ventas) { if(!this.state.ventas[emp].productos) this.state.ventas[emp].productos = {}; if(!this.state.ventas[emp].productos[p.id]) this.state.ventas[emp].productos[p.id] = { hoy: 0, total: 0 }; } }); } catch (e) { console.error("Error cargando ventas:", e); } },
-        async cargarInventarioLog() { try { const q = Firebase.query(Firebase.collection(db, 'inventario_log'), Firebase.orderBy('timestamp', 'desc')); const snapshot = await Firebase.getDocs(q); this.state.inventarioLog = []; snapshot.forEach(doc => this.state.inventarioLog.push(doc.data())); } catch (e) { console.error("Error cargando log de inventario:", e); } },
-        async cargarLibroNegro() { try { const snapshot = await Firebase.getDocs(Firebase.collection(db, 'libroNegro')); this.state.libroNegro = []; snapshot.forEach(doc => this.state.libroNegro.push({docId: doc.id, ...doc.data()})); } catch (e) { console.error("Error cargando Libro Negro:", e); } },
-        async cargarListaNegra() { try { const snapshot = await Firebase.getDocs(Firebase.collection(db, 'listaNegra')); this.state.listaNegra = []; snapshot.forEach(doc => this.state.listaNegra.push({docId: doc.id, ...doc.data()})); } catch (e) { console.error("Error cargando Lista Negra:", e); } },
+        async cargarTodosLosEmpleados() { 
+            console.log("Cargando empleados...");
+            try { 
+                const snapshot = await Firebase.getDocs(Firebase.query(Firebase.collection(db, 'empleados'), Firebase.orderBy('nombre'))); 
+                this.state.empleados = []; 
+                snapshot.forEach(doc => this.state.empleados.push({ id: doc.id, ...doc.data() })); 
+                console.log("Empleados cargados:", this.state.empleados.map(e => e.id));
+            } catch (e) { console.error("Error cargando empleados:", e); } 
+        },
+        async cargarTodosLosFichajes() { 
+            console.log("Cargando fichajes...");
+            try { 
+                const snapshot = await Firebase.getDocs(Firebase.collection(db, 'fichajes')); 
+                let fichajesData = {}; 
+                snapshot.forEach(doc => { fichajesData[doc.id] = doc.data(); }); 
+                this.state.fichajes = fichajesData; 
+                console.log("Fichajes cargados.");
+            } catch (e) { console.error("Error cargando fichajes:", e); } 
+        },
+        async cargarTodasLasVentas() { 
+            console.log("Cargando ventas...");
+            try { 
+                const snapshot = await Firebase.getDocs(Firebase.collection(db, 'ventas')); 
+                this.state.ventas = {}; 
+                snapshot.forEach(doc => { this.state.ventas[doc.id] = doc.data(); }); 
+                this.state.productos.forEach(p => { for(const emp in this.state.ventas) { if(!this.state.ventas[emp].productos) this.state.ventas[emp].productos = {}; if(!this.state.ventas[emp].productos[p.id]) this.state.ventas[emp].productos[p.id] = { hoy: 0, total: 0 }; } }); 
+                console.log("Ventas cargadas.");
+            } catch (e) { console.error("Error cargando ventas:", e); } 
+        },
+        async cargarInventarioLog() { 
+            console.log("Cargando log de inventario...");
+            try { 
+                const q = Firebase.query(Firebase.collection(db, 'inventario_log'), Firebase.orderBy('timestamp', 'desc')); 
+                const snapshot = await Firebase.getDocs(q); 
+                this.state.inventarioLog = []; 
+                snapshot.forEach(doc => this.state.inventarioLog.push(doc.data())); 
+                console.log("Log de inventario cargado.");
+            } catch (e) { console.error("Error cargando log de inventario:", e); } 
+        },
+        async cargarLibroNegro() { 
+            console.log("Cargando Libro Negro...");
+            try { 
+                const snapshot = await Firebase.getDocs(Firebase.collection(db, 'libroNegro')); 
+                this.state.libroNegro = []; 
+                snapshot.forEach(doc => this.state.libroNegro.push({docId: doc.id, ...doc.data()})); 
+                console.log("Libro Negro cargado.");
+            } catch (e) { console.error("Error cargando Libro Negro:", e); } 
+        },
+        async cargarListaNegra() { 
+            console.log("Cargando Lista Negra...");
+            try { 
+                const snapshot = await Firebase.getDocs(Firebase.collection(db, 'listaNegra')); 
+                this.state.listaNegra = []; 
+                snapshot.forEach(doc => this.state.listaNegra.push({docId: doc.id, ...doc.data()})); 
+                console.log("Lista Negra cargada.");
+            } catch (e) { console.error("Error cargando Lista Negra:", e); } 
+        },
         
         async cargarClienteVentas() {
+            console.log("Cargando ventas de clientes...");
             try {
                 const snapshot = await Firebase.getDocs(Firebase.collection(db, 'clientesVentas'));
                 this.state.clientesVentas = {};
                 snapshot.forEach(doc => {
                     this.state.clientesVentas[doc.id] = doc.data();
                 });
+                console.log("Ventas de clientes cargadas.");
             } catch (e) {
                 console.error("Error cargando ventas de clientes:", e);
             }
@@ -604,7 +657,10 @@ document.addEventListener('DOMContentLoaded', () => {
         async mostrarPanelEmpleados(nombre) {
             this.stopAllTimers();
             this.ajustarPosicionChatbot(false);
-            const empleadoDoc = await Firebase.getDoc(Firebase.doc(db, 'empleados', nombre)); const empleadoData = empleadoDoc.exists() ? empleadoDoc.data() : {};
+            // Asegurarse de recargar los datos del empleado para ver posibles ausencias actualizadas
+            await this.cargarTodosLosEmpleados(); 
+            const empleadoDoc = this.state.empleados.find(emp => emp.id === nombre) || {};
+            
             const datosFichaje = await this.gestionarReseteoDatos(nombre); await this.gestionarReseteoDatos(nombre, true);
             let tiempoHoy = datosFichaje.hoy || 0, tiempoSemana = datosFichaje.semana || 0, tiempoTotal = datosFichaje.total || 0;
             if (datosFichaje.fichado) { const t = Date.now() - datosFichaje.inicio; tiempoHoy += t; tiempoSemana += t; tiempoTotal += t; }
@@ -618,7 +674,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return `<div class="bg-nautics-mid p-4 rounded-lg text-center flex flex-col justify-between"><div><p class="font-bold text-lg">${boat.nombre}</p><p class="text-sm ${estadoActual.estado === 'ocupada' ? 'text-red-400' : 'text-green-400'} mb-2">${estadoActual.texto}</p></div><div>${controles}</div></div>`;
             }).join('');
 
-            const botonConveniosHTML = `<button onclick="VanillaApp.mostrarPanelConvenios(${empleadoData.directiva || false})" class="btn text-xs py-1">Convenios Navales</button>`;
+            const botonConveniosHTML = `<button onclick="VanillaApp.mostrarPanelConvenios(${empleadoDoc.directiva || false})" class="btn text-xs py-1">Convenios Navales</button>`;
             const botonesAccionHTML = `<button onclick="VanillaApp.mostrarModalAusencias('${nombre}')" class="btn text-xs py-1">Permisos de Ausencia</button>${botonConveniosHTML}<button onclick="VanillaApp.mostrarPanelInventario()" class="btn text-xs py-1">Inventario de Flota</button><button onclick="VanillaApp.mostrarListaNegraPublica()" class="btn text-xs py-1">Ver Piratas Vetados</button><button class="btn" style="background-color: #dc2626;" onclick="VanillaApp.cerrarSesion()">Abandonar Barco</button>`; 
             const hoyStr = new Date().toISOString().split('T')[0]; const packRecibido = datosFichaje.ultimoPackDiario === hoyStr;
             const controlHTML = `<div class="bg-nautics-mid bg-opacity-50 p-4 rounded-lg mb-6 text-center border border-nautics-primary-blue"><h3 class="text-lg font-semibold mb-4">Control de Operaciones de Flota</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div class="bg-nautics-dark bg-opacity-50 p-4 rounded-lg flex flex-col justify-center items-center"><p class="text-base font-bold mb-2">ESTADO DE LA FLOTA</p><div class="flex justify-center items-center gap-4"><button id="abrirLocalBtn" class="btn bg-green-600 hover:bg-green-700">Flota Lista (Abrir)</button><button id="cerrarLocalBtn" class="btn bg-red-600 hover:bg-red-700">Flota Inactiva (Cerrar)</button></div><div class="mt-3"><p id="tiempoAbiertoLocal" class="font-mono text-2xl text-nautics-accent-pink">00:00:00</p><div id="ultimoCierreInfo" class="text-xs text-nautics-light mt-1"></div></div></div><div class="bg-nautics-dark bg-opacity-50 p-4 rounded-lg"><p class="text-base font-bold mb-2">REGISTRO DE GUARDIA</p><div class="grid grid-cols-2 gap-2 text-center h-full"><div class="p-1 rounded-lg bg-nautics-mid flex flex-col justify-center"><p class="text-xs text-nautics-light">GUARDIA</p><p id="tiempoSesion" class="font-mono text-lg">${this.formatearTiempo(0)}</p></div><div class="p-1 rounded-lg bg-nautics-mid flex flex-col justify-center"><p class="text-xs text-nautics-light">HOY</p><p id="tiempoHoy" class="font-mono text-lg">${this.formatearTiempo(tiempoHoy)}</p></div><div class="p-1 rounded-lg bg-nautics-mid flex flex-col justify-center"><p class="text-xs text-nautics-light">SEMANA</p><p id="tiempoSemana" class="font-mono text-lg">${this.formatearTiempo(tiempoSemana)}</p></div><div class="p-1 rounded-lg bg-nautics-mid flex flex-col justify-center"><p class="text-xs text-nautics-light">TOTAL</p><p id="tiempoTotal" class="font-mono text-lg">${this.formatearTiempo(tiempoTotal)}</p></div></div></div></div><div class="mt-6 flex justify-center items-center gap-4 border-t border-nautics-mid pt-4"><button class="btn text-lg px-6 py-3" onclick="VanillaApp.fichar('${nombre}')">Iniciar Guardia</button><button class="btn text-lg px-6 py-3" onclick="VanillaApp.desfichar('${nombre}')">Finalizar Guardia</button><button id="packDiarioBtn" class="btn text-base px-4 py-2" style="background-color: ${packRecibido ? 'var(--color-nautics-mid)' : 'var(--color-nautics-secondary-pink)'};" onclick="VanillaApp.darPackDiarioVentas('${nombre}')" ${packRecibido ? 'disabled' : ''}>${packRecibido ? 'Raciones del día recibidas' : 'Raciones Diarias (Venta)'}</button></div></div>`;
@@ -633,8 +689,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         async mostrarModalAusencias(nombreEmpleado, esJefe = false) {
             this.stopAllTimers();
-            const empleadoDoc = await Firebase.getDoc(Firebase.doc(db, 'empleados', nombreEmpleado));
-            const empleadoData = empleadoDoc.exists() ? empleadoDoc.data() : {};
+            // Recargar empleados para asegurar que las ausencias estén actualizadas
+            await this.cargarTodosLosEmpleados();
+            const empleadoData = this.state.empleados.find(emp => emp.id === nombreEmpleado) || {};
             const ausencias = empleadoData.ausencias || [];
 
             let ausenciasHTML = ausencias.length === 0 
@@ -680,8 +737,19 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         
         async mostrarPanelAdmin() {
-            this.stopAllTimers(); if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); } 
+            this.stopAllTimers(); 
+            if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); } 
             this.ajustarPosicionChatbot(false);
+
+            // Asegurarse de recargar TODOS los datos necesarios para el panel de admin
+            await this.cargarTodosLosEmpleados(); 
+            await this.cargarTodosLosFichajes(); 
+            await this.cargarTodasLasVentas(); 
+            await this.cargarInventarioLog(); 
+            await this.cargarLibroNegro(); 
+            await this.cargarListaNegra(); 
+            await this.cargarClienteVentas(); // Asegúrate de que esto se cargue también
+
             const dashboardHTML = `<div class="mb-8 p-6 bg-nautics-mid bg-opacity-50 rounded-lg border border-nautics-primary-blue"><h2 class="text-2xl font-bold mb-4">Dashboard de Flota en Tiempo Real</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div><h3 class="font-semibold mb-2 text-nautics-light">Tripulación de Guardia</h3><ul id="dashboard-empleados" class="space-y-1 text-sm"><li>Cargando...</li></ul></div><div><h3 class="font-semibold mb-2 text-nautics-light">Barcos Ocupados</h3><ul id="dashboard-barcos" class="space-y-1 text-sm"><li>Cargando...</li></ul></div></div></div>`; 
             const anunciosHTML = `
                 <div class="mb-8 p-6 bg-nautics-mid bg-opacity-50 rounded-lg border border-nautics-primary-blue">
@@ -709,9 +777,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>`;
             
             let tablaEmpleadosHTML = '';
+            // Asegurarse de usar la lista de empleados actualizada para construir la tabla
             this.state.empleados.forEach(e => {
-                const f = this.state.fichajes[e.id] || {}; const v = this.state.ventas[e.id] || {};
-                let vH = 0, vT = 0; if (v.productos) { for (const p in v.productos) { vH += v.productos[p].hoy || 0; vT += v.productos[p].total || 0; } }
+                const f = this.state.fichajes[e.id] || {}; 
+                const v = this.state.ventas[e.id] || {};
+                let vH = 0, vT = 0; 
+                if (v.productos) { 
+                    for (const p in v.productos) { 
+                        vH += v.productos[p].hoy || 0; 
+                        vT += v.productos[p].total || 0; 
+                    } 
+                }
                 const enAusencia = this.estaDeAusencia(e);
                 const filaClass = enAusencia ? 'text-red-500' : '';
                 const directivaBtnStyle = e.directiva ? 'background-color:#16a34a;' : 'background-color:#555;'; 
@@ -745,6 +821,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const empleadosElem = document.getElementById('dashboard-empleados');
                 const barcosElem = document.getElementById('dashboard-barcos'); 
                 if (empleadosElem) {
+                    // Cargar empleados también para asegurar que la lista de nombres es completa
+                    await this.cargarTodosLosEmpleados();
                     const empleadosFichados = Object.entries(this.state.fichajes).filter(([_, data]) => data.fichado).map(([id, data]) => ({ id, ...data }));
                     if (empleadosFichados.length > 0) {
                         empleadosElem.innerHTML = empleadosFichados.map(e => `<li class="capitalize text-green-400">${e.id} (Desde: ${new Date(e.inicio).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })})</li>`).join('');
@@ -766,7 +844,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch(e) { console.error("Error actualizando el dashboard:", e); }
         },
-        async verificarAccesoAdmin() { await this.cargarTodosLosEmpleados(); await this.cargarTodosLosFichajes(); await this.cargarTodasLasVentas(); await this.cargarInventarioLog(); await this.cargarLibroNegro(); await this.cargarListaNegra(); await this.cargarClienteVentas(); await this.mostrarPanelAdmin(); }, 
+        async verificarAccesoAdmin() { 
+            // Cargar todos los datos antes de mostrar el panel de administración
+            console.log("Verificando acceso Admin y cargando todos los datos...");
+            await this.cargarTodosLosEmpleados(); 
+            await this.cargarTodosLosFichajes(); 
+            await this.cargarTodasLasVentas(); 
+            await this.cargarInventarioLog(); 
+            await this.cargarLibroNegro(); 
+            await this.cargarListaNegra(); 
+            await this.cargarClienteVentas(); 
+            console.log("Datos cargados. Mostrando panel Admin.");
+            await this.mostrarPanelAdmin(); 
+        }, 
         async verificarAccesoVIP() { 
             const nombre = document.getElementById('nombreInput')?.value.trim().toLowerCase(); 
             const pass = document.getElementById('passInput')?.value; 
@@ -776,28 +866,27 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             console.log("Intentando verificar acceso VIP para:", nombre); 
             try { 
-                const fichajeDoc = await Firebase.getDoc(Firebase.doc(db, 'fichajes', nombre)); 
-                if (fichajeDoc.exists() && fichajeDoc.data().fichado) { 
-                    console.log("Empleado ya fichado, intentando desfichar (failsafe)."); 
-                    await Firebase.updateDoc(fichajeDoc.ref, { fichado: false, inicio: null }); 
-                } 
-            } catch(e) { console.error("Error en el failsafe de fichaje:", e); } 
-            
-            const empleadoDoc = await Firebase.getDoc(Firebase.doc(db, 'empleados', nombre)); 
-            if (empleadoDoc.exists()) { 
-                const empleado = empleadoDoc.data(); 
-                console.log("Empleado encontrado:", empleado); 
-                if (this.hashPassword(pass) === empleado.passHash) { 
-                    sessionStorage.setItem('currentUser', nombre); 
-                    console.log("Acceso VIP exitoso, mostrando panel."); 
-                    await this.mostrarPanelEmpleados(nombre); 
+                // Al iniciar sesión, siempre recargar la lista de empleados
+                await this.cargarTodosLosEmpleados(); 
+                const empleadoDoc = this.state.empleados.find(e => e.id === nombre);
+
+                if (empleadoDoc) { 
+                    console.log("Empleado encontrado:", empleadoDoc.nombre); 
+                    if (this.hashPassword(pass) === empleadoDoc.passHash) { 
+                        sessionStorage.setItem('currentUser', nombre); 
+                        console.log("Acceso VIP exitoso, mostrando panel."); 
+                        await this.mostrarPanelEmpleados(nombre); 
+                    } else { 
+                        alert('Contraseña incorrecta.'); 
+                        console.warn("Contraseña incorrecta para:", nombre); 
+                    } 
                 } else { 
-                    alert('Contraseña incorrecta.'); 
-                    console.warn("Contraseña incorrecta para:", nombre); 
+                    alert('Nombre de tripulante no encontrado.'); 
+                    console.warn("Nombre de usuario no encontrado:", nombre); 
                 } 
-            } else { 
-                alert('Nombre de tripulante no encontrado.'); 
-                console.warn("Nombre de usuario no encontrado:", nombre); 
+            } catch(e) { 
+                console.error("Error en el acceso VIP:", e); 
+                alert("Error al verificar acceso: " + e.message);
             } 
         },
         cerrarSesion() { this.stopAllTimers(); if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); } sessionStorage.removeItem('currentUser'); this.mostrarInicio(); },
@@ -1020,7 +1109,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert(`Tripulante ${nombre} añadido correctamente.`); 
                 nombreInput.value = ''; 
                 passInput.value = ''; 
-                await this.cargarTodosLosEmpleados(); 
+                await this.cargarTodosLosEmpleados(); // Recargar la lista de empleados
                 await this.mostrarPanelAdmin(); 
             } catch (e) { 
                 console.error("Error al añadir empleado:", e); 
@@ -1032,7 +1121,7 @@ document.addEventListener('DOMContentLoaded', () => {
         async eliminarEmpleado(nombre) { if (confirm(`¿Estás SEGURO de que quieres eliminar a ${nombre} de la tripulación? Esta acción es irreversible.`)) { try { await Firebase.deleteDoc(Firebase.doc(db, 'empleados', nombre)); await Firebase.deleteDoc(Firebase.doc(db, 'fichajes', nombre)); await Firebase.deleteDoc(Firebase.doc(db, 'ventas', nombre)); alert(`${nombre} ha sido eliminado de la tripulación.`); await this.cargarTodosLosEmpleados(); await this.cargarTodosLosFichajes(); await this.cargarTodasLasVentas(); await this.mostrarPanelAdmin(); } catch (e) { console.error("Error al eliminar empleado:", e); alert("Error al eliminar el tripulante: " + e.message); } } },
         async actualizarControlesLocal() { const abrirBtn = document.getElementById('abrirLocalBtn'); const cerrarBtn = document.getElementById('cerrarLocalBtn'); const tiempoElem = document.getElementById('tiempoAbiertoLocal'); const ultimoCierreInfo = document.getElementById('ultimoCierreInfo'); if (!abrirBtn) return; try { const docSnap = await Firebase.getDoc(Firebase.doc(db, "control_local", "estado")); if (docSnap.exists()) { const estado = docSnap.data(); if (estado.abierto) { abrirBtn.disabled = true; cerrarBtn.disabled = false; this.startLocalOpenTimer(estado.inicioApertura.toMillis()); ultimoCierreInfo.innerHTML = ''; } else { abrirBtn.disabled = false; cerrarBtn.disabled = true; if(this.state.timers.localOpen) clearInterval(this.state.timers.localOpen); this.state.timers.localOpen = null; tiempoElem.textContent = "00:00:00"; let infoHTML = ''; if (estado.ultimoCierre) { infoHTML += `<div>Último cierre: ${estado.ultimoCierre.toDate().toLocaleString('es-ES')}</div>`; } if (estado.duracionUltimaApertura) { infoHTML += `<div class="mt-1">Duración: ${this.formatearTiempoHorasDecimal(estado.duracionUltimaApertura)} horas</div>`; } ultimoCierreInfo.innerHTML = infoHTML; } } else { abrirBtn.disabled = false; cerrarBtn.disabled = true; } } catch (e) { console.error("Error al actualizar controles local:", e); alert("Error al actualizar controles de local: " + e.message); } },
         async abrirLocal() { try { await Firebase.setDoc(Firebase.doc(db, "control_local", "estado"), { abierto: true, inicioApertura: Firebase.serverTimestamp(), }, { merge: true }); await this.actualizarControlesLocal(); } catch (e) { console.error("Error al abrir local:", e); alert("Error al abrir la flota: " + e.message); }},
-        async cerrarLocal() { try { const controlDoc = await Firebase.getDoc(Firebase.doc(db, "control_local", "estado")); let duracion = 0; if (controlDoc.exists() && controlDoc.data().inicioApertura) { duracion = Date.now() - controlDoc.data().inicioApertura.toMillis(); } await this.cargarTodosLosFichajes(); for (const nombre in this.state.fichajes) { if (this.state.fichajes[nombre].fichado) { await this.desfichar(nombre, true); } } await Firebase.setDoc(Firebase.doc(db, "control_local", "estado"), { abierto: false, ultimoCierre: Firebase.serverTimestamp(), duracionUltimaApertura: duracion }, { merge: true }); await this.actualizarControlesLocal(); } catch (e) { console.error("Error al cerrar local:", e); alert("Error al cerrar la flota: " + e.message); }},
+        async cerrarLocal() { try { const controlDoc = await Firebase.getDoc(Firebase.doc(db, "control_local", "estado")); let duracion = 0; if (controlDoc.exists() && controlDoc.data().inicioApertura) { duracion = Date.now() - controlDoc.data().inicioApertura.toMillis(); } await this.cargarTodosLosFichajes(); for (const nombre in this.state.fichajes) { if (this.state.fichajes[nombre].fichado) { await this.desfichar(nombre, true); } } await Firebase.setDoc(Firebase.doc(db, "control_local", "estado"), { abierto: false, ultimoCierre: Firebase.serverTimestamp(), duracionUltimaApertura: duracion }, { merge: true }); await this.actualizarControlesLocal(); } catch (e) { console.error("Error al cerrar local:", e); alert("Error al cerrar la flota: " + e.message); } },
         async mostrarPanelInventario() { this.stopAllTimers(); this.ajustarPosicionChatbot(false); const nombreEmpleado = sessionStorage.getItem('currentUser'); this.state.inventoryFiles = [null, null, null]; let uploadBoxesHTML = ''; for (let i = 0; i < 3; i++) { uploadBoxesHTML += `<div id="inventory-box-${i}" class="inventory-upload-box" tabindex="0"><span class="placeholder-text text-nautics-light text-center">Haz clic aquí y pega una imagen con<br/><strong>Ctrl+V</strong></span><img id="inventory-img-${i}" class="hidden"><button id="inventory-remove-${i}" class="remove-btn">&times;</button></div>`; } document.getElementById('contenido').innerHTML = `<div class="max-w-4xl mx-auto p-6 bg-nautics-dark bg-opacity-90 rounded-lg shadow-lg"><div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-bold">Inventario de Provisión</h2><button class="btn" onclick="VanillaApp.mostrarPanelEmpleados('${nombreEmpleado}')">Volver al Panel de Tripulación</button></div><div class="bg-nautics-mid p-6 rounded-lg text-center"><h3 class="text-xl font-semibold mb-4">Añadir Nuevo Inventario (hasta 3 imágenes)</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">${uploadBoxesHTML}</div><button id="upload-inventory-btn" class="btn text-lg py-2 px-6" style="background-color: var(--color-nautics-secondary-pink);">Guardar Inventario</button><div id="upload-status" class="mt-4 text-nautics-accent-pink"></div></div></div>`; for (let i = 0; i < 3; i++) { const box = document.getElementById(`inventory-box-${i}`); const img = document.getElementById(`inventory-img-${i}`); const removeBtn = document.getElementById(`inventory-remove-${i}`); const handleFile = (file) => { if (file && file.type.startsWith('image/')) { this.state.inventoryFiles[i] = file; img.src = URL.createObjectURL(file); img.classList.remove('hidden'); box.classList.add('has-image'); }}; box.addEventListener('paste', e => { e.preventDefault(); handleFile(e.clipboardData.files[0]); }); removeBtn.addEventListener('click', e => { e.stopPropagation(); this.state.inventoryFiles[i] = null; img.src = ''; img.classList.add('hidden'); box.classList.remove('has-image'); }); } document.getElementById('upload-inventory-btn').onclick = () => this.subirInventario(); },
         async subirInventario() { const empleado = sessionStorage.getItem('currentUser'); const filesToUpload = this.state.inventoryFiles.filter(f => f !== null); const statusElem = document.getElementById('upload-status'); const uploadBtn = document.getElementById('upload-inventory-btn'); if (filesToUpload.length === 0 || !empleado) { statusElem.textContent = "Añade al menos una imagen."; return; } statusElem.textContent = `Subiendo ${filesToUpload.length} imagen(es)...`; uploadBtn.disabled = true; try { const uploadPromises = filesToUpload.map(file => { const filePath = `inventario/${Date.now()}_${file.name}`; const storageRef = Firebase.ref(storage, filePath); return Firebase.uploadBytes(storageRef, file).then(snapshot => Firebase.getDownloadURL(snapshot.ref)); }); const imageUrls = await Promise.all(uploadPromises); const datosInventario = { imagenes: imageUrls, subidoPor: empleado, timestamp: Firebase.serverTimestamp() }; await Firebase.setDoc(Firebase.doc(db, "inventario_actual", "estado"), datosInventario); await Firebase.addDoc(Firebase.collection(db, "inventario_log"), datosInventario); statusElem.textContent = "¡Inventario guardado!"; setTimeout(() => { if (document.getElementById('upload-status')) this.mostrarPanelInventario(); }, 2000); } catch (e) { console.error("Error al subir inventario:", e); statusElem.textContent = "Error al subir: " + e.message; uploadBtn.disabled = false; } },
         toggleInventarioLog() { const lista = document.getElementById('listaInventarioLog'); if (lista) { lista.style.display = lista.style.display === 'none' ? 'block' : 'none'; } },
@@ -1114,10 +1203,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Regex para capturar "nombre apellido cantidad cebos/cañas [y cantidad cebos/cañas]"
                 // Más flexible: puede empezar con "vender a", "vender" o directamente con el nombre.
-                const salesRegex = /(?:vender a |vender )?([a-z]+\s[a-z]+) (\d+)\s*(cebos|cañas)(?: y (\d+)\s*(cebos|cañas))?/;
+                // Ajustado para capturar la palabra "vender" o "comprar" al inicio o antes del nombre.
+                const salesRegex = /(?:vender\s+a\s+|vender\s+|comprar\s+)?([a-z]+\s[a-z]+)\s+(\d+)\s*(cebos|cañas)(?: y (\d+)\s*(cebos|cañas))?/;
                 const match = userMsg.match(salesRegex);
 
                 if (match) { // If a sales pattern is detected
+                    console.log("Patrón de venta detectado:", match);
                     const clientName = match[1].trim();
                     const item1Quantity = parseInt(match[2]);
                     const item1Type = match[3];
@@ -1147,7 +1238,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             } else {
                                 salesPromises.push(Firebase.setDoc(Firebase.doc(db, 'clientesVentas', clientName), {
                                     ultimaCompraCebos: Firebase.serverTimestamp(),
-                                    compras: Firebase.arrayUnion({
+                                    compras: Firebase.arrayUnion({ // Corrected: Use Firebase.arrayUnion
                                         producto: 'cebo',
                                         cantidad: item1Quantity,
                                         timestamp: Firebase.serverTimestamp(),
@@ -1158,7 +1249,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         } else if (item1Type === 'cañas') {
                             salesPromises.push(Firebase.setDoc(Firebase.doc(db, 'clientesVentas', clientName), {
-                                compras: Firebase.arrayUnion({
+                                compras: Firebase.arrayUnion({ // Corrected: Use Firebase.arrayUnion
                                     producto: 'caña',
                                     cantidad: item1Quantity,
                                     timestamp: Firebase.serverTimestamp(),
@@ -1184,7 +1275,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     } else {
                                         salesPromises.push(Firebase.setDoc(Firebase.doc(db, 'clientesVentas', clientName), {
                                             ultimaCompraCebos: Firebase.serverTimestamp(),
-                                            compras: Firebase.arrayUnion({
+                                            compras: Firebase.arrayUnion({ // Corrected: Use Firebase.arrayUnion
                                                 producto: 'cebo',
                                                 cantidad: item2Quantity,
                                                 timestamp: Firebase.serverTimestamp(),
@@ -1196,7 +1287,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 }
                             } else if (item2Type === 'cañas') {
                                 salesPromises.push(Firebase.setDoc(Firebase.doc(db, 'clientesVentas', clientName), {
-                                    compras: Firebase.arrayUnion({
+                                    compras: Firebase.arrayUnion({ // Corrected: Use Firebase.arrayUnion
                                         producto: 'caña',
                                         cantidad: item2Quantity,
                                         timestamp: Firebase.serverTimestamp(),
@@ -1221,10 +1312,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
                 }
-                // End new logic for sales
-                else if (!messageText && files.length > 0) { 
-                    mockReply = "¡Qué buena pinta tienen esas fotos, almirante!";
-                } 
                 // General keyword responses (only if no sales pattern was matched)
                 else {
                     const keywords = {
@@ -1253,6 +1340,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         this.mostrarPanelBarcos();
                     } else if (keywords.hola.some(k => userMsg.includes(k))) {
                         mockReply = `¡Ahoy, ${currentUser || 'capitán'}! Soy Jack Sparrow, ¿en qué puedo ayudarte hoy?`;
+                    } else if (!messageText && files.length > 0) { // Keep this last for image-only messages
+                        mockReply = "¡Qué buena pinta tienen esas fotos, almirante!";
                     }
                 }
                 
@@ -1452,10 +1541,11 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("Iniciando aplicación Nautics...");
             this.iniciarListenerAnuncios();
             this.iniciarListenerBarcos(); 
+            // Cargar datos iniciales al arrancar la aplicación
             await this.cargarTodosLosEmpleados();
             await this.cargarTodosLosFichajes();
             await this.cargarTodasLasVentas();
-            await this.cargarClienteVentas(); // Load client sales data on init
+            await this.cargarClienteVentas(); 
 
             const chatButtonWrapper = document.getElementById('chatbot-button-wrapper');
             const chatContainer = document.getElementById('chatbot-container');
@@ -1514,9 +1604,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             batch.update(doc.ref, { ultimaCompraCebos: null }); 
                         }
                     });
-                    await batch.commit();
-                    console.log("Restricciones de compra de cebos reseteadas para todos los clientes.");
-                    this.cargarClienteVentas(); // Refresh local state
+                    try {
+                        await batch.commit();
+                        console.log("Restricciones de compra de cebos reseteadas para todos los clientes.");
+                        this.cargarClienteVentas(); // Refresh local state
+                    } catch (e) {
+                        console.error("Error al resetear restricciones de cebos:", e);
+                    }
                 }
             }, 1000 * 10); // Check every 10 seconds around midnight to ensure execution
         },
@@ -1524,11 +1618,12 @@ document.addEventListener('DOMContentLoaded', () => {
         async descargarInformeExcel() {
             alert("Preparando los informes de la flota. La descarga comenzará en breve.");
             
+            // Asegúrate de recargar todos los datos antes de generar el informe
             await this.cargarTodosLosEmpleados();
             await this.cargarTodosLosFichajes();
             await this.cargarTodasLasVentas();
             await this.cargarInventarioLog();
-            await this.cargarClienteVentas(); // Ensure client sales are loaded for the report
+            await this.cargarClienteVentas(); 
 
             const wb = XLSX.utils.book_new();
 
