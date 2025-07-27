@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>Vanilla - La Tentación Empieza Aquí</title>
+<title>Nautics - Gestión de Flota</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -81,14 +81,15 @@
     import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, query, orderBy, addDoc, serverTimestamp, where, writeBatch, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
     
+    // --- CONFIGURACIÓN PARA NAUTICS ---
     const firebaseConfig = {
-      apiKey: "AIzaSyAjSUwa9HtVsxBhY__73XdLbWXHmlcIyUE",
-      authDomain: "moore-club.firebaseapp.com",
-      projectId: "moore-club",
-      storageBucket: "moore-club.firebasestorage.app",
-      messagingSenderId: "674972089844",
-      appId: "1:674972089844:web:9d6f9680bec8f6cff98da1",
-      measurementId: "G-RSPNMJ466D"
+      apiKey: "AIzaSyA7pg9vtqsPNGu3EGEEZ8hGnQJTkTBVjss",
+      authDomain: "nautics-78bf2.firebaseapp.com",
+      projectId: "nautics-78bf2",
+      storageBucket: "nautics-78bf2.firebasestorage.app",
+      messagingSenderId: "791025583667",
+      appId: "1:791025583667:web:09c6171074ce448b94c546",
+      measurementId: "G-2ZJ4RBYD3N"
     };
     
     const firebaseApp = initializeApp(firebaseConfig);
@@ -107,7 +108,7 @@
 
 <div class="bg-overlay min-h-screen">
 <nav class="bg-purple-900 text-white px-6 py-4 flex justify-between items-center">
-<h1 class="text-xl font-bold cursor-pointer" onclick="VanillaApp.mostrarInicio()">Vanilla</h1>
+<h1 class="text-xl font-bold cursor-pointer" onclick="VanillaApp.mostrarInicio()">Nautics</h1>
 <ul class="flex space-x-6 text-sm">
 <li><a class="hover:underline" href="#" onclick="VanillaApp.mostrarInicio()">Inicio</a></li>
 <li><a class="hover:underline" href="#" onclick="VanillaApp.irAPanelEmpleado()">Empleados</a></li>
@@ -119,10 +120,10 @@
 </div>
 
 <div id="image-overlay"><span id="overlay-close-btn">&times;</span><img id="overlay-image" src="" alt="Imagen ampliada"></div>
-<div id="chatbot-button-wrapper"><div id="chatbot-bubble">Si necesitas alguna cosa amor, dime y te ayudo</div><div id="chatbot-button"><img alt="Asistente de Chat" src="Luna.png"/></div></div>
+<div id="chatbot-button-wrapper"><div id="chatbot-bubble">Si necesitas alguna cosa, dime y te ayudo</div><div id="chatbot-button"><img alt="Asistente de Chat" src="Luna.png"/></div></div>
 <div id="chatbot-container">
     <div id="chatbot-header">
-        <span>Asistente Vanilla</span>
+        <span>Asistente Nautics</span>
         <div><button id="chatbot-minimize" title="Minimizar">_</button><button id="chatbot-close" title="Cerrar">X</button></div>
     </div>
     <div id="chatbot-messages"></div>
@@ -193,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
         hashPassword(str) { let hash = 0; if (typeof str !== 'string' || str.length === 0) return "hash_0"; for (let i = 0; i < str.length; i++) { const char = str.charCodeAt(i); hash = ((hash << 5) - hash) + char; hash |= 0; } return "hash_" + Math.abs(hash); },
         formatearTiempo(ms) { if (isNaN(ms) || ms < 0) ms = 0; const s = Math.floor(ms / 1000), h = String(Math.floor(s / 3600)).padStart(2, '0'), m = String(Math.floor((s % 3600) / 60)).padStart(2, '0'), sec = String(s % 60).padStart(2, '0'); return `${h}:${m}:${sec}`; },
         formatearTiempoHorasDecimal(ms) { if (isNaN(ms) || ms <= 0) return "0,0"; const horas = ms / (1000 * 60 * 60); return horas.toFixed(1).replace('.', ','); },
-        getEstadoHabitacion(hab) { const now = Date.now(); if (!hab || !hab.reservas) return { estado: 'disponible', texto: 'Disponible', reservaActual: null }; const r = hab.reservas.find(res => now >= res.inicio && now < res.fin); return r ? { estado: 'ocupada', texto: 'Ocupada', reservaActual: r } : { estado: 'disponible', texto: 'Disponible', reservaActual: null }; },
+        getEstadoHabitacion(hab) { const now = Date.now(); if (!hab || !hab.reservas) return { estado: 'disponible', texto: 'Disponible', reservaActual: null }; const r = hab.reservas.find(res => now >= res.inicio && ahora < res.fin); return r ? { estado: 'ocupada', texto: 'Ocupada', reservaActual: r } : { estado: 'disponible', texto: 'Disponible', reservaActual: null }; },
         getWeekNumber(d) { d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7)); var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1)); return Math.ceil((((d - yearStart) / 86400000) + 1)/7); },
         estaDeAusencia(empleado) {
             if (!empleado || !empleado.ausencias || !Array.isArray(empleado.ausencias)) return false;
@@ -855,7 +856,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('chatbot-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') this.handleSendMessage(); });
             document.getElementById('chatbot-input-container').addEventListener('paste', (e) => this.handleChatPaste(e));
 
-            this.addMessageToChat('¡Hola! Soy Luna, tu asistente en Vanilla. ¿En qué puedo ayudarte?', 'bot');
+            this.addMessageToChat('¡Hola! Soy Luna, tu asistente en Nautics. ¿En qué puedo ayudarte?', 'bot');
 
             const currentUser = sessionStorage.getItem('currentUser');
             if (currentUser) {
@@ -867,7 +868,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         async descargarInformeExcel() {
             alert("Preparando los informes. La descarga comenzará en breve.");
-            
+
             await this.cargarTodosLosEmpleados();
             await this.cargarTodosLosFichajes();
             await this.cargarTodasLasVentas();
@@ -912,7 +913,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const datosInventario = this.state.inventarioLog.map(log => ({
                 Subido_Por: log.subidoPor,
                 Fecha: log.timestamp.toDate().toLocaleString('es-ES'),
-                Imagenes: (log.imagenes && Array.isArray(log.imagenes)) ? log.imagenes.map(url => `=HIPERVINCULO("${url}"; "Ver Imagen")`).join(' | ') : ""
+                Imagenes: (log.imagenes && Array.isArray(log.imagenes)) ? log.imagenes.map((url, i) => `=HYPERLINK("${url}", "Ver Imagen ${i + 1}")`).join(' | ') : ""
             }));
             if (datosInventario.length > 0) {
                 const wsInventario = XLSX.utils.json_to_sheet(datosInventario);
@@ -936,7 +937,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const blob = new Blob([wbout], { type: 'application/octet-stream' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = 'Informe_General_Vanilla.xlsx';
+            link.download = 'Informe_General_Nautics.xlsx';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
