@@ -147,8 +147,10 @@
 </style>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, query, orderBy, addDoc, serverTimestamp, where, writeBatch, onSnapshot, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"; // Added arrayUnion
+    import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, query, orderBy, addDoc, serverTimestamp, where, writeBatch, onSnapshot, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"; 
     import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+    // Si estás usando Firebase Authentication, necesitas esto también:
+    // import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     
     // Configuración de Firebase para el proyecto Nautics
     const firebaseConfig = {
@@ -164,8 +166,10 @@
     const firebaseApp = initializeApp(firebaseConfig);
     window.db = getFirestore(firebaseApp);
     window.storage = getStorage(firebaseApp);
+    // window.auth = getAuth(firebaseApp); // Si usas Firebase Auth
+    
     window.Firebase = {
-        collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, query, orderBy, addDoc, serverTimestamp, where, writeBatch, onSnapshot, arrayUnion // Export arrayUnion
+        collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, query, orderBy, addDoc, serverTimestamp, where, writeBatch, onSnapshot, arrayUnion
     };
 </script>
 </head>
@@ -176,7 +180,7 @@
 
 <div class="bg-overlay min-h-screen">
 <nav class="bg-nautics-dark text-white px-6 py-4 flex justify-between items-center">
-<h1 class="text-xl font-bold cursor-pointer" onclick="VanillaApp.mostrarInicio()">Nautics</h1>
+<h1 class="text-xl font-bold cursor-pointer" onclick="VanillaApp.mostrarInicio()">Nautics">Nautics</h1>
 <ul class="flex space-x-6 text-sm">
 <li><a class="hover:underline" href="#" onclick="VanillaApp.mostrarInicio()">Inicio</a></li>
 <li><a class="hover:underline" href="#" onclick="VanillaApp.irAPanelEmpleado()">Empleados</a></li>
@@ -659,7 +663,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.ajustarPosicionChatbot(false);
             // Asegurarse de recargar los datos del empleado para ver posibles ausencias actualizadas
             await this.cargarTodosLosEmpleados(); 
-            const empleadoDoc = this.state.empleados.find(emp => emp.id === nombre) || {};
+            const empleadoData = this.state.empleados.find(emp => emp.id === nombre) || {};
             
             const datosFichaje = await this.gestionarReseteoDatos(nombre); await this.gestionarReseteoDatos(nombre, true);
             let tiempoHoy = datosFichaje.hoy || 0, tiempoSemana = datosFichaje.semana || 0, tiempoTotal = datosFichaje.total || 0;
@@ -674,7 +678,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return `<div class="bg-nautics-mid p-4 rounded-lg text-center flex flex-col justify-between"><div><p class="font-bold text-lg">${boat.nombre}</p><p class="text-sm ${estadoActual.estado === 'ocupada' ? 'text-red-400' : 'text-green-400'} mb-2">${estadoActual.texto}</p></div><div>${controles}</div></div>`;
             }).join('');
 
-            const botonConveniosHTML = `<button onclick="VanillaApp.mostrarPanelConvenios(${empleadoDoc.directiva || false})" class="btn text-xs py-1">Convenios Navales</button>`;
+            const botonConveniosHTML = `<button onclick="VanillaApp.mostrarPanelConvenios(${empleadoData.directiva || false})" class="btn text-xs py-1">Convenios Navales</button>`;
             const botonesAccionHTML = `<button onclick="VanillaApp.mostrarModalAusencias('${nombre}')" class="btn text-xs py-1">Permisos de Ausencia</button>${botonConveniosHTML}<button onclick="VanillaApp.mostrarPanelInventario()" class="btn text-xs py-1">Inventario de Flota</button><button onclick="VanillaApp.mostrarListaNegraPublica()" class="btn text-xs py-1">Ver Piratas Vetados</button><button class="btn" style="background-color: #dc2626;" onclick="VanillaApp.cerrarSesion()">Abandonar Barco</button>`; 
             const hoyStr = new Date().toISOString().split('T')[0]; const packRecibido = datosFichaje.ultimoPackDiario === hoyStr;
             const controlHTML = `<div class="bg-nautics-mid bg-opacity-50 p-4 rounded-lg mb-6 text-center border border-nautics-primary-blue"><h3 class="text-lg font-semibold mb-4">Control de Operaciones de Flota</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div class="bg-nautics-dark bg-opacity-50 p-4 rounded-lg flex flex-col justify-center items-center"><p class="text-base font-bold mb-2">ESTADO DE LA FLOTA</p><div class="flex justify-center items-center gap-4"><button id="abrirLocalBtn" class="btn bg-green-600 hover:bg-green-700">Flota Lista (Abrir)</button><button id="cerrarLocalBtn" class="btn bg-red-600 hover:bg-red-700">Flota Inactiva (Cerrar)</button></div><div class="mt-3"><p id="tiempoAbiertoLocal" class="font-mono text-2xl text-nautics-accent-pink">00:00:00</p><div id="ultimoCierreInfo" class="text-xs text-nautics-light mt-1"></div></div></div><div class="bg-nautics-dark bg-opacity-50 p-4 rounded-lg"><p class="text-base font-bold mb-2">REGISTRO DE GUARDIA</p><div class="grid grid-cols-2 gap-2 text-center h-full"><div class="p-1 rounded-lg bg-nautics-mid flex flex-col justify-center"><p class="text-xs text-nautics-light">GUARDIA</p><p id="tiempoSesion" class="font-mono text-lg">${this.formatearTiempo(0)}</p></div><div class="p-1 rounded-lg bg-nautics-mid flex flex-col justify-center"><p class="text-xs text-nautics-light">HOY</p><p id="tiempoHoy" class="font-mono text-lg">${this.formatearTiempo(tiempoHoy)}</p></div><div class="p-1 rounded-lg bg-nautics-mid flex flex-col justify-center"><p class="text-xs text-nautics-light">SEMANA</p><p id="tiempoSemana" class="font-mono text-lg">${this.formatearTiempo(tiempoSemana)}</p></div><div class="p-1 rounded-lg bg-nautics-mid flex flex-col justify-center"><p class="text-xs text-nautics-light">TOTAL</p><p id="tiempoTotal" class="font-mono text-lg">${this.formatearTiempo(tiempoTotal)}</p></div></div></div></div><div class="mt-6 flex justify-center items-center gap-4 border-t border-nautics-mid pt-4"><button class="btn text-lg px-6 py-3" onclick="VanillaApp.fichar('${nombre}')">Iniciar Guardia</button><button class="btn text-lg px-6 py-3" onclick="VanillaApp.desfichar('${nombre}')">Finalizar Guardia</button><button id="packDiarioBtn" class="btn text-base px-4 py-2" style="background-color: ${packRecibido ? 'var(--color-nautics-mid)' : 'var(--color-nautics-secondary-pink)'};" onclick="VanillaApp.darPackDiarioVentas('${nombre}')" ${packRecibido ? 'disabled' : ''}>${packRecibido ? 'Raciones del día recibidas' : 'Raciones Diarias (Venta)'}</button></div></div>`;
@@ -742,13 +746,15 @@ document.addEventListener('DOMContentLoaded', () => {
             this.ajustarPosicionChatbot(false);
 
             // Asegurarse de recargar TODOS los datos necesarios para el panel de admin
+            console.log("Cargando todos los datos para el panel de Administrador...");
             await this.cargarTodosLosEmpleados(); 
             await this.cargarTodosLosFichajes(); 
             await this.cargarTodasLasVentas(); 
             await this.cargarInventarioLog(); 
             await this.cargarLibroNegro(); 
             await this.cargarListaNegra(); 
-            await this.cargarClienteVentas(); // Asegúrate de que esto se cargue también
+            await this.cargarClienteVentas(); 
+            console.log("Todos los datos cargados para el panel de Administrador.");
 
             const dashboardHTML = `<div class="mb-8 p-6 bg-nautics-mid bg-opacity-50 rounded-lg border border-nautics-primary-blue"><h2 class="text-2xl font-bold mb-4">Dashboard de Flota en Tiempo Real</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div><h3 class="font-semibold mb-2 text-nautics-light">Tripulación de Guardia</h3><ul id="dashboard-empleados" class="space-y-1 text-sm"><li>Cargando...</li></ul></div><div><h3 class="font-semibold mb-2 text-nautics-light">Barcos Ocupados</h3><ul id="dashboard-barcos" class="space-y-1 text-sm"><li>Cargando...</li></ul></div></div></div>`; 
             const anunciosHTML = `
@@ -812,17 +818,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             document.getElementById('contenido').innerHTML = `<div class="max-w-7xl mx-auto"><h1 class="text-4xl font-bold text-center mb-8">Panel de Jefes de Flota</h1>${dashboardHTML}${anunciosHTML}${gestionHTML}${tablaHTML}${informesHTML}${libroNegroHTML}${listaNegraHTML}${inventarioLogHTML}<div class="text-center mt-8"><button onclick="VanillaApp.cerrarSesion()" class="btn">Regresar a Puerto Base</button></div></div>`;
             this.actualizarLibroNegro(); this.actualizarListaNegra(); this.actualizarInventarioLog();
-            this.startDashboardTimer();
+            this.startDashboardTimer(); // Iniciar/reiniciar el temporizador del dashboard
         },
         
         async actualizarDashboard() {
             try {
-                await this.cargarTodosLosFichajes();
+                // Asegúrate de cargar todos los empleados para que el dashboard tenga la lista completa
+                await this.cargarTodosLosEmpleados();
+                await this.cargarTodosLosFichajes(); // También refresca los fichajes
+
                 const empleadosElem = document.getElementById('dashboard-empleados');
                 const barcosElem = document.getElementById('dashboard-barcos'); 
                 if (empleadosElem) {
-                    // Cargar empleados también para asegurar que la lista de nombres es completa
-                    await this.cargarTodosLosEmpleados();
                     const empleadosFichados = Object.entries(this.state.fichajes).filter(([_, data]) => data.fichado).map(([id, data]) => ({ id, ...data }));
                     if (empleadosFichados.length > 0) {
                         empleadosElem.innerHTML = empleadosFichados.map(e => `<li class="capitalize text-green-400">${e.id} (Desde: ${new Date(e.inicio).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })})</li>`).join('');
@@ -868,11 +875,12 @@ document.addEventListener('DOMContentLoaded', () => {
             try { 
                 // Al iniciar sesión, siempre recargar la lista de empleados
                 await this.cargarTodosLosEmpleados(); 
-                const empleadoDoc = this.state.empleados.find(e => e.id === nombre);
+                // Buscar el empleado en la lista cargada
+                const empleado = this.state.empleados.find(e => e.id === nombre);
 
-                if (empleadoDoc) { 
-                    console.log("Empleado encontrado:", empleadoDoc.nombre); 
-                    if (this.hashPassword(pass) === empleadoDoc.passHash) { 
+                if (empleado) { 
+                    console.log("Empleado encontrado:", empleado.nombre); 
+                    if (this.hashPassword(pass) === empleado.passHash) { 
                         sessionStorage.setItem('currentUser', nombre); 
                         console.log("Acceso VIP exitoso, mostrando panel."); 
                         await this.mostrarPanelEmpleados(nombre); 
@@ -1157,7 +1165,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const chatbotInput = document.getElementById('chatbot-input');
             const messageText = chatbotInput.value.trim();
             const files = this.state.chatFiles;
-            const currentUser = sessionStorage.getItem('currentUser');
+            const currentUser = sessionStorage.getItem('currentUser'); // Este es el nombre del empleado en minúsculas
 
             if (!messageText && files.length === 0) return; 
 
@@ -1203,19 +1211,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Regex para capturar "nombre apellido cantidad cebos/cañas [y cantidad cebos/cañas]"
                 // Más flexible: puede empezar con "vender a", "vender" o directamente con el nombre.
-                // Ajustado para capturar la palabra "vender" o "comprar" al inicio o antes del nombre.
+                // IMPORTANTE: El nombre y apellido deben ser dos palabras
                 const salesRegex = /(?:vender\s+a\s+|vender\s+|comprar\s+)?([a-z]+\s[a-z]+)\s+(\d+)\s*(cebos|cañas)(?: y (\d+)\s*(cebos|cañas))?/;
                 const match = userMsg.match(salesRegex);
 
                 if (match) { // If a sales pattern is detected
                     console.log("Patrón de venta detectado:", match);
-                    const clientName = match[1].trim();
+                    const clientName = match[1].trim(); // Nombre y apellido del cliente
                     const item1Quantity = parseInt(match[2]);
                     const item1Type = match[3];
                     const item2Quantity = match[4] ? parseInt(match[4]) : 0;
                     const item2Type = match[5];
                     
-                    if (!clientName.includes(' ')) { // Basic check for full name (name and surname)
+                    if (!clientName.includes(' ')) { 
                         mockReply = "¡Almirante! Para registrar la venta, necesito el nombre y **apellido** del cliente.";
                     } else if (!currentUser) {
                         mockReply = "¡Capitán, solo la tripulación autorizada puede registrar ventas! Por favor, inicia sesión.";
@@ -1227,18 +1235,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         // Process first item
                         if (item1Type === 'cebos') {
-                            const clientDoc = await Firebase.getDoc(Firebase.doc(db, 'clientesVentas', clientName));
+                            const clientDocRef = Firebase.doc(db, 'clientesVentas', clientName);
+                            const clientDoc = await Firebase.getDoc(clientDocRef);
                             const clientData = clientDoc.exists() ? clientDoc.data() : { ultimaCompraCebos: null, compras: [] };
-                            const lastCeboPurchaseDate = clientData.ultimaCompraCebos ? new Date(clientData.ultimaCompraCebos.toDate()).toDateString() : null;
+                            
+                            // Get date of last cebo purchase
+                            const lastCeboPurchaseDate = clientData.ultimaCompraCebos ? 
+                                new Date(clientData.ultimaCompraCebos.toDate ? clientData.ultimaCompraCebos.toDate() : clientData.ultimaCompraCebos).toDateString() : null;
                             const todayDate = new Date().toDateString();
 
                             if (lastCeboPurchaseDate === todayDate) {
                                 responseMessages.push(`¡Almirante! El cliente ${clientName} ya compró cebos hoy. No podemos venderle más hasta mañana.`);
                                 ceboSoldToday = true;
                             } else {
-                                salesPromises.push(Firebase.setDoc(Firebase.doc(db, 'clientesVentas', clientName), {
+                                salesPromises.push(Firebase.setDoc(clientDocRef, {
                                     ultimaCompraCebos: Firebase.serverTimestamp(),
-                                    compras: Firebase.arrayUnion({ // Corrected: Use Firebase.arrayUnion
+                                    compras: Firebase.arrayUnion({ 
                                         producto: 'cebo',
                                         cantidad: item1Quantity,
                                         timestamp: Firebase.serverTimestamp(),
@@ -1248,8 +1260,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                 responseMessages.push(`¡${item1Quantity} cebos registrados para ${clientName}!`);
                             }
                         } else if (item1Type === 'cañas') {
-                            salesPromises.push(Firebase.setDoc(Firebase.doc(db, 'clientesVentas', clientName), {
-                                compras: Firebase.arrayUnion({ // Corrected: Use Firebase.arrayUnion
+                            const clientDocRef = Firebase.doc(db, 'clientesVentas', clientName);
+                            salesPromises.push(Firebase.setDoc(clientDocRef, {
+                                compras: Firebase.arrayUnion({ 
                                     producto: 'caña',
                                     cantidad: item1Quantity,
                                     timestamp: Firebase.serverTimestamp(),
@@ -1262,20 +1275,23 @@ document.addEventListener('DOMContentLoaded', () => {
                         // Process second item if present and not a cebo already sold (if the first was cebos)
                         if (item2Quantity > 0 && item2Type) {
                             if (item2Type === 'cebos') {
-                                if (ceboSoldToday) { // If cebos already sold in the first part, don't sell again
+                                if (ceboSoldToday) { 
                                     responseMessages.push(`¡Atención! ${clientName} ya compró cebos hoy, no puedo registrar más cebos.`);
                                 } else {
-                                    const clientDoc = await Firebase.getDoc(Firebase.doc(db, 'clientesVentas', clientName));
+                                    const clientDocRef = Firebase.doc(db, 'clientesVentas', clientName);
+                                    const clientDoc = await Firebase.getDoc(clientDocRef);
                                     const clientData = clientDoc.exists() ? clientDoc.data() : { ultimaCompraCebos: null, compras: [] };
-                                    const lastCeboPurchaseDate = clientData.ultimaCompraCebos ? new Date(clientData.ultimaCompraCebos.toDate()).toDateString() : null;
+                                    
+                                    const lastCeboPurchaseDate = clientData.ultimaCompraCebos ? 
+                                        new Date(clientData.ultimaCompraCebos.toDate ? clientData.ultimaCompraCebos.toDate() : clientData.ultimaCompraCebos).toDateString() : null;
                                     const todayDate = new Date().toDateString();
 
                                     if (lastCeboPurchaseDate === todayDate) {
                                         responseMessages.push(`¡Atención! ${clientName} ya compró cebos hoy, no puedo registrar más cebos.`);
                                     } else {
-                                        salesPromises.push(Firebase.setDoc(Firebase.doc(db, 'clientesVentas', clientName), {
+                                        salesPromises.push(Firebase.setDoc(clientDocRef, {
                                             ultimaCompraCebos: Firebase.serverTimestamp(),
-                                            compras: Firebase.arrayUnion({ // Corrected: Use Firebase.arrayUnion
+                                            compras: Firebase.arrayUnion({ 
                                                 producto: 'cebo',
                                                 cantidad: item2Quantity,
                                                 timestamp: Firebase.serverTimestamp(),
@@ -1286,8 +1302,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                     }
                                 }
                             } else if (item2Type === 'cañas') {
-                                salesPromises.push(Firebase.setDoc(Firebase.doc(db, 'clientesVentas', clientName), {
-                                    compras: Firebase.arrayUnion({ // Corrected: Use Firebase.arrayUnion
+                                const clientDocRef = Firebase.doc(db, 'clientesVentas', clientName);
+                                salesPromises.push(Firebase.setDoc(clientDocRef, {
+                                    compras: Firebase.arrayUnion({ 
                                         producto: 'caña',
                                         cantidad: item2Quantity,
                                         timestamp: Firebase.serverTimestamp(),
@@ -1304,7 +1321,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 mockReply = responseMessages.join(" ");
                                 this.cargarClienteVentas(); // Refresh client sales data
                             } else {
-                                mockReply = responseMessages.join(" "); // If no sales were processed due to restrictions, still show the message.
+                                mockReply = responseMessages.join(" "); 
                             }
                         } catch (e) {
                             console.error("Error al registrar venta de cliente:", e);
@@ -1340,7 +1357,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         this.mostrarPanelBarcos();
                     } else if (keywords.hola.some(k => userMsg.includes(k))) {
                         mockReply = `¡Ahoy, ${currentUser || 'capitán'}! Soy Jack Sparrow, ¿en qué puedo ayudarte hoy?`;
-                    } else if (!messageText && files.length > 0) { // Keep this last for image-only messages
+                    } else if (!messageText && files.length > 0) { 
                         mockReply = "¡Qué buena pinta tienen esas fotos, almirante!";
                     }
                 }
@@ -1525,7 +1542,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     const currentUser = sessionStorage.getItem('currentUser');
                     let barcosHTML = this.state.barcos.map(boat => { 
                         const estadoActual = this.getEstadoBarco(boat); 
-                        const imagenHTML = `<img src="${boat.imagen}" alt="${boat.nombre}" class="barco-img mb-4" onerror="this.style.display='none'">`; 
                         let controles = (estadoActual.estado === 'disponible') 
                             ? `<div class="flex flex-col gap-2"><button class="btn text-sm py-2 w-full" onclick="VanillaApp.ocuparBarcoAhora(${boat.id}, '${currentUser}', 30)">Paseo (30 min)</button><button class="btn text-sm py-2 w-full" onclick="VanillaApp.ocuparBarcoAhora(${boat.id}, '${currentUser}', 45)" style="background-color: var(--color-nautics-secondary-pink);">Alquiler (45 min)</button></div>` 
                             : `<div class="font-mono text-xl mb-2" id="timer-boat-${boat.id}">--:--:--</div><div class="flex gap-2"><button class="btn text-xs py-1 flex-grow" onclick="VanillaApp.anadirTiempoBarco(${boat.id}, '${currentUser}', 30)">+30 min</button><button class="btn text-xs py-1 flex-grow" style="background-color:#dc2626" onclick="VanillaApp.liberarBarco(${boat.id}, '${currentUser}')">Liberar</button></div>`;
