@@ -41,7 +41,7 @@
 
     body { 
         font-family: 'Inter', sans-serif; 
-        background: url('Fondo.png') center top no-repeat; /* Usando Fondo.png */
+        background: url('fondo_marino.jpeg') center top no-repeat; /* Asegúrate de tener esta imagen */
         background-size: cover; 
         background-attachment: fixed; 
         color: var(--color-nautics-text); 
@@ -128,22 +128,7 @@
     .chat-preview-item { position: relative; }
     .chat-preview-img { height: 50px; width: 50px; object-fit: cover; border-radius: 5px; }
     .chat-preview-remove { position: absolute; top: -5px; right: -5px; background: #c44; color: white; border-radius: 50%; width: 18px; height: 18px; border: none; cursor: pointer; font-size: 12px; line-height: 18px; text-align: center; font-weight: bold; }
-    .chat-preview-item.has-image .remove-btn { display: block; }
     .chat-message img { max-width: 100%; border-radius: 10px; margin-top: 5px; }
-
-    /* Estilo para la tabla de precios */
-    .prices-table th, .prices-table td {
-        padding: 0.75rem; /* Espaciado interno */
-        border-bottom: 1px solid var(--color-nautics-mid); /* Separador de fila */
-        text-align: left;
-    }
-    .prices-table th {
-        background-color: var(--color-nautics-dark);
-        font-weight: bold;
-    }
-    .prices-table tr:last-child td {
-        border-bottom: none; /* No hay borde en la última fila */
-    }
 </style>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -210,12 +195,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const VanillaApp = { 
         state: {
-            // Productos individuales para Nautics
+            // Productos específicos para Nautics
             productos: [ 
                 { id: 'pescanova', nombre: 'PescAnova', imagen: 'PescAnova.png', precio: 50 }, 
-                { id: 'cana', nombre: 'Caña de Pescar', imagen: 'Caña.png', precio: 750 }, /* Usando Caña.png */
-                { id: 'cebo', nombre: 'Cebo Marino', imagen: 'Cebo.png', precio: 1000 }, /* Usando Cebo.png */
-                { id: 'yonkayate', nombre: 'WonkaYate', imagen: 'WonkaYate.png', precio: 50 } /* Usando WonkaYate.png */
+                { id: 'cana', nombre: 'Caña de Pescar', imagen: 'cana_pescar_product.png', precio: 750 }, 
+                { id: 'cebo', nombre: 'Cebo Marino', imagen: 'cebo_marino_product.png', precio: 1000 }, 
+                { id: 'yonkayate', nombre: 'Yonkayate', imagen: 'WonkaYate.png', precio: 50 } 
             ],
             // Barcos disponibles para Nautics (se corresponden con las imágenes que tienes)
             datosBarcosBase: [ 
@@ -230,11 +215,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 { id: 9, nombre: 'El Sun Trap', imagen: 'SunTrap.png', reservas: [] },
                 { id: 10, nombre: 'El Toro', imagen: 'Toro.png', reservas: [] },
                 { id: 11, nombre: 'El Tropic', imagen: 'Tropic.png', reservas: [] },
-                { id: 12, nombre: 'La Dhingy', imagen: 'Dhingy.png', reservas: [] }, /* Nueva adición */
             ],
             empleados: [], fichajes: {}, ventas: {}, barcos: [], 
             inventarioLog: [], libroNegro: [], listaNegra: [], 
-            clientesVentas: {}, // Nueva propiedad para almacenar ventas de clientes
             timers: { fichaje: null, barcos: null, dashboard: null, localOpen: null }, 
             inventoryFiles: [null, null, null],
             chatFiles: [],
@@ -296,18 +279,6 @@ document.addEventListener('DOMContentLoaded', () => {
         async cargarLibroNegro() { try { const snapshot = await Firebase.getDocs(Firebase.collection(db, 'libroNegro')); this.state.libroNegro = []; snapshot.forEach(doc => this.state.libroNegro.push({docId: doc.id, ...doc.data()})); } catch (e) { console.error("Error cargando Libro Negro:", e); } },
         async cargarListaNegra() { try { const snapshot = await Firebase.getDocs(Firebase.collection(db, 'listaNegra')); this.state.listaNegra = []; snapshot.forEach(doc => this.state.listaNegra.push({docId: doc.id, ...doc.data()})); } catch (e) { console.error("Error cargando Lista Negra:", e); } },
         
-        async cargarClienteVentas() {
-            try {
-                const snapshot = await Firebase.getDocs(Firebase.collection(db, 'clientesVentas'));
-                this.state.clientesVentas = {};
-                snapshot.forEach(doc => {
-                    this.state.clientesVentas[doc.id] = doc.data();
-                });
-            } catch (e) {
-                console.error("Error cargando ventas de clientes:", e);
-            }
-        },
-
         async irAPanelEmpleado() { const currentUser = sessionStorage.getItem('currentUser'); if (currentUser) { await this.mostrarPanelEmpleados(currentUser); } else { this.mostrarLoginVIP(); }},
         mostrarInicio() { 
             this.stopAllTimers(); 
@@ -347,6 +318,20 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             <div class="flex justify-center md:order-2">
                                 <img src="jacktesoro.png" alt="Jack Sparrow con Tesoro" class="rounded-lg shadow-2xl w-full h-auto object-contain max-w-md border-2 border-nautics-secondary-pink" />
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="mb-12">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                            <div class="flex justify-center md:order-1">
+                                <img src="Tito.png" alt="Tito Giovanni" class="rounded-lg shadow-2xl w-full h-auto object-cover max-w-md border-2 border-nautics-secondary-pink" />
+                            </div>
+                            <div class="space-y-6 md:order-2">
+                                <div class="bg-nautics-mid bg-opacity-50 p-4 rounded-lg border border-nautics-primary-blue">
+                                    <h2 class="text-2xl font-bold text-white mb-2">Tito Giovanni: El Almirante del Lujo</h2>
+                                    <p class="text-nautics-light">Conocido por su estilo único y extravagante, Tito Giovanni es el carismático líder de Nautics. Vestido siempre de morado, con su sombrero de copa y bigote impecable, es el cerebro maestro detrás de cada operación de lujo en el mar. Su visión transforma el alquiler de barcos en una experiencia inigualable, y su carisma es tan vasto como el océano. Con la astucia de Jack a su lado, la flota de Nautics es imparable, prometiendo aventuras y el máximo confort en cada travesía.</p>
+                                </div>
                             </div>
                         </div>
                     </section>
@@ -434,82 +419,94 @@ document.addEventListener('DOMContentLoaded', () => {
             const categoriaBajaHTML = `
                 <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
                     <div><img src="small_boat_category.png" alt="Categoría Baja" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
-                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">Dhingy (Categoría Baja)</h3></div>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">Categoría Baja</h3></div>
                     <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $1000 | Paseo: $1100</p></div>
                 </div>
                 <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
-                    <div><img src="SunTrap.png" alt="El Sun Trap" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
-                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Sun Trap (Categoría Baja)</h3></div>
-                    <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $1000 | Paseo: $1100</p></div>
+                    <div><img src="Marquis.png" alt="El Marquis" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Marquis</h3></div>
+                    <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $1430 | Paseo: $1570</p></div>
                 </div>
             `;
             const categoriaEstandarHTML = `
                 <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
                     <div><img src="big_yacht_category.png" alt="Categoría Estándar" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
-                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">Squalo (Categoría Estándar)</h3></div>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">Categoría Estándar</h3></div>
                     <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $1430 | Paseo: $1570</p></div>
                 </div>
                 <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
-                    <div><img src="Tropic.png" alt="El Tropic" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
-                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Tropic (Categoría Estándar)</h3></div>
+                    <div><img src="Avisa.png" alt="La Avisa" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">La Avisa</h3></div>
                     <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $1430 | Paseo: $1570</p></div>
                 </div>
             `;
             const categoriaMediaHTML = `
                 <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
                     <div><img src="jet_ski_category.png" alt="Categoría Media" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
-                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El JetMax (Categoría Media)</h3></div>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">Categoría Media</h3></div>
                     <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $1860 | Paseo: $2050</p></div>
                 </div>
             `;
             const categoriaGoldHTML = `
                 <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
                     <div><img src="luxury_yacht_category.jpg" alt="Yate de Lujo" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
-                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Marquis (Categoría Gold)</h3></div>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">Categoría Gold</h3></div>
                     <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $2290 | Paseo: $2520</p></div>
                 </div>
                 <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
                     <div><img src="LongFin.png" alt="El Long Fin" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
-                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Long Fin (Categoría Gold)</h3></div>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Long Fin</h3></div>
                     <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $2290 | Paseo: $2520</p></div>
                 </div>
-                   <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
-                    <div><img src="Speeder.png" alt="El Speeder" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
-                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Speeder (Categoría Gold)</h3></div>
+                 <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
+                    <div><img src="Squalo.png" alt="El Squalo" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Squalo</h3></div>
                     <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $2290 | Paseo: $2520</p></div>
                 </div>
                 <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
-                    <div><img src="Toro.png" alt="El Toro" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
-                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Toro (Categoría Gold)</h3></div>
+                    <div><img src="Speeder.png" alt="El Speeder" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Speeder</h3></div>
                     <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $2290 | Paseo: $2520</p></div>
                 </div>
             `;
             const categoriaAventuraHTML = `
                 <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
-                    <div><img src="Avisa.png" alt="La Avisa" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
-                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">La Avisa (Categoría Aventura)</h3></div>
+                    <div><img src="fishing_boat_category.png" alt="Categoría Aventura" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">Categoría Aventura</h3></div>
                     <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $2720 | Paseo: $3000</p></div>
                 </div>
                 <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
-                    <div><img src="Submarino.png" alt="El Submarino" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
-                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Submarino (Categoría Aventura)</h3></div>
+                    <div><img src="pirate_ship_category.png" alt="Categoría Pirata" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">Categoría Aventura (Pirata)</h3></div>
                     <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $2720 | Paseo: $3000</p></div>
                 </div>
             `;
             const categoriaMotosAguaHTML = `
                 <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
-                    <div><img src="jet_ski_category.png" alt="Moto de Agua" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
-                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">Moto de Agua</h3></div>
+                    <div><img src="Speeder.png" alt="Moto de Agua Rápida" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">Motos de Agua (Rápida)</h3></div>
+                    <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $500 | Paseo: $500</p></div>
+                </div>
+                <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
+                    <div><img src="Squalo.png" alt="Moto de Agua Deportiva" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">Motos de Agua (Deportiva)</h3></div>
                     <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $500 | Paseo: $500</p></div>
                 </div>
             `;
+
+
+            const comidasHTML = `<div class="producto-card bg-nautics-mid rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">Zumo Tropical</h3></div><div><p class="text-nautics-light text-lg font-bold mt-2">$35</p></div></div><div class="producto-card bg-nautics-mid rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">Licor de Ron</h3></div><div><p class="text-nautics-light text-lg font-bold mt-2">$60</p></div></div>`; 
+            const serviciosHTML = `<div class="producto-card bg-nautics-mid rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">Alquiler de Barco</h3></div><div><p class="text-nautics-light text-lg font-bold mt-2">$2000</p></div></div><div class="producto-card bg-nautics-mid rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">Capitán Personal</h3></div><div><p class="text-nautics-light text-lg font-bold mt-2">$2000</p></div></div>`; 
+            const packsPropiosHTML = `<div class="producto-card bg-nautics-mid rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">Pack Navegante (5 y 5)</h3></div><div><p class="text-nautics-light text-lg font-bold mt-2">$350</p></div></div><div class="producto-card bg-nautics-mid rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">Pack Almirante (10 y 10)</h3></div><div><p class="text-nautics-light text-lg font-bold mt-2">$700</p></div></div>`; 
+            const packsReventaHTML = `<div class="producto-card bg-nautics-mid rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">Pack Contrabando (5 y 5)</h3></div><div><p class="text-nautics-light text-lg font-bold mt-2">$400</p></div></div><div class="producto-card bg-nautics-mid rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">Pack Pirata (10 y 10)</h3></div><div><p class="text-nautics-light text-lg font-bold mt-2">$800</p></div></div>`; 
+            const packsNuevosHTML = `<div class="producto-card bg-nautics-mid rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">Tesoro Hundido (100 y 100 Reventa)</h3></div><div><p class="text-nautics-light text-lg font-bold mt-2">$3000</p></div></div><div class="producto-card bg-nautics-mid rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">Leyenda del Mar (100 y 100 Empleado)</h3></div><div><p class="text-nautics-light text-lg font-bold mt-2">$6300</p></div></div>`; 
             
             document.getElementById('contenido').innerHTML = `
                 <h2 class="text-3xl font-bold mb-6 text-center uppercase">Provisiones y Servicios de Flota</h2>
                 
                 <h3 class="text-2xl font-semibold mb-4 border-t border-nautics-mid pt-6 uppercase">Precios Principales por Categoría</h3>
                 <div class="overflow-x-auto mb-8 bg-nautics-mid rounded-lg shadow-lg">
-                    <table class="w-full text-left text-nautics-text prices-table">
+                    <table class="w-full text-left text-nautics-text">
                         <thead class="bg-nautics-dark uppercase text-sm">
                             <tr>
                                 <th class="p-3 text-nautics-light">Categorías</th>
@@ -518,38 +515,32 @@ document.addEventListener('DOMContentLoaded', () => {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td colspan="3"><hr class="border-t border-nautics-primary-blue my-2"/></td></tr> {/* Separador */}
-                            <tr>
+                            <tr class="border-b border-nautics-mid">
                                 <td class="p-3">Categoría Baja</td>
                                 <td class="p-3">$1000</td>
                                 <td class="p-3">$1100</td>
                             </tr>
-                            <tr><td colspan="3"><hr class="border-t border-nautics-mid my-2"/></td></tr> {/* Separador */}
-                            <tr>
+                            <tr class="border-b border-nautics-mid">
                                 <td class="p-3">Categoría Estándar</td>
                                 <td class="p-3">$1430</td>
                                 <td class="p-3">$1570</td>
                             </tr>
-                            <tr><td colspan="3"><hr class="border-t border-nautics-mid my-2"/></td></tr> {/* Separador */}
-                            <tr>
+                            <tr class="border-b border-nautics-mid">
                                 <td class="p-3">Categoría Media</td>
                                 <td class="p-3">$1860</td>
                                 <td class="p-3">$2050</td>
                             </tr>
-                            <tr><td colspan="3"><hr class="border-t border-nautics-mid my-2"/></td></tr> {/* Separador */}
-                            <tr>
+                            <tr class="border-b border-nautics-mid">
                                 <td class="p-3">Categoría Gold</td>
                                 <td class="p-3">$2290</td>
                                 <td class="p-3">$2520</td>
                             </tr>
-                            <tr><td colspan="3"><hr class="border-t border-nautics-mid my-2"/></td></tr> {/* Separador */}
-                            <tr>
+                            <tr class="border-b border-nautics-mid">
                                 <td class="p-3">Categoría Aventura</td>
                                 <td class="p-3">$2720</td>
                                 <td class="p-3">$3000</td>
                             </tr>
-                            <tr><td colspan="3"><hr class="border-t border-nautics-mid my-2"/></td></tr> {/* Separador */}
-                            <tr>
+                            <tr class="border-b border-nautics-mid">
                                 <td class="p-3">Motos de Agua</td>
                                 <td class="p-3">$500</td>
                                 <td class="p-3">$500</td>
@@ -561,28 +552,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h3 class="text-2xl font-semibold mb-4 border-t border-nautics-mid pt-6 uppercase">Equipamiento Básico (Productos Individuales)</h3>
                 <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6">${productosBaseHTML}</div>
 
-                <h3 class="text-2xl font-semibold mb-4 border-t border-nautics-mid pt-6 mt-8 uppercase">Nuestra Flota por Categorías</h3>
-                
-                <h4 class="text-xl font-semibold mb-3 mt-6 text-nautics-primary-blue">Categoría Baja (Barcos Pequeños)</h4>
+                <h3 class="text-2xl font-semibold mb-4 border-t border-nautics-mid pt-6 mt-8 uppercase">Categoría Baja (Barcos Pequeños)</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">${categoriaBajaHTML}</div>
 
-                <h4 class="text-xl font-semibold mb-3 mt-6 text-nautics-primary-blue">Categoría Estándar (Barcos Medianos)</h4>
+                <h3 class="text-2xl font-semibold mb-4 border-t border-nautics-mid pt-6 mt-8 uppercase">Categoría Estándar (Barcos Medianos)</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">${categoriaEstandarHTML}</div>
 
-                <h4 class="text-xl font-semibold mb-3 mt-6 text-nautics-primary-blue">Categoría Media (Lanchas Rápidas)</h4>
+                <h3 class="text-2xl font-semibold mb-4 border-t border-nautics-mid pt-6 mt-8 uppercase">Categoría Media (Jets y Lanchas)</h3>
                 <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-6">${categoriaMediaHTML}</div>
 
-                <h4 class="text-xl font-semibold mb-3 mt-6 text-nautics-primary-blue">Categoría Gold (Yates de Lujo)</h4>
+                <h3 class="text-2xl font-semibold mb-4 border-t border-nautics-mid pt-6 mt-8 uppercase">Categoría Gold (Yates de Lujo)</h3>
                 <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6">${categoriaGoldHTML}</div>
 
-                <h4 class="text-xl font-semibold mb-3 mt-6 text-nautics-primary-blue">Categoría Aventura (Exploración y Submarinismo)</h4>
+                <h3 class="text-2xl font-semibold mb-4 border-t border-nautics-mid pt-6 mt-8 uppercase">Categoría Aventura (Pesca y Submarinismo)</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">${categoriaAventuraHTML}</div>
 
-                <h4 class="text-xl font-semibold mb-3 mt-6 text-nautics-primary-blue">Motos de Agua</h4>
-                <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-6">${categoriaMotosAguaHTML}</div>
+                <h3 class="text-2xl font-semibold mb-4 border-t border-nautics-mid pt-6 mt-8 uppercase">Motos de Agua</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">${categoriaMotosAguaHTML}</div>
 
-                {/* Secciones de Víveres, Packs, etc., eliminadas como se solicitó */}
-                
+                <h3 class="text-2xl font-semibold mb-4 border-t border-nautics-mid pt-6 mt-8 uppercase">Víveres y Refrescos</h3>
+                <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6">${comidasHTML}</div>
+                <h3 class="text-2xl font-semibold mb-4 border-t border-nautics-mid pt-6 mt-8 uppercase">Packs de Provisión Propios</h3>
+                <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6">${packsPropiosHTML}</div>
+                <h3 class="text-2xl font-semibold mb-4 border-t border-nautics-mid pt-6 mt-8 uppercase">Packs de Reventa</h3>
+                <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6">${packsReventaHTML}</div>
+                <h3 class="text-2xl font-semibold mb-4 border-t border-nautics-mid pt-6 mt-8 uppercase">Nuevos Packs Legendarios</h3>
+                <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6">${packsNuevosHTML}</div>
+                <h3 class="text-2xl font-semibold mb-4 border-t border-nautics-mid pt-6 mt-8 uppercase">Servicios de Alquiler</h3>
+                <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6">${serviciosHTML}</div>
                 <div class="text-center"><button onclick="VanillaApp.mostrarInicio()" class="btn mt-8">Volver al Inicio</button></div>`; 
         },
         async mostrarPanelBarcos() { 
@@ -593,7 +590,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.barcos.forEach(boat => { 
                 const estadoActual = this.getEstadoBarco(boat); 
                 const imagenHTML = `<img src="${boat.imagen}" alt="${boat.nombre}" class="barco-img mb-4" onerror="this.style.display='none'">`; 
-                html += `<div class="border-2 ${estadoActual.estado === 'disponible' ? 'border-green-600' : 'border-red-600'} p-4 rounded-lg bg-nautics-dark bg-opacity-70 flex flex-col">${imagenHTML}<div class="text-left flex-grow"><h2 class="text-2xl font-bold">${boat.nombre}</h2><p class="text-lg ${estadoActual.estado === 'disponible' ? 'text-green-400' : 'text-red-400'}">${estadoActual.texto}</p><div class="mt-2 text-sm"><p class="font-bold mb-1">Reservas para hoy:</p><ul class="list-disc list-inside space-y-1 h-20 overflow-y-auto text-xs">${boat.reservas.filter(r => new Date(r.inicio.toMillis ? r.inicio.toMillis() : r.inicio).toDateString() === new Date().toDateString()).sort((a,b)=>(a.inicio.toMillis ? a.inicio.toMillis() : a.inicio)-(b.inicio.toMillis ? b.inicio.toMillis() : b.inicio)).map(r => `<li>${new Date(r.inicio.toMillis ? r.inicio.toMillis() : r.inicio).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} - ${new Date(r.fin.toMillis ? r.fin.toMillis() : r.fin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} (${r.cliente})</li>`).join('') || '<li>Ninguna reserva hoy.</li>'}</ul></div></div><div id="form-boat-${boat.id}" class="mt-3 text-left border-t border-nautics-mid pt-3"><h4 class="font-bold mb-2 text-center">Hacer una nueva reserva:</h4><input type="text" id="cliente-boat-${boat.id}" placeholder="Nombre del Alquilador" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><div class="flex gap-2"><input type="date" id="fecha-boat-${boat.id}" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><input type="time" id="hora-boat-${boat.id}" step="1800" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"></div><select id="duracion-boat-${boat.id}" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><option value="30">30 Minutos (Paseo)</option><option value="45">45 Minutos (Alquiler)</option><option value="60">1 Hora</option><option value="120">2 Horas</option><option value="180">3 Horas</option></select><button class="btn w-full mt-2" onclick="VanillaApp.reservarBarco(${boat.id})">Confirmar Alquiler</button></div></div>`; 
+                html += `<div class="border-2 ${estadoActual.estado === 'disponible' ? 'border-green-600' : 'border-red-600'} p-4 rounded-lg bg-nautics-dark bg-opacity-70 flex flex-col">${imagenHTML}<div class="text-left flex-grow"><h2 class="text-2xl font-bold">${boat.nombre}</h2><p class="text-lg ${estadoActual.estado === 'disponible' ? 'text-green-400' : 'text-red-400'}">${estadoActual.texto}</p><div class="mt-2 text-sm"><p class="font-bold mb-1">Reservas para hoy:</p><ul class="list-disc list-inside space-y-1 h-20 overflow-y-auto text-xs">${boat.reservas.filter(r => new Date(r.inicio.toMillis ? r.inicio.toMillis() : r.inicio).toDateString() === new Date().toDateString()).sort((a,b)=>(a.inicio.toMillis ? a.inicio.toMillis() : a.inicio)-(b.inicio.toMillis ? b.inicio.toMillis() : b.inicio)).map(r => `<li>${new Date(r.inicio.toMillis ? r.inicio.toMillis() : r.inicio).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} - ${new Date(r.fin.toMillis ? r.fin.toMillis() : r.fin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} (${r.cliente})</li>`).join('') || '<li>Ninguna reserva hoy.</li>'}</ul></div></div><div id="form-boat-${boat.id}" class="mt-3 text-left border-t border-nautics-mid pt-3"><h4 class="font-bold mb-2 text-center">Hacer una nueva reserva:</h4><input type="text" id="cliente-boat-${boat.id}" placeholder="Nombre del Alquilador" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><div class="flex gap-2"><input type="date" id="fecha-boat-${boat.id}" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><input type="time" id="hora-boat-${boat.id}" step="1800" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"></div><select id="duracion-boat-${boat.id}" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><option value="1">1 Hora</option><option value="2">2 Horas</option><option value="3">3 Horas</option></select><button class="btn w-full mt-2" onclick="VanillaApp.reservarBarco(${boat.id})">Confirmar Alquiler</button></div></div>`; 
             }); 
             html += `</div><div class="text-center"><button onclick="VanillaApp.mostrarInicio()" class="btn mt-8">Volver al Inicio</button></div></div>`; 
             document.getElementById('contenido').innerHTML = html; 
@@ -614,8 +611,8 @@ document.addEventListener('DOMContentLoaded', () => {
             let barcosHTML = this.state.barcos.map(boat => { 
                 const estadoActual = this.getEstadoBarco(boat); 
                 let controles = (estadoActual.estado === 'disponible') 
-                    ? `<button class="btn text-sm py-2 w-full" onclick="VanillaApp.ocuparBarcoAhora(${boat.id}, '${nombre}', 30)">Alquilar (30 min)</button>` /* Paseo */
-                    : `<div class="font-mono text-xl mb-2" id="timer-boat-${boat.id}">--:--:--</div><div class="flex gap-2"><button class="btn text-xs py-1 flex-grow" onclick="VanillaApp.anadirTiempoBarco(${boat.id}, '${nombre}', 30)">+30 min</button><button class="btn text-xs py-1 flex-grow" style="background-color:#dc2626" onclick="VanillaApp.liberarBarco(${boat.id}, '${nombre}')">Liberar</button></div>`; 
+                    ? `<button class="btn text-sm py-2 w-full" onclick="VanillaApp.ocuparBarcoAhora(${boat.id}, '${nombre}')">Alquilar (30 min)</button>` 
+                    : `<div class="font-mono text-xl mb-2" id="timer-boat-${boat.id}">--:--:--</div><div class="flex gap-2"><button class="btn text-xs py-1 flex-grow" onclick="VanillaApp.anadirTiempoBarco(${boat.id}, '${nombre}')">+30 min</button><button class="btn text-xs py-1 flex-grow" style="background-color:#dc2626" onclick="VanillaApp.liberarBarco(${boat.id}, '${nombre}')">Liberar</button></div>`; 
                 return `<div class="bg-nautics-mid p-4 rounded-lg text-center flex flex-col justify-between"><div><p class="font-bold text-lg">${boat.nombre}</p><p class="text-sm ${estadoActual.estado === 'ocupada' ? 'text-red-400' : 'text-green-400'} mb-2">${estadoActual.texto}</p></div><div>${controles}</div></div>`;
             }).join('');
 
@@ -644,9 +641,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     const inicio = new Date(ausencia.inicio).toLocaleDateString('es-ES');
                     const fin = new Date(ausencia.fin).toLocaleDateString('es-ES');
                     return `<li class="flex justify-between items-center p-2 bg-nautics-mid rounded">
-                                        <span>Del <strong>${inicio}</strong> al <strong>${fin}</strong></span>
-                                        <button onclick="VanillaApp.eliminarAusencia('${nombreEmpleado}', ${index}, ${esJefe})" class="btn text-xs py-1" style="background-color:#dc2626">Revocar Permiso</button>
-                                    </li>`; 
+                                    <span>Del <strong>${inicio}</strong> al <strong>${fin}</strong></span>
+                                    <button onclick="VanillaApp.eliminarAusencia('${nombreEmpleado}', ${index}, ${esJefe})" class="btn text-xs py-1" style="background-color:#dc2626">Revocar Permiso</button>
+                                </li>`; 
                 }).join('');
 
             const hoy = new Date().toISOString().split('T')[0];
@@ -767,7 +764,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch(e) { console.error("Error actualizando el dashboard:", e); }
         },
-        async verificarAccesoAdmin() { await this.cargarTodosLosEmpleados(); await this.cargarTodosLosFichajes(); await this.cargarTodasLasVentas(); await this.cargarInventarioLog(); await this.cargarLibroNegro(); await this.cargarListaNegra(); await this.cargarClienteVentas(); await this.mostrarPanelAdmin(); }, // Added cargarClienteVentas
+        async verificarAccesoAdmin() { await this.cargarTodosLosEmpleados(); await this.cargarTodosLosFichajes(); await this.cargarTodasLasVentas(); await this.cargarInventarioLog(); await this.cargarLibroNegro(); await this.cargarListaNegra(); await this.mostrarPanelAdmin(); },
         async verificarAccesoVIP() { 
             const nombre = document.getElementById('nombreInput')?.value.trim().toLowerCase(); 
             const pass = document.getElementById('passInput')?.value; 
@@ -900,14 +897,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const cantNum = parseInt(cantidad); if (isNaN(cantNum)) return;
             let datosVenta = await this.gestionarReseteoDatos(nombreEmpleado, true);
             const producto = this.state.productos.find(p => p.id === productoId);
-            const precioProducto = producto ? producto.precio : 50; 
+            const precioProducto = producto ? producto.precio : 50; // Usar el precio definido en el estado o un default
 
             if (!datosVenta.productos[productoId]) datosVenta.productos[productoId] = { hoy: 0, total: 0 };
             if (datosVenta.productos[productoId].hoy + cantNum < 0) return;
             datosVenta.productos[productoId].hoy += cantNum;
             datosVenta.productos[productoId].total += cantNum;
-            datosVenta.productos[productoId].valorHoy = (datosVenta.productos[productoId].valorHoy || 0) + (cantNum * precioProducto); 
-            datosVenta.productos[productoId].valorTotal = (datosVenta.productos[productoId].valorTotal || 0) + (cantNum * precioProducto); 
+            datosVenta.productos[productoId].valorHoy = (datosVenta.productos[productoId].valorHoy || 0) + (cantNum * precioProducto); // Nuevo: Valor total de ventas
+            datosVenta.productos[productoId].valorTotal = (datosVenta.productos[productoId].valorTotal || 0) + (cantNum * precioProducto); // Nuevo: Valor total de ventas
             this.state.ventas[nombreEmpleado] = datosVenta;
             try {
                 await Firebase.setDoc(Firebase.doc(db, 'ventas', nombreEmpleado), datosVenta);
@@ -920,15 +917,15 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (e) { console.error("Error al modificar venta:", e); alert("Error al modificar venta: " + e.message); }
         },
         async darPackDiarioVentas(nombre) { const hoyStr = new Date().toISOString().split('T')[0]; const fichajeRef = Firebase.doc(db, 'fichajes', nombre); try { const fichajeDoc = await Firebase.getDoc(fichajeRef); if (fichajeDoc.exists() && fichajeDoc.data().ultimoPackDiario === hoyStr) { alert('Ya has recibido las raciones del día.'); return; } await this.modificarVenta('golosinas_picantes', nombre, 5); await this.modificarVenta('refresco_manzana', nombre, 5); await Firebase.updateDoc(fichajeRef, { ultimoPackDiario: hoyStr }); const packBtn = document.getElementById('packDiarioBtn'); if(packBtn){ packBtn.disabled = true; packBtn.textContent = 'Raciones del día recibidas'; packBtn.style.backgroundColor = 'var(--color-nautics-mid)'; } } catch(e) { console.error("Error al dar pack diario:", e); alert("Error al dar pack diario: " + e.message); }},
-        async ocuparBarcoAhora(id, nombreEmpleado, durationMinutes) { 
-            console.log(`Intentando alquilar barco ${id} por ${durationMinutes} minutos:`, nombreEmpleado); 
+        async ocuparBarcoAhora(id, nombreEmpleado) { 
+            console.log("Intentando alquilar barco:", id); 
             const boat = this.state.barcos.find(h => h.id === id); 
             if (boat && this.getEstadoBarco(boat).estado === 'disponible') { 
                 const ahora = Date.now(); 
-                boat.reservas.push({ id: ahora, cliente: nombreEmpleado, inicio: ahora, fin: ahora + durationMinutes * 60 * 1000 }); 
+                boat.reservas.push({ id: ahora, cliente: 'Alquiler Directo', inicio: ahora, fin: ahora + 30 * 60 * 1000 }); 
                 try { 
                     await Firebase.setDoc(Firebase.doc(db, 'barcos', String(boat.id)), boat); 
-                    console.log(`Barco ${id} alquilado exitosamente por ${durationMinutes} minutos.`); 
+                    console.log("Barco alquilado exitosamente en Firebase."); 
                 } catch (e) { 
                     console.error("Error al alquilar barco:", e); 
                     alert("Error al alquilar barco: " + e.message); 
@@ -937,15 +934,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert("El barco no está disponible para alquiler.");
             }
         }, 
-        async anadirTiempoBarco(id, nombreEmpleado, addMinutes) { 
-            console.log(`Intentando añadir ${addMinutes} minutos al barco:`, id); 
+        async anadirTiempoBarco(id, nombreEmpleado) { 
+            console.log("Intentando añadir tiempo al barco:", id); 
             const boat = this.state.barcos.find(h => h.id === id); 
             const r = boat.reservas.find(res => Date.now() >= (res.inicio.toMillis ? res.inicio.toMillis() : res.inicio) && Date.now() < (res.fin.toMillis ? res.fin.toMillis() : res.fin)); 
             if (boat && r) { 
-                r.fin = (r.fin.toMillis ? r.fin.toMillis() : r.fin) + addMinutes * 60 * 1000; 
+                r.fin = (r.fin.toMillis ? r.fin.toMillis() : r.fin) + 30 * 60 * 1000; 
                 try { 
                     await Firebase.setDoc(Firebase.doc(db, 'barcos', String(boat.id)), boat); 
-                    console.log(`Tiempo añadido al barco ${id} en Firebase.`); 
+                    console.log("Tiempo añadido al barco en Firebase."); 
                 } catch (e) { 
                     console.error("Error al añadir tiempo:", e); 
                     alert("Error al añadir tiempo al barco: " + e.message); 
@@ -977,14 +974,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const cliente = document.getElementById(`cliente-boat-${id}`).value.trim();
             const fecha = document.getElementById(`fecha-boat-${id}`).value;
             const hora = document.getElementById(`hora-boat-${id}`).value;
-            const duracionMinutes = parseInt(document.getElementById(`duracion-boat-${id}`).value); 
+            const duracion = parseInt(document.getElementById(`duracion-boat-${id}`).value); 
             
-            if (!cliente || !fecha || !hora || isNaN(duracionMinutes)) {
+            if (!cliente || !fecha || !hora || isNaN(duracion)) {
                 return alert('Rellena todos los campos para el alquiler.'); 
             }
             
             const inicio = new Date(`${fecha}T${hora}`); 
-            const fin = new Date(inicio.getTime() + duracionMinutes * 60 * 1000); 
+            const fin = new Date(inicio.getTime() + duracion*60*60*1000); 
             const boat = this.state.barcos.find(h => h.id === id); 
             
             if(boat.reservas.some(r => inicio < (r.fin.toMillis ? r.fin.toMillis() : r.fin) && fin > (r.inicio.toMillis ? r.inicio.toMillis() : r.inicio))) { 
@@ -1109,7 +1106,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.chatFiles = [];
             this.renderChatPreviews();
 
-            setTimeout(async () => { // Marked as async
+            setTimeout(() => {
                 let mockReply = "Lo siento, almirante, mi brújula no me indica esa dirección. ¿Puedes ser más específico?"; 
                 const userMsg = messageText.toLowerCase();
 
@@ -1118,114 +1115,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     empleado: ["empleado", "tripulacion", "panel", "área", "zona"],
                     producto: ["producto", "provisiones", "vender", "catálogo", "precios"],
                     barco: ["barco", "flota", "navio", "submarino", "alquilar"],
-                    hola: ["hola", "buenas", "buenos", "ey", "ahoy"],
-                    vender: ["vender", "comprar", "dar", "entregar"] // Added for sales
+                    hola: ["hola", "buenas", "buenos", "ey", "ahoy"]
                 };
 
-                // New logic for sales
-                const salesRegex = /(.*?) (\d+)\s*(cebos|cañas)(?: y (\d+)\s*(cebos|cañas))?/;
-                const match = userMsg.match(salesRegex);
-
-                if (match && keywords.vender.some(k => userMsg.includes(k))) {
-                    const clientName = match[1].trim();
-                    const item1Quantity = parseInt(match[2]);
-                    const item1Type = match[3];
-                    const item2Quantity = match[4] ? parseInt(match[4]) : 0;
-                    const item2Type = match[5];
-                    
-                    if (!clientName.includes(' ')) { // Basic check for full name (name and surname)
-                        mockReply = "¡Almirante! Para registrar la venta, necesito el nombre y **apellido** del cliente.";
-                    } else {
-                        const salesPromises = [];
-                        let ceboSoldToday = false;
-
-                        // Process first item
-                        if (item1Type === 'cebos') {
-                            const clientDoc = await Firebase.getDoc(Firebase.doc(db, 'clientesVentas', clientName));
-                            const clientData = clientDoc.exists() ? clientDoc.data() : { ultimaCompraCebos: null, compras: [] };
-                            const lastCeboPurchaseDate = clientData.ultimaCompraCebos ? new Date(clientData.ultimaCompraCebos.toDate()).toDateString() : null;
-                            const todayDate = new Date().toDateString();
-
-                            if (lastCeboPurchaseDate === todayDate) {
-                                mockReply = `¡Almirante! El cliente ${clientName} ya compró cebos hoy. No podemos venderle más hasta mañana.`;
-                                ceboSoldToday = true;
-                            } else {
-                                salesPromises.push(Firebase.setDoc(Firebase.doc(db, 'clientesVentas', clientName), {
-                                    ultimaCompraCebos: Firebase.serverTimestamp(),
-                                    compras: Firebase.Firebase.arrayUnion({
-                                        producto: 'cebo',
-                                        cantidad: item1Quantity,
-                                        timestamp: Firebase.serverTimestamp(),
-                                        empleado: currentUser
-                                    })
-                                }, { merge: true }));
-                                mockReply = `¡Cebos registrados para ${clientName}!`;
-                            }
-                        } else if (item1Type === 'cañas') {
-                            salesPromises.push(Firebase.setDoc(Firebase.doc(db, 'clientesVentas', clientName), {
-                                compras: Firebase.Firebase.arrayUnion({
-                                    producto: 'caña',
-                                    cantidad: item1Quantity,
-                                    timestamp: Firebase.serverTimestamp(),
-                                    empleado: currentUser
-                                })
-                            }, { merge: true }));
-                            mockReply = `¡Cañas registradas para ${clientName}!`;
-                        }
-
-                        // Process second item if present and not a cebo already sold
-                        if (item2Quantity > 0 && !ceboSoldToday) {
-                            if (item2Type === 'cebos') {
-                                const clientDoc = await Firebase.getDoc(Firebase.doc(db, 'clientesVentas', clientName));
-                                const clientData = clientDoc.exists() ? clientDoc.data() : { ultimaCompraCebos: null, compras: [] };
-                                const lastCeboPurchaseDate = clientData.ultimaCompraCebos ? new Date(clientData.ultimaCompraCebos.toDate()).toDateString() : null;
-                                const todayDate = new Date().toDateString();
-
-                                if (lastCeboPurchaseDate === todayDate) {
-                                    mockReply += ` ¡Atención! ${clientName} ya compró cebos hoy, no puedo registrar más.`;
-                                } else {
-                                    salesPromises.push(Firebase.setDoc(Firebase.doc(db, 'clientesVentas', clientName), {
-                                        ultimaCompraCebos: Firebase.serverTimestamp(),
-                                        compras: Firebase.Firebase.arrayUnion({
-                                            producto: 'cebo',
-                                            cantidad: item2Quantity,
-                                            timestamp: Firebase.serverTimestamp(),
-                                            empleado: currentUser
-                                        })
-                                    }, { merge: true }));
-                                    mockReply += ` Y cebos también registrados para ${clientName}.`;
-                                }
-                            } else if (item2Type === 'cañas') {
-                                salesPromises.push(Firebase.setDoc(Firebase.doc(db, 'clientesVentas', clientName), {
-                                    compras: Firebase.Firebase.arrayUnion({
-                                        producto: 'caña',
-                                        cantidad: item2Quantity,
-                                        timestamp: Firebase.serverTimestamp(),
-                                        empleado: currentUser
-                                    })
-                                }, { merge: true }));
-                                mockReply += ` Y cañas también registradas para ${clientName}.`;
-                            }
-                        }
-
-                        try {
-                            if (salesPromises.length > 0) {
-                                await Promise.all(salesPromises);
-                                mockReply = `¡Venta registrada para ${clientName}!: ${item1Quantity} ${item1Type}.`
-                                if (item2Quantity > 0 && item2Type) {
-                                    mockReply += ` Y ${item2Quantity} ${item2Type}.`;
-                                }
-                                this.cargarClienteVentas(); // Refresh client sales data
-                            }
-                        } catch (e) {
-                            console.error("Error al registrar venta de cliente:", e);
-                            mockReply = "¡Rayos! No pude registrar la venta. Error: " + e.message;
-                        }
-                    }
-                }
-                // End new logic for sales
-
-                else if (!messageText && files.length > 0) { 
+                if (!messageText && files.length > 0) { 
                     mockReply = "¡Qué buena pinta tienen esas fotos, almirante!";
                 } else if (keywords.fichar.some(k => userMsg.includes(k))) {
                     if(currentUser) {
@@ -1428,9 +1321,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     let barcosHTML = this.state.barcos.map(boat => { 
                         const estadoActual = this.getEstadoBarco(boat); 
                         const imagenHTML = `<img src="${boat.imagen}" alt="${boat.nombre}" class="barco-img mb-4" onerror="this.style.display='none'">`; 
-                        let controles = (estadoActual.estado === 'disponible') 
-                            ? `<div class="flex flex-col gap-2"><button class="btn text-sm py-2 w-full" onclick="VanillaApp.ocuparBarcoAhora(${boat.id}, '${currentUser}', 30)">Paseo (30 min)</button><button class="btn text-sm py-2 w-full" onclick="VanillaApp.ocuparBarcoAhora(${boat.id}, '${currentUser}', 45)" style="background-color: var(--color-nautics-secondary-pink);">Alquiler (45 min)</button></div>` 
-                            : `<div class="font-mono text-xl mb-2" id="timer-boat-${boat.id}">--:--:--</div><div class="flex gap-2"><button class="btn text-xs py-1 flex-grow" onclick="VanillaApp.anadirTiempoBarco(${boat.id}, '${currentUser}', 30)">+30 min</button><button class="btn text-xs py-1 flex-grow" style="background-color:#dc2626" onclick="VanillaApp.liberarBarco(${boat.id}, '${currentUser}')">Liberar</button></div>`;
                         return `<div class="bg-nautics-mid p-4 rounded-lg text-center flex flex-col justify-between"><div><p class="font-bold text-lg">${boat.nombre}</p><p class="text-sm ${estadoActual.estado === 'ocupada' ? 'text-red-400' : 'text-green-400'} mb-2">${estadoActual.texto}</p></div><div>${controles}</div></div>`;
                     }).join('');
                     panelBarcos.innerHTML = barcosHTML; 
@@ -1446,7 +1336,6 @@ document.addEventListener('DOMContentLoaded', () => {
             await this.cargarTodosLosEmpleados();
             await this.cargarTodosLosFichajes();
             await this.cargarTodasLasVentas();
-            await this.cargarClienteVentas(); // Load client sales data on init
 
             const chatButtonWrapper = document.getElementById('chatbot-button-wrapper');
             const chatContainer = document.getElementById('chatbot-container');
@@ -1490,22 +1379,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 this.mostrarInicio();
             }
-
-            // Set up interval to reset cebo purchase restrictions daily
-            setInterval(async () => {
-                const now = new Date();
-                if (now.getHours() === 0 && now.getMinutes() === 0 && now.getSeconds() < 10) { // Execute shortly after midnight
-                    console.log("Reseteando restricciones de compra de cebos...");
-                    const clientsSnapshot = await Firebase.getDocs(Firebase.collection(db, 'clientesVentas'));
-                    const batch = Firebase.writeBatch(db);
-                    clientsSnapshot.forEach(doc => {
-                        batch.update(doc.ref, { ultimaCompraCebos: null }); // Reset to null or update date to previous day
-                    });
-                    await batch.commit();
-                    console.log("Restricciones de compra de cebos reseteadas para todos los clientes.");
-                    this.cargarClienteVentas(); // Refresh local state
-                }
-            }, 1000 * 60); // Check every minute
         },
 
         async descargarInformeExcel() {
@@ -1515,7 +1388,6 @@ document.addEventListener('DOMContentLoaded', () => {
             await this.cargarTodosLosFichajes();
             await this.cargarTodasLasVentas();
             await this.cargarInventarioLog();
-            await this.cargarClienteVentas(); // Ensure client sales are loaded for the report
 
             const wb = XLSX.utils.book_new();
 
@@ -1538,27 +1410,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (datosVentas.length > 0) {
                 const wsVentas = XLSX.utils.json_to_sheet(datosVentas);
                 XLSX.utils.book_append_sheet(wb, wsVentas, "Transacciones");
-            }
-
-            // New: Add client sales to Excel report
-            const datosClienteVentas = [];
-            for (const clientName in this.state.clientesVentas) {
-                const clientData = this.state.clientesVentas[clientName];
-                if (clientData.compras && Array.isArray(clientData.compras)) {
-                    clientData.compras.forEach(compra => {
-                        datosClienteVentas.push({
-                            Cliente: clientName,
-                            Producto: compra.producto,
-                            Cantidad: compra.cantidad,
-                            Fecha_Compra: new Date(compra.timestamp.toDate()).toLocaleString('es-ES'),
-                            Empleado: compra.empleado || 'N/A'
-                        });
-                    });
-                }
-            }
-            if (datosClienteVentas.length > 0) {
-                const wsClienteVentas = XLSX.utils.json_to_sheet(datosClienteVentas);
-                XLSX.utils.book_append_sheet(wb, wsClienteVentas, "Ventas a Clientes");
             }
 
             const datosAusencias = [];
