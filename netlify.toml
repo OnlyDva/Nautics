@@ -1,9 +1,0 @@
-[functions]
-  directory = "netlify/functions"
-  # node_bundler = "esbuild" # Comentamos esto también para la prueba más simple
-
-[build]
-  # Hemos quitado el comando npm install --prefix netlify/functions de aquí
-  # Netlify debería autodetectar e instalar las dependencias de las funciones
-  # si hay un package.json dentro de la carpeta de la función.
-  publish = "." # Directorio raíz para publicar archivos estáticos

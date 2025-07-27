@@ -11,10 +11,54 @@
 <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 
 <style>
-    body { font-family: 'Inter', sans-serif; background: url('Mooreclub1.jpeg') center top no-repeat; background-size: cover; background-attachment: fixed; color: white; }
-    .bg-overlay { background-color: rgba(0, 0, 0, 0.85); }
-    .btn { background-color: #6b21a8; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 600; cursor: pointer; transition: background-color 0.3s; margin-right: 0.5rem; }
-    .btn:hover { background-color: #5b189b; }
+    /* Reset de márgenes y paddings por defecto del navegador */
+    body { margin: 0; padding: 0; }
+
+    /* Definición de colores personalizados para Tailwind */
+    :root {
+        --color-nautics-primary-blue: #0D47A1; /* Azul profundo */
+        --color-nautics-secondary-pink: #FF4081; /* Rosado vibrante (más prominente) */
+        --color-nautics-dark: #0A1C2C; /* Azul oscuro naval, casi negro */
+        --color-nautics-mid: #1E3A59; /* Medium Blue-Grey */
+        --color-nautics-light: #B0D3F5; /* Azul claro */
+        --color-nautics-accent-pink: #F8C8DC; /* Rosa claro para acentos suaves */
+        --color-nautics-text: #F0F8FF; /* Blanco roto para texto general */
+        --color-nautics-chat-bg: #2A3A4A; /* Un azul más claro para el fondo del chat */
+    }
+
+    .bg-nautics-dark { background-color: var(--color-nautics-dark); }
+    .bg-nautics-mid { background-color: var(--color-nautics-mid); }
+    .bg-nautics-accent { background-color: var(--color-nautics-accent); } 
+    .bg-nautics-accent-pink { background-color: var(--color-nautics-accent-pink); } 
+    .text-nautics-light { color: var(--color-nautics-light); }
+    .text-nautics-text { color: var(--color-nautics-text); }
+    .text-nautics-primary-blue { color: var(--color-nautics-primary-blue); }
+    .text-nautics-secondary-pink { color: var(--color-nautics-secondary-pink); }
+    .border-nautics-mid { border-color: var(--color-nautics-mid); }
+    .border-nautics-primary-blue { border-color: var(--color-nautics-primary-blue); }
+    .border-nautics-secondary-pink { border-color: var(--color-nautics-secondary-pink); }
+
+
+    body { 
+        font-family: 'Inter', sans-serif; 
+        background: url('Fondo.png') center top no-repeat; /* Usando Fondo.png */
+        background-size: cover; 
+        background-attachment: fixed; 
+        color: var(--color-nautics-text); 
+    }
+    .bg-overlay { background-color: rgba(0, 0, 0, 0.75); } 
+    .btn { 
+        background-color: var(--color-nautics-primary-blue); 
+        color: white; 
+        padding: 0.5rem 1rem; 
+        border-radius: 0.375rem; 
+        font-weight: 600; 
+        cursor: pointer; 
+        transition: background-color 0.3s; 
+        margin-right: 0.5rem; 
+        border: 1px solid var(--color-nautics-light);
+    }
+    .btn:hover { background-color: var(--color-nautics-mid); }
     .btn:disabled { background-color: #3b0764; cursor: not-allowed; }
     
     #anuncio-panel-lateral { 
@@ -23,9 +67,9 @@
         left: 20px; 
         width: 320px; 
         max-height: 80vh;
-        background-color: rgba(18, 9, 31, 0.85);
+        background-color: rgba(10, 28, 44, 0.9); 
         backdrop-filter: blur(8px);
-        border: 1px solid #6b21a8;
+        border: 1px solid var(--color-nautics-primary-blue);
         border-radius: 10px;
         padding: 1.5rem;
         z-index: 9998; 
@@ -41,18 +85,28 @@
         transform: translateX(0);
     }
     #anuncio-cerrar { font-size: 1.5rem; cursor: pointer; background: none; border: none; color: white; position: absolute; top: 10px; right: 15px; }
-    .votacion-btn { background-color: rgba(107, 33, 168, 0.5); border: 1px solid #a855f7; border-radius: 8px; padding: 0.5rem; margin-top: 0.5rem; width: 48%; font-size: 1rem; transition: background-color 0.2s; }
-    .votacion-btn:hover:not(:disabled) { background-color: rgba(107, 33, 168, 0.8); }
-    .votacion-btn:disabled { opacity: 0.6; cursor: not-allowed; background-color: #3b0764; }
+    .votacion-btn { 
+        background-color: var(--color-nautics-mid); 
+        border: 1px solid var(--color-nautics-light); 
+        border-radius: 8px; padding: 0.5rem; margin-top: 0.5rem; width: 48%; font-size: 1rem; transition: background-color 0.2s; 
+    }
+    .votacion-btn:hover:not(:disabled) { background-color: var(--color-nautics-primary-blue); }
+    .votacion-btn:disabled { opacity: 0.6; cursor: not-allowed; background-color: var(--color-nautics-dark); }
 
-    .producto-card img, .producto-card svg { border-radius: 0.5rem; height: 96px; width: 96px; object-fit: cover; margin: auto; }
+    .producto-card img, .producto-card svg { 
+        border-radius: 0.5rem; 
+        height: 96px; 
+        width: 96px; 
+        object-fit: cover; /* Asegura que la imagen cubra el área, "zoom" */
+        margin: auto; 
+    }
     #contenido { min-height: 60vh; }
     .panel-image { width: 100%; height: 100%; max-height: 200px; object-fit: contain; }
     .status-indicator { width: 20px; height: 20px; border-radius: 50%; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
     .status-indicator:hover { transform: scale(1.1); }
     .status-indicator.active { box-shadow: 0 0 0 3px white; }
-    .habitacion-img { width: 100%; height: 120px; object-fit: cover; border-radius: 0.375rem; }
-    .inventory-upload-box { width: 100%; height: 180px; background-color: rgba(0,0,0,0.2); border: 2px dashed #5b189b; border-radius: 0.5rem; display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; overflow: hidden; }
+    .barco-img { width: 100%; height: 120px; object-fit: cover; border-radius: 0.375rem; } 
+    .inventory-upload-box { width: 100%; height: 180px; background-color: rgba(0,0,0,0.2); border: 2px dashed var(--color-nautics-primary-blue); border-radius: 0.5rem; display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; overflow: hidden; }
     .inventory-upload-box:hover { background-color: rgba(0,0,0,0.4); }
     .inventory-upload-box img { width: 100%; height: 100%; object-fit: cover; }
     .inventory-upload-box .remove-btn { position: absolute; top: 5px; right: 5px; background-color: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-weight: bold; line-height: 24px; text-align: center; cursor: pointer; display: none; }
@@ -63,24 +117,40 @@
     #chatbot-button:hover { transform: scale(1.05); }
     #chatbot-button img { width: 100%; height: 100%; object-fit: contain; z-index: 1001; position: relative; }
     @keyframes pulse-small{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
-    #chatbot-bubble{position:absolute;bottom:150px;right:0;background-color:#a855f7;color:#fff;padding:12px 18px;border-radius:20px;border-bottom-right-radius:2px;box-shadow:0 4px 8px rgba(0,0,0,.3);white-space:nowrap;font-weight:600;cursor:pointer;opacity:0;visibility:hidden;transform:translateY(20px);transition:opacity .4s ease,transform .4s ease}#chatbot-bubble.visible{opacity:1;visibility:visible;transform:translateY(0)}
-    #chatbot-container{position:fixed;bottom:40px;right:40px;width:450px;height:600px;background-color:#1a1a2e;border-radius:10px;box-shadow:0 8px 20px rgba(0,0,0,.5);display:none;flex-direction:column;z-index:999;overflow:hidden;border:2px solid #6b21a8;box-sizing:border-box}#chatbot-header{background-color:#6b21a8;color:#fff;padding:10px 15px;font-weight:700;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;box-sizing:border-box;width:100%}#chatbot-close,#chatbot-minimize{background:0 0;border:none;color:#fff;font-size:1.2em;cursor:pointer;margin-left:10px;padding:0;line-height:1}
-    #chatbot-messages{flex-grow:1;padding:15px;overflow-y:auto;background-color:#2a2a4a;display:flex;flex-direction:column;min-height:0;box-sizing:border-box; background-image: url('Luna.png'); background-repeat: no-repeat; background-position: bottom 10px right 10px; background-size: 120px; background-blend-mode: luminosity; opacity: 0.8;}
-    .chat-message{margin-bottom:10px;padding:8px 12px;border-radius:15px;max-width:80%;line-height:1.4;word-wrap:break-word;box-sizing:border-box; position: relative; z-index: 2;}.user-message{background-color:#a855f7;align-self:flex-end;border-bottom-right-radius:2px}.bot-message{background-color:#4a4a6e;align-self:flex-start;border-bottom-left-radius:2px}#chatbot-input-container{padding:10px 15px;display:flex;align-items:center;gap:10px;background-color:#1a1a2e;flex-shrink:0;box-sizing:border-box;width:100%; position: relative; z-index: 1002;}
-    #chatbot-input{flex-grow:1;padding:10px;border-radius:20px;border:1px solid #6b21a8;background-color:#333355;color:#fff;box-sizing:border-box;min-width:0}
-    .chatbot-action-btn{background-color:transparent;color:#fff;border:none;border-radius:50%;width:40px;height:40px;display:flex;justify-content:center;align-items:center;cursor:pointer;font-size:1.5em;transition:background-color .3s;flex-shrink:0}.chatbot-action-btn:hover{background-color:#5b189b}
+    #chatbot-bubble{position:absolute;bottom:150px;right:0;background-color:var(--color-nautics-secondary-pink);color:#fff;padding:12px 18px;border-radius:20px;border-bottom-right-radius:2px;box-shadow:0 4px 8px rgba(0,0,0,.3);white-space:nowrap;font-weight:600;cursor:pointer;opacity:0;visibility:hidden;transform:translateY(20px);transition:opacity .4s ease,transform .4s ease}#chatbot-bubble.visible{opacity:1;visibility:visible;transform:translateY(0)}
+    #chatbot-container{position:fixed;bottom:40px;right:40px;width:450px;height:600px;background-color:var(--color-nautics-dark);border-radius:10px;box-shadow:0 8px 20px rgba(0,0,0,.5);display:none;flex-direction:column;z-index:999;overflow:hidden;border:2px solid var(--color-nautics-primary-blue);box-sizing:border-box}#chatbot-header{background-color:var(--color-nautics-primary-blue);color:#fff;padding:10px 15px;font-weight:700;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;box-sizing:border-box;width:100%}#chatbot-close,#chatbot-minimize{background:0 0;border:none;color:#fff;font-size:1.2em;cursor:pointer;margin-left:10px;padding:0;line-height:1}
+    #chatbot-messages{flex-grow:1;padding:15px;overflow-y:auto;background-color:var(--color-nautics-chat-bg);display:flex;flex-direction:column;min-height:0;box-sizing:border-box; background-image: url('Jack_Sparrow.png'); background-repeat: no-repeat; background-position: bottom 10px right 10px; background-size: 120px; background-blend-mode: luminosity; opacity: 0.8;}
+    .chat-message{margin-bottom:10px;padding:8px 12px;border-radius:15px;max-width:80%;line-height:1.4;word-wrap:break-word;box-sizing:border-box; position: relative; z-index: 2;}.user-message{background-color:var(--color-nautics-secondary-pink);align-self:flex-end;border-bottom-right-radius:2px}.bot-message{background-color:var(--color-nautics-mid);align-self:flex-start;border-bottom-left-radius:2px}#chatbot-input-container{padding:10px 15px;display:flex;align-items:center;gap:10px;background-color:var(--color-nautics-dark);flex-shrink:0;box-sizing:border-box;width:100%; position: relative; z-index: 1002;}
+    #chatbot-input{flex-grow:1;padding:10px;border-radius:20px;border:1px solid var(--color-nautics-primary-blue);background-color:#333355;color:#fff;box-sizing:border-box;min-width:0}
+    .chatbot-action-btn{background-color:transparent;color:#fff;border:none;border-radius:50%;width:40px;height:40px;display:flex;justify-content:center;align-items:center;cursor:pointer;font-size:1.5em;transition:background-color .3s;flex-shrink:0}.chatbot-action-btn:hover{background-color:var(--color-nautics-primary-blue)}
     #image-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.85);display:none;justify-content:center;align-items:center;z-index:2000}#overlay-image{max-width:90%;max-height:90%;object-fit:contain;cursor:pointer}#overlay-close-btn{position:absolute;top:20px;right:35px;font-size:45px;color:#fff;cursor:pointer;line-height:1}
-    #chatbot-image-previews { display: flex; gap: 8px; padding: 0 15px 10px 15px; flex-wrap: wrap; background-color: #1a1a2e;}
+    #chatbot-image-previews { display: flex; gap: 8px; padding: 0 15px 10px 15px; flex-wrap: wrap; background-color: var(--color-nautics-dark);}
     .chat-preview-item { position: relative; }
     .chat-preview-img { height: 50px; width: 50px; object-fit: cover; border-radius: 5px; }
     .chat-preview-remove { position: absolute; top: -5px; right: -5px; background: #c44; color: white; border-radius: 50%; width: 18px; height: 18px; border: none; cursor: pointer; font-size: 12px; line-height: 18px; text-align: center; font-weight: bold; }
+    .chat-preview-item.has-image .remove-btn { display: block; }
     .chat-message img { max-width: 100%; border-radius: 10px; margin-top: 5px; }
+
+    /* Estilo para la tabla de precios */
+    .prices-table th, .prices-table td {
+        padding: 0.75rem; /* Espaciado interno */
+        border-bottom: 1px solid var(--color-nautics-mid); /* Separador de fila */
+        text-align: left;
+    }
+    .prices-table th {
+        background-color: var(--color-nautics-dark);
+        font-weight: bold;
+    }
+    .prices-table tr:last-child td {
+        border-bottom: none; /* No hay borde en la última fila */
+    }
 </style>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, query, orderBy, addDoc, serverTimestamp, where, writeBatch, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
     
+    // Configuración de Firebase para el proyecto Nautics
     const firebaseConfig = {
       apiKey: "AIzaSyA7pg9vtqsPNGu3EGEEZ8hGnQJTkTBVjss",
       authDomain: "nautics-78bf2.firebaseapp.com",
@@ -100,26 +170,26 @@
     };
 </script>
 </head>
-<body class="text-purple-200">
+<body class="text-nautics-text">
 <div id="anuncio-panel-lateral"></div>
 <audio id="alarm-sound" src="alarm.mp3" preload="auto"></audio>
 <audio id="notification-sound" src="notification.mp3" preload="auto"></audio>
 
 <div class="bg-overlay min-h-screen">
-<nav class="bg-purple-900 text-white px-6 py-4 flex justify-between items-center">
+<nav class="bg-nautics-dark text-white px-6 py-4 flex justify-between items-center">
 <h1 class="text-xl font-bold cursor-pointer" onclick="VanillaApp.mostrarInicio()">Nautics</h1>
 <ul class="flex space-x-6 text-sm">
 <li><a class="hover:underline" href="#" onclick="VanillaApp.mostrarInicio()">Inicio</a></li>
 <li><a class="hover:underline" href="#" onclick="VanillaApp.irAPanelEmpleado()">Empleados</a></li>
 <li><a class="hover:underline" href="#" onclick="VanillaApp.mostrarPanelProductos()">Productos</a></li>
-<li><a class="hover:underline" href="#" onclick="VanillaApp.mostrarPanelHabitaciones()">Habitaciones</a></li>
+<li><a class="hover:underline" href="#" onclick="VanillaApp.mostrarPanelBarcos()">Barcos</a></li>
 </ul>
 </nav>
 <main class="p-8" id="contenido"></main>
 </div>
 
 <div id="image-overlay"><span id="overlay-close-btn">&times;</span><img id="overlay-image" src="" alt="Imagen ampliada"></div>
-<div id="chatbot-button-wrapper"><div id="chatbot-bubble">Si necesitas alguna cosa, dime y te ayudo</div><div id="chatbot-button"><img alt="Asistente de Chat" src="Luna.png"/></div></div>
+<div id="chatbot-button-wrapper"><div id="chatbot-bubble">Si necesitas alguna cosa, dime y te ayudo</div><div id="chatbot-button"><img alt="Asistente de Chat" src="Jack_Sparrow.png"/></div></div>
 <div id="chatbot-container">
     <div id="chatbot-header">
         <span>Asistente Nautics</span>
@@ -138,37 +208,52 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-    const VanillaApp = {
+    const VanillaApp = { 
         state: {
+            // Productos individuales para Nautics
             productos: [ 
-                { id: 'tito_griego', nombre: 'Tito Dios Griego', imagen: 'Tito.png' }, { id: 'la_tita', nombre: 'La Tita', imagen: 'Tita.png' }, { id: 'mascara_cat', nombre: 'Máscara “Cat Vanilla”', imagen: 'Mascara.png' }, { id: 'pinzas_led', nombre: 'Pinzas LED “Sweet Pain”', imagen: 'Pinzas.png' }, { id: 'preservativos', nombre: '“Espadas del Deseo”', imagen: 'condones.png' },
-                { id: 'golosinas_picantes', nombre: 'Golosinas Picantes', imagen: 'Golosinas.png' },{ id: 'refresco_manzana', nombre: 'Refresco de Manzana', imagen: 'Refresco.png' },{ id: 'comida_reventa', nombre: 'Comida (Reventa)', imagen: 'comida reventa.png' },{ id: 'alcohol_reventa', nombre: 'Alcohol (Reventa)', imagen: 'alcohol de reventa.png' }
+                { id: 'pescanova', nombre: 'PescAnova', imagen: 'PescAnova.png', precio: 50 }, 
+                { id: 'cana', nombre: 'Caña de Pescar', imagen: 'Caña.png', precio: 750 }, /* Usando Caña.png */
+                { id: 'cebo', nombre: 'Cebo Marino', imagen: 'Cebo.png', precio: 1000 }, /* Usando Cebo.png */
+                { id: 'yonkayate', nombre: 'WonkaYate', imagen: 'WonkaYate.png', precio: 50 } /* Usando WonkaYate.png */
             ],
-            datosHabitacionesBase: [
-                { id: 1, nombre: 'Habitacion Roja', imagen: 'habitacion roja.jpg' }, { id: 2, nombre: 'Habitacion Casino', imagen: 'Casino.jpg' }, { id: 3, nombre: 'Habitacion Gamer', imagen: 'gamer.jpg' },
-                { id: 4, nombre: 'Habitacion Japonesa', imagen: 'japonesa.jpg' }, { id: 5, nombre: 'Habitacion Cowboy', imagen: 'oeste.jpg' }, { id: 6, nombre: 'Habitacion Cueva', imagen: 'Cueva.jpg' },
-                { id: 7, nombre: 'Habitacion Egipcia', imagen: 'Egipcia.jpg' }, { id: 8, nombre: 'Habitación 8', imagen: 'placeholder.png' }, { id: 9, nombre: 'Habitación 9', imagen: 'placeholder.png' },{ id: 10, nombre: 'Habitación 10', imagen: 'placeholder.png' },
+            // Barcos disponibles para Nautics (se corresponden con las imágenes que tienes)
+            datosBarcosBase: [ 
+                { id: 1, nombre: 'La Perla Negra', imagen: 'Jack_Sparrow.png', reservas: [] }, 
+                { id: 2, nombre: 'El Jet Max', imagen: 'JetMax.png', reservas: [] },
+                { id: 3, nombre: 'El Long Fin', imagen: 'LongFin.png', reservas: [] },
+                { id: 4, nombre: 'El Marquis', imagen: 'Marquis.png', reservas: [] },
+                { id: 5, nombre: 'La Avisa', imagen: 'Avisa.png', reservas: [] },
+                { id: 6, nombre: 'El Speeder', imagen: 'Speeder.png', reservas: [] },
+                { id: 7, nombre: 'El Squalo', imagen: 'Squalo.png', reservas: [] },
+                { id: 8, nombre: 'El Submarino', imagen: 'Submarino.png', reservas: [] },
+                { id: 9, nombre: 'El Sun Trap', imagen: 'SunTrap.png', reservas: [] },
+                { id: 10, nombre: 'El Toro', imagen: 'Toro.png', reservas: [] },
+                { id: 11, nombre: 'El Tropic', imagen: 'Tropic.png', reservas: [] },
+                { id: 12, nombre: 'La Dhingy', imagen: 'Dhingy.png', reservas: [] }, /* Nueva adición */
             ],
-            empleados: [], fichajes: {}, ventas: {}, habitaciones: [], inventarioLog: [], libroNegro: [], listaNegra: [],
-            timers: { fichaje: null, habitaciones: null, dashboard: null, localOpen: null },
+            empleados: [], fichajes: {}, ventas: {}, barcos: [], 
+            inventarioLog: [], libroNegro: [], listaNegra: [], 
+            clientesVentas: {}, // Nueva propiedad para almacenar ventas de clientes
+            timers: { fichaje: null, barcos: null, dashboard: null, localOpen: null }, 
             inventoryFiles: [null, null, null],
             chatFiles: [],
             ultimoAnuncioMostrado: null,
-            unsubscribeHabitaciones: null,
+            unsubscribeBarcos: null, 
         },
 
         stopAllTimers() { Object.keys(this.state.timers).forEach(t => { if(this.state.timers[t]) clearInterval(this.state.timers[t]); this.state.timers[t] = null; }); },
-        stopPanelTimers() { if(this.state.timers.fichaje) clearInterval(this.state.timers.fichaje); if(this.state.timers.habitaciones) clearInterval(this.state.timers.habitaciones); this.state.timers.fichaje = null; this.state.timers.habitaciones = null;},
+        stopPanelTimers() { if(this.state.timers.fichaje) clearInterval(this.state.timers.fichaje); if(this.state.timers.barcos) clearInterval(this.state.timers.barcos); this.state.timers.fichaje = null; this.state.timers.barcos = null;}, 
         startClockInTimer(horaInicio, baseHoy, baseSemana, baseTotal) { this.stopPanelTimers(); this.state.timers.fichaje = setInterval(() => { const tiempoSesionElem = document.getElementById('tiempoSesion'); const tiempoHoyElem = document.getElementById('tiempoHoy'); const tiempoSemanaElem = document.getElementById('tiempoSemana'); const tiempoTotalElem = document.getElementById('tiempoTotal'); if (tiempoSesionElem && tiempoHoyElem && tiempoSemanaElem && tiempoTotalElem) { const tiempoSesion = Date.now() - horaInicio; tiempoHoyElem.textContent = this.formatearTiempo(baseHoy + tiempoSesion); tiempoSemanaElem.textContent = this.formatearTiempo(baseSemana + tiempoSesion); tiempoTotalElem.textContent = this.formatearTiempo(baseTotal + tiempoSesion); tiempoSesionElem.textContent = this.formatearTiempo(tiempoSesion); } }, 1000); },
-        startRoomsTimer() {
-            this.state.timers.habitaciones = setInterval(() => {
-                this.state.habitaciones.forEach(hab => {
+        startBoatsTimer() { 
+            this.state.timers.barcos = setInterval(() => { 
+                this.state.barcos.forEach(boat => { 
                     const ahora = Date.now();
-                    const reservaActual = hab.reservas ? hab.reservas.find(res => ahora >= res.inicio && ahora < res.fin) : null;
-                    const tiempoRestanteElem = document.getElementById(`timer-hab-${hab.id}`);
+                    const reservaActual = boat.reservas ? boat.reservas.find(res => ahora >= (res.inicio.toMillis ? res.inicio.toMillis() : res.inicio) && ahora < (res.fin.toMillis ? res.fin.toMillis() : res.fin)) : null;
+                    const tiempoRestanteElem = document.getElementById(`timer-boat-${boat.id}`); 
                     if (tiempoRestanteElem) {
                         if (reservaActual) {
-                            const restante = reservaActual.fin - ahora;
+                            const restante = (reservaActual.fin.toMillis ? reservaActual.fin.toMillis() : reservaActual.fin) - ahora;
                             if (restante > 0) {
                                 tiempoRestanteElem.textContent = this.formatearTiempo(restante);
                             } else {
@@ -193,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
         hashPassword(str) { let hash = 0; if (typeof str !== 'string' || str.length === 0) return "hash_0"; for (let i = 0; i < str.length; i++) { const char = str.charCodeAt(i); hash = ((hash << 5) - hash) + char; hash |= 0; } return "hash_" + Math.abs(hash); },
         formatearTiempo(ms) { if (isNaN(ms) || ms < 0) ms = 0; const s = Math.floor(ms / 1000), h = String(Math.floor(s / 3600)).padStart(2, '0'), m = String(Math.floor((s % 3600) / 60)).padStart(2, '0'), sec = String(s % 60).padStart(2, '0'); return `${h}:${m}:${sec}`; },
         formatearTiempoHorasDecimal(ms) { if (isNaN(ms) || ms <= 0) return "0,0"; const horas = ms / (1000 * 60 * 60); return horas.toFixed(1).replace('.', ','); },
-        getEstadoHabitacion(hab) { const now = Date.now(); if (!hab || !hab.reservas) return { estado: 'disponible', texto: 'Disponible', reservaActual: null }; const r = hab.reservas.find(res => now >= res.inicio && ahora < res.fin); return r ? { estado: 'ocupada', texto: 'Ocupada', reservaActual: r } : { estado: 'disponible', texto: 'Disponible', reservaActual: null }; },
+        getEstadoBarco(boat) { const now = Date.now(); if (!boat || !boat.reservas) return { estado: 'disponible', texto: 'Disponible', reservaActual: null }; const r = boat.reservas.find(res => now >= (res.inicio.toMillis ? res.inicio.toMillis() : res.inicio) && now < (res.fin.toMillis ? res.fin.toMillis() : res.fin)); return r ? { estado: 'ocupada', texto: 'Ocupado', reservaActual: r } : { estado: 'disponible', texto: 'Disponible', reservaActual: null }; }, 
         getWeekNumber(d) { d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7)); var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1)); return Math.ceil((((d - yearStart) / 86400000) + 1)/7); },
         estaDeAusencia(empleado) {
             if (!empleado || !empleado.ausencias || !Array.isArray(empleado.ausencias)) return false;
@@ -206,30 +291,90 @@ document.addEventListener('DOMContentLoaded', () => {
 
         async cargarTodosLosEmpleados() { try { const snapshot = await Firebase.getDocs(Firebase.query(Firebase.collection(db, 'empleados'), Firebase.orderBy('nombre'))); this.state.empleados = []; snapshot.forEach(doc => this.state.empleados.push({ id: doc.id, ...doc.data() })); } catch (e) { console.error("Error cargando empleados:", e); } },
         async cargarTodosLosFichajes() { try { const snapshot = await Firebase.getDocs(Firebase.collection(db, 'fichajes')); let fichajesData = {}; snapshot.forEach(doc => { fichajesData[doc.id] = doc.data(); }); this.state.fichajes = fichajesData; } catch (e) { console.error("Error cargando fichajes:", e); } },
-        async cargarTodasLasVentas() { try { const snapshot = await Firebase.getDocs(Firebase.collection(db, 'ventas')); this.state.ventas = {}; snapshot.forEach(doc => { this.state.ventas[doc.id] = doc.data(); }); } catch (e) { console.error("Error cargando ventas:", e); } },
+        async cargarTodasLasVentas() { try { const snapshot = await Firebase.getDocs(Firebase.collection(db, 'ventas')); this.state.ventas = {}; snapshot.forEach(doc => { this.state.ventas[doc.id] = doc.data(); }); this.state.productos.forEach(p => { for(const emp in this.state.ventas) { if(!this.state.ventas[emp].productos) this.state.ventas[emp].productos = {}; if(!this.state.ventas[emp].productos[p.id]) this.state.ventas[emp].productos[p.id] = { hoy: 0, total: 0 }; } }); } catch (e) { console.error("Error cargando ventas:", e); } },
         async cargarInventarioLog() { try { const q = Firebase.query(Firebase.collection(db, 'inventario_log'), Firebase.orderBy('timestamp', 'desc')); const snapshot = await Firebase.getDocs(q); this.state.inventarioLog = []; snapshot.forEach(doc => this.state.inventarioLog.push(doc.data())); } catch (e) { console.error("Error cargando log de inventario:", e); } },
         async cargarLibroNegro() { try { const snapshot = await Firebase.getDocs(Firebase.collection(db, 'libroNegro')); this.state.libroNegro = []; snapshot.forEach(doc => this.state.libroNegro.push({docId: doc.id, ...doc.data()})); } catch (e) { console.error("Error cargando Libro Negro:", e); } },
         async cargarListaNegra() { try { const snapshot = await Firebase.getDocs(Firebase.collection(db, 'listaNegra')); this.state.listaNegra = []; snapshot.forEach(doc => this.state.listaNegra.push({docId: doc.id, ...doc.data()})); } catch (e) { console.error("Error cargando Lista Negra:", e); } },
         
+        async cargarClienteVentas() {
+            try {
+                const snapshot = await Firebase.getDocs(Firebase.collection(db, 'clientesVentas'));
+                this.state.clientesVentas = {};
+                snapshot.forEach(doc => {
+                    this.state.clientesVentas[doc.id] = doc.data();
+                });
+            } catch (e) {
+                console.error("Error cargando ventas de clientes:", e);
+            }
+        },
+
         async irAPanelEmpleado() { const currentUser = sessionStorage.getItem('currentUser'); if (currentUser) { await this.mostrarPanelEmpleados(currentUser); } else { this.mostrarLoginVIP(); }},
-        mostrarInicio() { this.stopAllTimers(); if (typeof this.state.unsubscribeHabitaciones === 'function') { this.state.unsubscribeHabitaciones(); } document.getElementById('contenido').innerHTML = `<div class="p-4 md:p-8 max-w-7xl mx-auto rounded-lg bg-purple-900 bg-opacity-90 shadow-lg"><header class="mb-8 text-center"><h1 class="text-5xl font-extrabold text-white drop-shadow-lg mb-2">Bienvenido a Nautics</h1><p class="text-purple-300 text-lg">Tu aventura en el mar empieza aquí.</p></header><div class="flex flex-col md:flex-row items-center gap-8"><div class="md:w-5/12"><img src="Tito y Marta.png" alt="Tito y Marta" class="rounded-lg shadow-2xl w-full h-auto object-cover" /></div><div class="md:w-7/12 space-y-6"><div class="bg-purple-800 bg-opacity-50 p-4 rounded-lg"><h2 class="text-2xl font-bold text-white mb-2">Tito Giovanni</h2><p class="text-purple-200">El carismático maestro de ceremonias y corazón de Nautics. Su elegancia y estilo inconfundible, siempre vestido de morado, garantizan una experiencia inolvidable. Es el anfitrión perfecto, el alma de la aventura.</p></div><div class="bg-purple-800 bg-opacity-50 p-4 rounded-lg"><h2 class="text-2xl font-bold text-white mb-2">Marta</h2><p class="text-purple-200">La musa indiscutible del club. Con una actitud que cautiva y una sensualidad que desarma, Marta es la protagonista de los shows más aclamados. Su presencia en el escenario es pura magia y provocación.</p></div></div></div><div class="mt-10 flex justify-center gap-4"><button onclick="VanillaApp.mostrarLoginVIP()" class="btn">Área Empleados</button><button onclick="VanillaApp.mostrarLoginAdmin()" class="btn" style="background-color: #a855f7;">Jefes</button></div></div>`; this.ajustarPosicionChatbot(true); },
+        mostrarInicio() { 
+            this.stopAllTimers(); 
+            if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); } 
+            document.getElementById('contenido').innerHTML = `
+                <div class="p-4 md:p-8 max-w-7xl mx-auto rounded-lg bg-nautics-dark bg-opacity-90 shadow-lg border border-nautics-primary-blue">
+                    <header class="mb-8 text-center">
+                        <h1 class="text-5xl font-extrabold text-white drop-shadow-lg mb-2">¡Ahoy, Navegante! Bienvenido a Nautics</h1>
+                        <p class="text-nautics-light text-lg">Donde la brújula del lujo te guía a la aventura.</p>
+                    </header>
+                    
+                    <section class="mb-12">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                            <div class="flex justify-center md:order-1">
+                                <img src="Jackcompleto.png" alt="Capitán Jack Sparrow" class="rounded-lg shadow-2xl w-full h-auto object-cover max-w-md border-2 border-nautics-secondary-pink" />
+                            </div>
+                            <div class="space-y-6 md:order-2">
+                                <div class="bg-nautics-mid bg-opacity-50 p-4 rounded-lg border border-nautics-primary-blue">
+                                    <h2 class="text-2xl font-bold text-white mb-2">El Comienzo de la Leyenda en Nautics</h2>
+                                    <p class="text-nautics-light">Se dice que tras innumerables escapes y búsquedas de tesoros, el mismísimo Capitán Jack Sparrow sintió el llamado de un nuevo horizonte. Fue en las costas de Murcia donde sus ojos avistaron Nautics, un imperio de lujo y aventura en el mar. Fascinado por el espíritu de Nautics y la audacia de Tito Giovanni y su flota, Jack decidió que este sería su próximo gran "negocio". Con su carisma inconfundible y su sombrero desafiante, se unió a la tripulación, no para robar, sino para enriquecerla con su espíritu indomable y su astucia legendaria.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="mb-12">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                            <div class="space-y-6 md:order-1">
+                                <div class="bg-nautics-mid bg-opacity-50 p-4 rounded-lg border border-nautics-primary-blue">
+                                    <h2 class="text-2xl font-bold text-white mb-2">Un Nuevo Timón, Un Nuevo Destino</h2>
+                                    <p class="text-nautics-light">La influencia de Jack no tardó en notarse. Inspirado por la elegancia de Tito y la eficiencia de Capitana Marta, Jack "invirtió" sus peculiares ganancias en innovar la flota. Se rumorea que el diseño del timón principal de Nautics guarda secretos de sus mapas más preciados, y que cada barco zarpa con una pizca de su espíritu aventurero. El timón, con su madera pulida y su tacto firme, guía a la flota hacia destinos que solo los verdaderos capitanes conocen, siempre con la promesa de una travesía inolvidable.</p>
+                                </div>
+                                <div class="bg-nautics-mid bg-opacity-50 p-4 rounded-lg border border-nautics-primary-blue">
+                                    <h2 class="text-2xl font-bold text-white mb-2">El Cofre de las Oportunidades</h2>
+                                    <p class="text-nautics-light">Incluso un pirata legendario sabe que la logística es clave para un imperio. El inventario de Nautics, repleto de provisiones exóticas y equipos de alta tecnología, está custodiado por un cofre ancestral, un "obsequio" del propio Jack. Cada producto, desde un zumo tropical hasta un submarino de lujo, es parte de un tesoro que ahora está a tu alcance, gestionado con la astucia que solo un pirata y un empresario como Tito Giovanni pueden ofrecer.</p>
+                                </div>
+                            </div>
+                            <div class="flex justify-center md:order-2">
+                                <img src="jacktesoro.png" alt="Jack Sparrow con Tesoro" class="rounded-lg shadow-2xl w-full h-auto object-contain max-w-md border-2 border-nautics-secondary-pink" />
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <div class="mt-10 flex justify-center gap-4 flex-wrap">
+                        <button onclick="VanillaApp.mostrarLoginVIP()" class="btn text-lg px-6 py-3">Acceso a la Tripulación</button>
+                        <button onclick="VanillaApp.mostrarLoginAdmin()" class="btn text-lg px-6 py-3" style="background-color: var(--color-nautics-secondary-pink);">Jefes de Flota</button>
+                    </div>
+                </div>`; 
+            this.ajustarPosicionChatbot(true); 
+        },
         mostrarLoginVIP() {
             this.stopAllTimers();
-            if (typeof this.state.unsubscribeHabitaciones === 'function') { this.state.unsubscribeHabitaciones(); }
+            if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); }
             document.getElementById('contenido').innerHTML = `
-                <div class="max-w-md mx-auto bg-black bg-opacity-30 p-8 rounded-lg shadow-lg">
-                    <h2 class="text-2xl font-bold mb-4 text-center">Acceso Empleados</h2>
+                <div class="max-w-md mx-auto bg-nautics-dark bg-opacity-70 p-8 rounded-lg shadow-lg border-2 border-nautics-mid">
+                    <h2 class="text-2xl font-bold mb-4 text-center text-nautics-text">Acceso de la Tripulación</h2>
                     <div class="mb-4">
-                        <label class="block mb-2">Nombre completo:</label>
-                        <input id="nombreInput" type="text" class="w-full px-3 py-2 text-black rounded" placeholder="nombre y apellido en minúsculas" autocomplete="username" />
+                        <label class="block mb-2 text-nautics-light">Nombre completo:</label>
+                        <input id="nombreInput" type="text" class="w-full px-3 py-2 text-gray-900 rounded bg-nautics-light" placeholder="nombre y apellido en minúsculas" autocomplete="username" />
                     </div>
                     <div class="mb-4">
-                        <label class="block mb-2">Contraseña:</label>
-                        <input id="passInput" type="password" class="w-full px-3 py-2 text-black rounded" autocomplete="current-password" />
+                        <label class="block mb-2 text-nautics-light">Contraseña:</label>
+                        <input id="passInput" type="password" class="w-full px-3 py-2 text-gray-900 rounded bg-nautics-light" autocomplete="current-password" />
                     </div>
                     <div class="flex justify-between mt-6">
-                        <button onclick="VanillaApp.verificarAccesoVIP()" class="btn">Entrar</button>
-                        <button onclick="VanillaApp.mostrarInicio()" class="btn" style="background-color:#5b189b;">Volver</button>
+                        <button onclick="VanillaApp.verificarAccesoVIP()" class="btn">Embarcar</button>
+                        <button onclick="VanillaApp.mostrarInicio()" class="btn" style="background-color:var(--color-nautics-mid);">Volver a Puerto</button>
                     </div>
                 </div>`;
             document.getElementById('passInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') this.verificarAccesoVIP(); });
@@ -237,16 +382,16 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         mostrarLoginAdmin() {
             this.stopAllTimers();
-            if (typeof this.state.unsubscribeHabitaciones === 'function') { this.state.unsubscribeHabitaciones(); }
+            if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); }
             document.getElementById('contenido').innerHTML = `
-                <div class="max-w-md mx-auto bg-black bg-opacity-50 p-8 rounded-lg shadow-lg border-2 border-purple-400">
-                    <h2 class="text-3xl font-bold mb-4 text-center text-purple-300">Acceso Privado - Jefes</h2>
+                <div class="max-w-md mx-auto bg-nautics-dark bg-opacity-70 p-8 rounded-lg shadow-lg border-2 border-nautics-secondary-pink">
+                    <h2 class="text-3xl font-bold mb-4 text-center text-nautics-text">Acceso Privado - Jefes de Flota</h2>
                     <input type="text" name="username" value="jefe-nautics" autocomplete="username" style="display: none;">
-                    <label class="block mb-2">Contraseña de Jefes:</label>
-                    <input id="adminPassInput" type="password" class="w-full px-3 py-2 text-black rounded" autocomplete="current-password" />
+                    <label class="block mb-2 text-nautics-light">Contraseña de Jefes:</label>
+                    <input id="adminPassInput" type="password" class="w-full px-3 py-2 text-gray-900 rounded bg-nautics-light" autocomplete="current-password" />
                     <div class="flex justify-between mt-6">
-                        <button onclick="VanillaApp.verificarAccesoAdmin()" class="btn">Entrar</button>
-                        <button onclick="VanillaApp.mostrarInicio()" class="btn" style="background-color:#5b189b;">Volver</button>
+                        <button onclick="VanillaApp.verificarAccesoAdmin()" class="btn">Izad la Bandera</button>
+                        <button onclick="VanillaApp.mostrarInicio()" class="btn" style="background-color:var(--color-nautics-mid);">Volver a Puerto</button>
                     </div>
                 </div>`;
             document.getElementById('adminPassInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') this.verificarAccesoAdmin(); });
@@ -255,6 +400,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         crearTarjetaProducto(producto, esPanelVenta = false, nombreEmpleado = '') {
             let totalVentasHoy = 0, totalVentasHist = 0;
+            // Asegura que el producto.precio esté definido, si no, usa el valor por defecto (50) para el cálculo
+            const productoPrecio = producto.precio !== undefined ? producto.precio : 50; 
+
             if (this.state.ventas[nombreEmpleado] && this.state.ventas[nombreEmpleado].productos && this.state.ventas[nombreEmpleado].productos[producto.id]) {
                 totalVentasHoy = this.state.ventas[nombreEmpleado].productos[producto.id].hoy || 0;
                 totalVentasHist = this.state.ventas[nombreEmpleado].productos[producto.id].total || 0;
@@ -262,21 +410,197 @@ document.addEventListener('DOMContentLoaded', () => {
             const desc = `<p class="text-xs mt-1" id="desc-${producto.id}">Hoy: ${totalVentasHoy} | Total: ${totalVentasHist}</p>`;
             const inputVentasHTML = esPanelVenta 
                 ? `<div class="mt-2">
-                     <div class="flex items-center justify-center gap-2">
+                    <div class="flex items-center justify-center gap-2">
                        <button onclick="VanillaApp.modificarVenta('${producto.id}', '${nombreEmpleado}', -1)" class="btn text-lg py-1 px-3">-</button>
                        <span class="font-bold text-lg w-8 text-center" id="ventas-hoy-${producto.id}">${totalVentasHoy}</span>
                        <button onclick="VanillaApp.modificarVenta('${producto.id}', '${nombreEmpleado}', 1)" class="btn text-lg py-1 px-3">+</button>
                      </div>
                      ${desc}
                    </div>`
-                : `<p class="text-purple-300 text-lg font-bold mt-2">$50</p>`;
+                : `<p class="text-nautics-light text-lg font-bold mt-2">$${productoPrecio}</p>`; // Usa el precio del producto
             const placeholderSVG = `<svg class="mx-auto mb-2 text-gray-500" width="80" height="80" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"></path></svg>`;
             const imagenHTML = producto.imagen && !producto.imagen.includes('placeholder') ? `<img src="${producto.imagen}" alt="${producto.nombre}" class="mx-auto mb-2 w-24 h-24 object-cover rounded" onerror="this.src='placeholder.png'"/>` : placeholderSVG;
-            return `<div class="producto-card bg-purple-800 rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div>${imagenHTML}<h3 class="text-white font-semibold leading-tight uppercase">${producto.nombre}</h3></div><div>${inputVentasHTML}</div></div>`;
+            return `<div class="producto-card bg-nautics-mid rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div>${imagenHTML}<h3 class="text-white font-semibold leading-tight uppercase">${producto.nombre}</h3></div><div>${inputVentasHTML}</div></div>`;
         },
 
-        mostrarPanelProductos() { this.stopAllTimers(); if (typeof this.state.unsubscribeHabitaciones === 'function') { this.state.unsubscribeHabitaciones(); } this.ajustarPosicionChatbot(false); const productosHTML = this.state.productos.filter(p => !p.id.includes('reventa')).map(p => this.crearTarjetaProducto(p, false)).join(''); const comidasHTML = `<div class="producto-card bg-purple-800 rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">Zumo</h3></div><div><p class="text-purple-300 text-lg font-bold mt-2">$35</p></div></div><div class="producto-card bg-purple-800 rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">Alcohol</h3></div><div><p class="text-purple-300 text-lg font-bold mt-2">$60</p></div></div>`; const serviciosHTML = `<div class="producto-card bg-purple-800 rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">Habitaciones</h3></div><div><p class="text-purple-300 text-lg font-bold mt-2">$2000</p></div></div><div class="producto-card bg-purple-800 rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">Bailarín/a Privado/a</h3></div><div><p class="text-purple-300 text-lg font-bold mt-2">$2000</p></div></div>`; const packsPropiosHTML = `<div class="producto-card bg-purple-800 rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">5 y 5</h3></div><div><p class="text-purple-300 text-lg font-bold mt-2">$350</p></div></div><div class="producto-card bg-purple-800 rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">10 y 10</h3></div><div><p class="text-purple-300 text-lg font-bold mt-2">$700</p></div></div>`; const packsReventaHTML = `<div class="producto-card bg-purple-800 rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">5 y 5</h3></div><div><p class="text-purple-300 text-lg font-bold mt-2">$400</p></div></div><div class="producto-card bg-purple-800 rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">10 y 10</h3></div><div><p class="text-purple-300 text-lg font-bold mt-2">$800</p></div></div>`; const packsNuevosHTML = `<div class="producto-card bg-purple-800 rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">Pack 100 y 100 (Reventa)</h3></div><div><p class="text-purple-300 text-lg font-bold mt-2">$3000</p></div></div><div class="producto-card bg-purple-800 rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">Pack 100 y 100 (Empleado)</h3></div><div><p class="text-purple-300 text-lg font-bold mt-2">$6300</p></div></div>`; document.getElementById('contenido').innerHTML = `<h2 class="text-3xl font-bold mb-6 text-center uppercase">Productos y Servicios</h2><h3 class="text-2xl font-semibold mb-4 border-t border-purple-700 pt-6 uppercase">Productos</h3><div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">${productosHTML}</div><h3 class="text-2xl font-semibold mb-4 border-t border-purple-700 pt-6 mt-8 uppercase">Comidas y Bebidas</h3><div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6">${comidasHTML}</div><h3 class="text-2xl font-semibold mb-4 border-t border-purple-700 pt-6 mt-8 uppercase">Packs de Comida y Bebida Propia</h3><div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6">${packsPropiosHTML}</div><h3 class="text-2xl font-semibold mb-4 border-t border-purple-700 pt-6 mt-8 uppercase">Packs de Reventa</h3><div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6">${packsReventaHTML}</div><h3 class="text-2xl font-semibold mb-4 border-t border-purple-700 pt-6 mt-8 uppercase">Nuevos Packs</h3><div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6">${packsNuevosHTML}</div><h3 class="text-2xl font-semibold mb-4 border-t border-purple-700 pt-6 mt-8 uppercase">Servicios</h3><div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6">${serviciosHTML}</div><div class="text-center"><button onclick="VanillaApp.mostrarInicio()" class="btn mt-8">Volver</button></div>`; },
-        async mostrarPanelHabitaciones() { this.stopAllTimers(); if (typeof this.state.unsubscribeHabitaciones === 'function') { this.state.unsubscribeHabitaciones(); } let html = `<div class="max-w-7xl mx-auto text-center"><h1 class="text-4xl font-bold mb-8">Nuestras Habitaciones</h1><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`; this.state.habitaciones.forEach(hab => { const estadoActual = this.getEstadoHabitacion(hab); const imagenHTML = `<img src="${hab.imagen}" alt="${hab.nombre}" class="habitacion-img mb-4" onerror="this.style.display='none'">`; html += `<div class="border-2 ${estadoActual.estado === 'disponible' ? 'border-purple-600' : 'border-gray-600'} p-4 rounded-lg bg-purple-900 bg-opacity-50 flex flex-col">${imagenHTML}<div class="text-left flex-grow"><h2 class="text-2xl font-bold">${hab.nombre}</h2><p class="text-lg ${estadoActual.estado === 'disponible' ? 'text-green-400' : 'text-red-400'}">${estadoActual.texto}</p><div class="mt-2 text-sm"><p class="font-bold mb-1">Reservas para hoy:</p><ul class="list-disc list-inside space-y-1 h-20 overflow-y-auto text-xs">${hab.reservas.filter(r => new Date(r.inicio).toDateString() === new Date().toDateString()).sort((a,b)=>a.inicio-b.inicio).map(r => `<li>${new Date(r.inicio).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} - ${new Date(r.fin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} (${r.cliente})</li>`).join('') || '<li>Ninguna reserva hoy.</li>'}</ul></div></div><div id="form-hab-${hab.id}" class="mt-3 text-left border-t border-purple-800 pt-3"><h4 class="font-bold mb-2 text-center">Hacer una nueva reserva:</h4><input type="text" id="cliente-hab-${hab.id}" placeholder="Tu nombre" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><div class="flex gap-2"><input type="date" id="fecha-hab-${hab.id}" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><input type="time" id="hora-hab-${hab.id}" step="1800" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"></div><select id="duracion-hab-${hab.id}" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><option value="1">1 Hora</option><option value="2">2 Horas</option><option value="3">3 Horas</option></select><button class="btn w-full mt-2" onclick="VanillaApp.reservarHabitacion(${hab.id})">Confirmar Reserva</button></div></div>`; }); html += `</div><div class="text-center"><button onclick="VanillaApp.mostrarInicio()" class="btn mt-8">Volver</button></div></div>`; document.getElementById('contenido').innerHTML = html; const hoy = new Date(); const unaSemana = new Date(); unaSemana.setDate(hoy.getDate() + 7); const minDate = hoy.toISOString().split('T')[0]; const maxDate = unaSemana.toISOString().split('T')[0]; document.querySelectorAll('input[type="date"]').forEach(input => { input.min = minDate; input.max = maxDate; input.value = minDate; }); this.ajustarPosicionChatbot(false);},
+        mostrarPanelProductos() { 
+            this.stopAllTimers(); 
+            if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); } 
+            this.ajustarPosicionChatbot(false); 
+            
+            const productosBaseHTML = this.state.productos.map(p => this.crearTarjetaProducto(p, false)).join(''); 
+            
+            // --- Nuevas categorías de productos ---
+            const categoriaBajaHTML = `
+                <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
+                    <div><img src="small_boat_category.png" alt="Categoría Baja" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">Dhingy (Categoría Baja)</h3></div>
+                    <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $1000 | Paseo: $1100</p></div>
+                </div>
+                <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
+                    <div><img src="SunTrap.png" alt="El Sun Trap" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Sun Trap (Categoría Baja)</h3></div>
+                    <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $1000 | Paseo: $1100</p></div>
+                </div>
+            `;
+            const categoriaEstandarHTML = `
+                <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
+                    <div><img src="big_yacht_category.png" alt="Categoría Estándar" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">Squalo (Categoría Estándar)</h3></div>
+                    <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $1430 | Paseo: $1570</p></div>
+                </div>
+                <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
+                    <div><img src="Tropic.png" alt="El Tropic" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Tropic (Categoría Estándar)</h3></div>
+                    <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $1430 | Paseo: $1570</p></div>
+                </div>
+            `;
+            const categoriaMediaHTML = `
+                <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
+                    <div><img src="jet_ski_category.png" alt="Categoría Media" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El JetMax (Categoría Media)</h3></div>
+                    <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $1860 | Paseo: $2050</p></div>
+                </div>
+            `;
+            const categoriaGoldHTML = `
+                <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
+                    <div><img src="luxury_yacht_category.jpg" alt="Yate de Lujo" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Marquis (Categoría Gold)</h3></div>
+                    <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $2290 | Paseo: $2520</p></div>
+                </div>
+                <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
+                    <div><img src="LongFin.png" alt="El Long Fin" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Long Fin (Categoría Gold)</h3></div>
+                    <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $2290 | Paseo: $2520</p></div>
+                </div>
+                   <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
+                    <div><img src="Speeder.png" alt="El Speeder" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Speeder (Categoría Gold)</h3></div>
+                    <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $2290 | Paseo: $2520</p></div>
+                </div>
+                <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
+                    <div><img src="Toro.png" alt="El Toro" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Toro (Categoría Gold)</h3></div>
+                    <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $2290 | Paseo: $2520</p></div>
+                </div>
+            `;
+            const categoriaAventuraHTML = `
+                <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
+                    <div><img src="Avisa.png" alt="La Avisa" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">La Avisa (Categoría Aventura)</h3></div>
+                    <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $2720 | Paseo: $3000</p></div>
+                </div>
+                <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
+                    <div><img src="Submarino.png" alt="El Submarino" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Submarino (Categoría Aventura)</h3></div>
+                    <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $2720 | Paseo: $3000</p></div>
+                </div>
+            `;
+            const categoriaMotosAguaHTML = `
+                <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
+                    <div><img src="jet_ski_category.png" alt="Moto de Agua" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">Moto de Agua</h3></div>
+                    <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $500 | Paseo: $500</p></div>
+                </div>
+            `;
+            
+            document.getElementById('contenido').innerHTML = `
+                <h2 class="text-3xl font-bold mb-6 text-center uppercase">Provisiones y Servicios de Flota</h2>
+                
+                <h3 class="text-2xl font-semibold mb-4 border-t border-nautics-mid pt-6 uppercase">Precios Principales por Categoría</h3>
+                <div class="overflow-x-auto mb-8 bg-nautics-mid rounded-lg shadow-lg">
+                    <table class="w-full text-left text-nautics-text prices-table">
+                        <thead class="bg-nautics-dark uppercase text-sm">
+                            <tr>
+                                <th class="p-3 text-nautics-light">Categorías</th>
+                                <th class="p-3 text-nautics-light">Alquiler</th>
+                                <th class="p-3 text-nautics-light">Paseo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="3"><hr class="border-t border-nautics-primary-blue my-2"/></td></tr> {/* Separador */}
+                            <tr>
+                                <td class="p-3">Categoría Baja</td>
+                                <td class="p-3">$1000</td>
+                                <td class="p-3">$1100</td>
+                            </tr>
+                            <tr><td colspan="3"><hr class="border-t border-nautics-mid my-2"/></td></tr> {/* Separador */}
+                            <tr>
+                                <td class="p-3">Categoría Estándar</td>
+                                <td class="p-3">$1430</td>
+                                <td class="p-3">$1570</td>
+                            </tr>
+                            <tr><td colspan="3"><hr class="border-t border-nautics-mid my-2"/></td></tr> {/* Separador */}
+                            <tr>
+                                <td class="p-3">Categoría Media</td>
+                                <td class="p-3">$1860</td>
+                                <td class="p-3">$2050</td>
+                            </tr>
+                            <tr><td colspan="3"><hr class="border-t border-nautics-mid my-2"/></td></tr> {/* Separador */}
+                            <tr>
+                                <td class="p-3">Categoría Gold</td>
+                                <td class="p-3">$2290</td>
+                                <td class="p-3">$2520</td>
+                            </tr>
+                            <tr><td colspan="3"><hr class="border-t border-nautics-mid my-2"/></td></tr> {/* Separador */}
+                            <tr>
+                                <td class="p-3">Categoría Aventura</td>
+                                <td class="p-3">$2720</td>
+                                <td class="p-3">$3000</td>
+                            </tr>
+                            <tr><td colspan="3"><hr class="border-t border-nautics-mid my-2"/></td></tr> {/* Separador */}
+                            <tr>
+                                <td class="p-3">Motos de Agua</td>
+                                <td class="p-3">$500</td>
+                                <td class="p-3">$500</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 class="text-2xl font-semibold mb-4 border-t border-nautics-mid pt-6 uppercase">Equipamiento Básico (Productos Individuales)</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6">${productosBaseHTML}</div>
+
+                <h3 class="text-2xl font-semibold mb-4 border-t border-nautics-mid pt-6 mt-8 uppercase">Nuestra Flota por Categorías</h3>
+                
+                <h4 class="text-xl font-semibold mb-3 mt-6 text-nautics-primary-blue">Categoría Baja (Barcos Pequeños)</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">${categoriaBajaHTML}</div>
+
+                <h4 class="text-xl font-semibold mb-3 mt-6 text-nautics-primary-blue">Categoría Estándar (Barcos Medianos)</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">${categoriaEstandarHTML}</div>
+
+                <h4 class="text-xl font-semibold mb-3 mt-6 text-nautics-primary-blue">Categoría Media (Lanchas Rápidas)</h4>
+                <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-6">${categoriaMediaHTML}</div>
+
+                <h4 class="text-xl font-semibold mb-3 mt-6 text-nautics-primary-blue">Categoría Gold (Yates de Lujo)</h4>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6">${categoriaGoldHTML}</div>
+
+                <h4 class="text-xl font-semibold mb-3 mt-6 text-nautics-primary-blue">Categoría Aventura (Exploración y Submarinismo)</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">${categoriaAventuraHTML}</div>
+
+                <h4 class="text-xl font-semibold mb-3 mt-6 text-nautics-primary-blue">Motos de Agua</h4>
+                <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-6">${categoriaMotosAguaHTML}</div>
+
+                {/* Secciones de Víveres, Packs, etc., eliminadas como se solicitó */}
+                
+                <div class="text-center"><button onclick="VanillaApp.mostrarInicio()" class="btn mt-8">Volver al Inicio</button></div>`; 
+        },
+        async mostrarPanelBarcos() { 
+            this.stopAllTimers(); 
+            if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); } 
+            let html = `<div class="max-w-7xl mx-auto text-center"><h1 class="text-4xl font-bold mb-8">Nuestra Flota de Barcos</h1><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`; 
+            // Genera los paneles para cada barco con sus formularios de reserva
+            this.state.barcos.forEach(boat => { 
+                const estadoActual = this.getEstadoBarco(boat); 
+                const imagenHTML = `<img src="${boat.imagen}" alt="${boat.nombre}" class="barco-img mb-4" onerror="this.style.display='none'">`; 
+                html += `<div class="border-2 ${estadoActual.estado === 'disponible' ? 'border-green-600' : 'border-red-600'} p-4 rounded-lg bg-nautics-dark bg-opacity-70 flex flex-col">${imagenHTML}<div class="text-left flex-grow"><h2 class="text-2xl font-bold">${boat.nombre}</h2><p class="text-lg ${estadoActual.estado === 'disponible' ? 'text-green-400' : 'text-red-400'}">${estadoActual.texto}</p><div class="mt-2 text-sm"><p class="font-bold mb-1">Reservas para hoy:</p><ul class="list-disc list-inside space-y-1 h-20 overflow-y-auto text-xs">${boat.reservas.filter(r => new Date(r.inicio.toMillis ? r.inicio.toMillis() : r.inicio).toDateString() === new Date().toDateString()).sort((a,b)=>(a.inicio.toMillis ? a.inicio.toMillis() : a.inicio)-(b.inicio.toMillis ? b.inicio.toMillis() : b.inicio)).map(r => `<li>${new Date(r.inicio.toMillis ? r.inicio.toMillis() : r.inicio).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} - ${new Date(r.fin.toMillis ? r.fin.toMillis() : r.fin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} (${r.cliente})</li>`).join('') || '<li>Ninguna reserva hoy.</li>'}</ul></div></div><div id="form-boat-${boat.id}" class="mt-3 text-left border-t border-nautics-mid pt-3"><h4 class="font-bold mb-2 text-center">Hacer una nueva reserva:</h4><input type="text" id="cliente-boat-${boat.id}" placeholder="Nombre del Alquilador" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><div class="flex gap-2"><input type="date" id="fecha-boat-${boat.id}" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><input type="time" id="hora-boat-${boat.id}" step="1800" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"></div><select id="duracion-boat-${boat.id}" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><option value="30">30 Minutos (Paseo)</option><option value="45">45 Minutos (Alquiler)</option><option value="60">1 Hora</option><option value="120">2 Horas</option><option value="180">3 Horas</option></select><button class="btn w-full mt-2" onclick="VanillaApp.reservarBarco(${boat.id})">Confirmar Alquiler</button></div></div>`; 
+            }); 
+            html += `</div><div class="text-center"><button onclick="VanillaApp.mostrarInicio()" class="btn mt-8">Volver al Inicio</button></div></div>`; 
+            document.getElementById('contenido').innerHTML = html; 
+            const hoy = new Date(); const unaSemana = new Date(); unaSemana.setDate(hoy.getDate() + 7); const minDate = hoy.toISOString().split('T')[0]; const maxDate = unaSemana.toISOString().split('T')[0]; 
+            document.querySelectorAll('input[type="date"]').forEach(input => { input.min = minDate; input.max = maxDate; input.value = minDate; }); 
+            this.ajustarPosicionChatbot(false);
+        },
         
         async mostrarPanelEmpleados(nombre) {
             this.stopAllTimers();
@@ -287,22 +611,22 @@ document.addEventListener('DOMContentLoaded', () => {
             if (datosFichaje.fichado) { const t = Date.now() - datosFichaje.inicio; tiempoHoy += t; tiempoSemana += t; tiempoTotal += t; }
             
             const productosVentaHTML = this.state.productos.map(p => this.crearTarjetaProducto(p, true, nombre)).join('');
-            let habitacionesHTML = this.state.habitaciones.map(hab => {
-                const estadoActual = this.getEstadoHabitacion(hab);
+            let barcosHTML = this.state.barcos.map(boat => { 
+                const estadoActual = this.getEstadoBarco(boat); 
                 let controles = (estadoActual.estado === 'disponible') 
-                    ? `<button class="btn text-sm py-2 w-full" onclick="VanillaApp.ocuparHabitacionAhora(${hab.id}, '${nombre}')">Ocupar (30 min)</button>` 
-                    : `<div class="font-mono text-xl mb-2" id="timer-hab-${hab.id}">--:--:--</div><div class="flex gap-2"><button class="btn text-xs py-1 flex-grow" onclick="VanillaApp.anadirTiempoHabitacion(${hab.id}, '${nombre}')">+30 min</button><button class="btn text-xs py-1 flex-grow" style="background-color:#c44" onclick="VanillaApp.liberarHabitacion(${hab.id}, '${nombre}')">Liberar</button></div>`;
-                return `<div class="bg-purple-800 p-4 rounded-lg text-center flex flex-col justify-between"><div><p class="font-bold text-lg">${hab.nombre}</p><p class="text-sm ${estadoActual.estado === 'ocupada' ? 'text-red-400' : 'text-green-400'} mb-2">${estadoActual.texto}</p></div><div>${controles}</div></div>`;
+                    ? `<button class="btn text-sm py-2 w-full" onclick="VanillaApp.ocuparBarcoAhora(${boat.id}, '${nombre}', 30)">Alquilar (30 min)</button>` /* Paseo */
+                    : `<div class="font-mono text-xl mb-2" id="timer-boat-${boat.id}">--:--:--</div><div class="flex gap-2"><button class="btn text-xs py-1 flex-grow" onclick="VanillaApp.anadirTiempoBarco(${boat.id}, '${nombre}', 30)">+30 min</button><button class="btn text-xs py-1 flex-grow" style="background-color:#dc2626" onclick="VanillaApp.liberarBarco(${boat.id}, '${nombre}')">Liberar</button></div>`; 
+                return `<div class="bg-nautics-mid p-4 rounded-lg text-center flex flex-col justify-between"><div><p class="font-bold text-lg">${boat.nombre}</p><p class="text-sm ${estadoActual.estado === 'ocupada' ? 'text-red-400' : 'text-green-400'} mb-2">${estadoActual.texto}</p></div><div>${controles}</div></div>`;
             }).join('');
 
-            const botonConveniosHTML = `<button onclick="VanillaApp.mostrarPanelConvenios(${empleadoData.directiva || false})" class="btn text-xs py-1">Convenios</button>`;
-            const botonesAccionHTML = `<button onclick="VanillaApp.mostrarModalAusencias('${nombre}')" class="btn text-xs py-1">Ausencias</button>${botonConveniosHTML}<button onclick="VanillaApp.mostrarPanelInventario()" class="btn text-xs py-1">Inventario</button><button onclick="VanillaApp.mostrarListaNegraPublica()" class="btn text-xs py-1">Ver Vetados</button><button class="btn" style="background-color: #d63636;" onclick="VanillaApp.cerrarSesion()">Cerrar Sesión</button>`;
+            const botonConveniosHTML = `<button onclick="VanillaApp.mostrarPanelConvenios(${empleadoData.directiva || false})" class="btn text-xs py-1">Convenios Navales</button>`;
+            const botonesAccionHTML = `<button onclick="VanillaApp.mostrarModalAusencias('${nombre}')" class="btn text-xs py-1">Permisos de Ausencia</button>${botonConveniosHTML}<button onclick="VanillaApp.mostrarPanelInventario()" class="btn text-xs py-1">Inventario de Flota</button><button onclick="VanillaApp.mostrarListaNegraPublica()" class="btn text-xs py-1">Ver Piratas Vetados</button><button class="btn" style="background-color: #dc2626;" onclick="VanillaApp.cerrarSesion()">Abandonar Barco</button>`; 
             const hoyStr = new Date().toISOString().split('T')[0]; const packRecibido = datosFichaje.ultimoPackDiario === hoyStr;
-            const controlHTML = `<div class="bg-gray-800/50 p-4 rounded-lg mb-6 text-center border border-gray-700"><h3 class="text-lg font-semibold mb-4">Control Global y Personal</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div class="bg-gray-900/50 p-4 rounded-lg flex flex-col justify-center items-center"><p class="text-base font-bold mb-2">ESTADO DEL LOCAL</p><div class="flex justify-center items-center gap-4"><button id="abrirLocalBtn" class="btn bg-green-600 hover:bg-green-700">Abrir Local</button><button id="cerrarLocalBtn" class="btn bg-red-600 hover:bg-red-700">Cerrar Local</button></div><div class="mt-3"><p id="tiempoAbiertoLocal" class="font-mono text-2xl text-yellow-300">00:00:00</p><div id="ultimoCierreInfo" class="text-xs text-gray-400 mt-1"></div></div></div><div class="bg-gray-900/50 p-4 rounded-lg"><p class="text-base font-bold mb-2">FICHAJE PERSONAL</p><div class="grid grid-cols-2 gap-2 text-center h-full"><div class="p-1 rounded-lg bg-purple-900/50 flex flex-col justify-center"><p class="text-xs text-purple-300">SESIÓN</p><p id="tiempoSesion" class="font-mono text-lg">${this.formatearTiempo(0)}</p></div><div class="p-1 rounded-lg bg-purple-900/50 flex flex-col justify-center"><p class="text-xs text-purple-300">HOY</p><p id="tiempoHoy" class="font-mono text-lg">${this.formatearTiempo(tiempoHoy)}</p></div><div class="p-1 rounded-lg bg-purple-900/50 flex flex-col justify-center"><p class="text-xs text-purple-300">SEMANA</p><p id="tiempoSemana" class="font-mono text-lg">${this.formatearTiempo(tiempoSemana)}</p></div><div class="p-1 rounded-lg bg-purple-900/50 flex flex-col justify-center"><p class="text-xs text-purple-300">TOTAL</p><p id="tiempoTotal" class="font-mono text-lg">${this.formatearTiempo(tiempoTotal)}</p></div></div></div></div><div class="mt-6 flex justify-center items-center gap-4 border-t border-gray-700 pt-4"><button class="btn text-lg px-6 py-3" onclick="VanillaApp.fichar('${nombre}')">Fichar Entrada</button><button class="btn text-lg px-6 py-3" onclick="VanillaApp.desfichar('${nombre}')">Fichar Salida</button><button id="packDiarioBtn" class="btn text-base px-4 py-2" style="background-color: ${packRecibido ? '#581c87' : '#16a34a'};" onclick="VanillaApp.darPackDiarioVentas('${nombre}')" ${packRecibido ? 'disabled' : ''}>${packRecibido ? 'Pack ya recibido' : 'Pack Diario (Venta)'}</button></div></div>`;
-            document.getElementById('contenido').innerHTML = `<div class="p-6 bg-purple-900 bg-opacity-90 rounded-lg max-w-6xl mx-auto shadow-lg"><div class="flex justify-between items-center mb-6 flex-wrap gap-y-4"><h2 class="text-2xl font-bold">Panel de Fichaje: <span class="text-purple-300 capitalize">${nombre}</span></h2><div class="flex items-center gap-2 flex-wrap">${botonesAccionHTML}</div></div>${controlHTML}<h3 class="text-xl font-semibold mb-4 border-t border-purple-700 pt-6">Gestión de Habitaciones</h3><div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8" id="panel-habitaciones">${habitacionesHTML}</div> <h3 class="text-xl font-semibold mb-4 border-t border-purple-700 pt-6">Registrar Ventas</h3><div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4" id="productosVenta">${productosVentaHTML}</div></div>`;
+            const controlHTML = `<div class="bg-nautics-mid bg-opacity-50 p-4 rounded-lg mb-6 text-center border border-nautics-primary-blue"><h3 class="text-lg font-semibold mb-4">Control de Operaciones de Flota</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div class="bg-nautics-dark bg-opacity-50 p-4 rounded-lg flex flex-col justify-center items-center"><p class="text-base font-bold mb-2">ESTADO DE LA FLOTA</p><div class="flex justify-center items-center gap-4"><button id="abrirLocalBtn" class="btn bg-green-600 hover:bg-green-700">Flota Lista (Abrir)</button><button id="cerrarLocalBtn" class="btn bg-red-600 hover:bg-red-700">Flota Inactiva (Cerrar)</button></div><div class="mt-3"><p id="tiempoAbiertoLocal" class="font-mono text-2xl text-nautics-accent-pink">00:00:00</p><div id="ultimoCierreInfo" class="text-xs text-nautics-light mt-1"></div></div></div><div class="bg-nautics-dark bg-opacity-50 p-4 rounded-lg"><p class="text-base font-bold mb-2">REGISTRO DE GUARDIA</p><div class="grid grid-cols-2 gap-2 text-center h-full"><div class="p-1 rounded-lg bg-nautics-mid flex flex-col justify-center"><p class="text-xs text-nautics-light">GUARDIA</p><p id="tiempoSesion" class="font-mono text-lg">${this.formatearTiempo(0)}</p></div><div class="p-1 rounded-lg bg-nautics-mid flex flex-col justify-center"><p class="text-xs text-nautics-light">HOY</p><p id="tiempoHoy" class="font-mono text-lg">${this.formatearTiempo(tiempoHoy)}</p></div><div class="p-1 rounded-lg bg-nautics-mid flex flex-col justify-center"><p class="text-xs text-nautics-light">SEMANA</p><p id="tiempoSemana" class="font-mono text-lg">${this.formatearTiempo(tiempoSemana)}</p></div><div class="p-1 rounded-lg bg-nautics-mid flex flex-col justify-center"><p class="text-xs text-nautics-light">TOTAL</p><p id="tiempoTotal" class="font-mono text-lg">${this.formatearTiempo(tiempoTotal)}</p></div></div></div></div><div class="mt-6 flex justify-center items-center gap-4 border-t border-nautics-mid pt-4"><button class="btn text-lg px-6 py-3" onclick="VanillaApp.fichar('${nombre}')">Iniciar Guardia</button><button class="btn text-lg px-6 py-3" onclick="VanillaApp.desfichar('${nombre}')">Finalizar Guardia</button><button id="packDiarioBtn" class="btn text-base px-4 py-2" style="background-color: ${packRecibido ? 'var(--color-nautics-mid)' : 'var(--color-nautics-secondary-pink)'};" onclick="VanillaApp.darPackDiarioVentas('${nombre}')" ${packRecibido ? 'disabled' : ''}>${packRecibido ? 'Raciones del día recibidas' : 'Raciones Diarias (Venta)'}</button></div></div>`;
+            document.getElementById('contenido').innerHTML = `<div class="p-6 bg-nautics-dark bg-opacity-90 rounded-lg max-w-6xl mx-auto shadow-lg"><div class="flex justify-between items-center mb-6 flex-wrap gap-y-4"><h2 class="text-2xl font-bold">Panel de Tripulación: <span class="text-nautics-light capitalize">${nombre}</span></h2><div class="flex items-center gap-2 flex-wrap">${botonesAccionHTML}</div></div>${controlHTML}<h3 class="text-xl font-semibold mb-4 border-t border-nautics-mid pt-6">Gestión de Flota (Barcos)</h3><div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8" id="panel-barcos">${barcosHTML}</div> <h3 class="text-xl font-semibold mb-4 border-t border-nautics-mid pt-6">Registrar Transacciones</h3><div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4" id="productosVenta">${productosVentaHTML}</div></div>`;
             
             await this.actualizarControlesLocal();
-            this.startRoomsTimer();
+            this.startBoatsTimer(); 
             if (datosFichaje.fichado) { this.startClockInTimer(datosFichaje.inicio, datosFichaje.hoy, datosFichaje.semana, datosFichaje.total); }
             document.getElementById('abrirLocalBtn').onclick = () => this.abrirLocal(); 
             document.getElementById('cerrarLocalBtn').onclick = () => this.cerrarLocal();
@@ -315,41 +639,41 @@ document.addEventListener('DOMContentLoaded', () => {
             const ausencias = empleadoData.ausencias || [];
 
             let ausenciasHTML = ausencias.length === 0 
-                ? '<p class="text-center text-gray-400">No hay ausencias programadas.</p>'
+                ? '<p class="text-center text-nautics-light">No hay permisos de ausencia programados.</p>'
                 : ausencias.map((ausencia, index) => {
                     const inicio = new Date(ausencia.inicio).toLocaleDateString('es-ES');
                     const fin = new Date(ausencia.fin).toLocaleDateString('es-ES');
-                    return `<li class="flex justify-between items-center p-2 bg-purple-800 rounded">
-                                <span>Del <strong>${inicio}</strong> al <strong>${fin}</strong></span>
-                                <button onclick="VanillaApp.eliminarAusencia('${nombreEmpleado}', ${index}, ${esJefe})" class="btn text-xs py-1" style="background-color:#c44">Eliminar</button>
-                            </li>`;
+                    return `<li class="flex justify-between items-center p-2 bg-nautics-mid rounded">
+                                        <span>Del <strong>${inicio}</strong> al <strong>${fin}</strong></span>
+                                        <button onclick="VanillaApp.eliminarAusencia('${nombreEmpleado}', ${index}, ${esJefe})" class="btn text-xs py-1" style="background-color:#dc2626">Revocar Permiso</button>
+                                    </li>`; 
                 }).join('');
 
             const hoy = new Date().toISOString().split('T')[0];
             const volverBtn = esJefe 
-                ? `<button onclick="VanillaApp.verificarAccesoAdmin()" class="btn" style="background-color:#5b189b;">Volver</button>`
-                : `<button onclick="VanillaApp.mostrarPanelEmpleados('${nombreEmpleado}')" class="btn" style="background-color:#5b189b;">Volver</button>`;
+                ? `<button onclick="VanillaApp.verificarAccesoAdmin()" class="btn" style="background-color:var(--color-nautics-mid);">Volver a Flota Principal</button>`
+                : `<button onclick="VanillaApp.mostrarPanelEmpleados('${nombreEmpleado}')" class="btn" style="background-color:var(--color-nautics-mid);">Volver a Panel de Tripulación</button>`;
 
             const modalHTML = `
-                <div class="max-w-2xl mx-auto bg-purple-900 bg-opacity-95 p-8 rounded-lg shadow-lg border-2 border-purple-700">
-                    <h2 class="text-2xl font-bold mb-2 text-center">Gestionar Ausencias</h2>
-                    <p class="text-center text-purple-300 capitalize mb-6">${nombreEmpleado}</p>
+                <div class="max-w-2xl mx-auto bg-nautics-dark bg-opacity-90 p-8 rounded-lg shadow-lg border-2 border-nautics-primary-blue">
+                    <h2 class="text-2xl font-bold mb-2 text-center text-nautics-text">Gestionar Permisos de Ausencia</h2>
+                    <p class="text-center text-nautics-light capitalize mb-6">${nombreEmpleado}</p>
                     <div class="mb-6">
-                        <h3 class="text-lg font-semibold mb-3 border-b border-purple-700 pb-2">Ausencias Programadas</h3>
+                        <h3 class="text-lg font-semibold mb-3 border-b border-nautics-mid pb-2">Permisos Programados</h3>
                         <ul class="space-y-2">${ausenciasHTML}</ul>
                     </div>
                     ${!esJefe ? `
                     <div class="mb-4">
-                        <h3 class="text-lg font-semibold mb-3 border-b border-purple-700 pb-2">Solicitar Nueva Ausencia</h3>
+                        <h3 class="text-lg font-semibold mb-3 border-b border-nautics-mid pb-2">Solicitar Nueva Ausencia</h3>
                         <div class="mb-4">
-                            <label for="ausenciaInicio" class="block mb-2">Fecha de Inicio:</label>
-                            <input type="date" id="ausenciaInicio" class="w-full px-3 py-2 text-black rounded" min="${hoy}">
+                            <label for="ausenciaInicio" class="block mb-2 text-nautics-light">Fecha de Inicio de Ausencia:</label>
+                            <input type="date" id="ausenciaInicio" class="w-full px-3 py-2 text-gray-900 rounded bg-nautics-light" min="${hoy}">
                         </div>
                         <div class="mb-4">
-                            <label for="ausenciaFin" class="block mb-2">Fecha de Fin (opcional):</label>
-                            <input type="date" id="ausenciaFin" class="w-full px-3 py-2 text-black rounded" min="${hoy}">
+                            <label for="ausenciaFin" class="block mb-2 text-nautics-light">Fecha de Fin (opcional):</label>
+                            <input type="date" id="ausenciaFin" class="w-full px-3 py-2 text-gray-900 rounded bg-nautics-light" min="${hoy}">
                         </div>
-                        <button onclick="VanillaApp.solicitarAusencia('${nombreEmpleado}')" class="btn w-full">Confirmar Ausencia</button>
+                        <button onclick="VanillaApp.solicitarAusencia('${nombreEmpleado}')" class="btn w-full">Confirmar Solicitud</button>
                     </div>` : ''}
                     <div class="flex justify-end mt-6">${volverBtn}</div>
                 </div>`;
@@ -357,16 +681,16 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         
         async mostrarPanelAdmin() {
-            this.stopAllTimers(); if (typeof this.state.unsubscribeHabitaciones === 'function') { this.state.unsubscribeHabitaciones(); }
+            this.stopAllTimers(); if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); } 
             this.ajustarPosicionChatbot(false);
-            const dashboardHTML = `<div class="mb-8 p-6 bg-purple-900 bg-opacity-50 rounded-lg"><h2 class="text-2xl font-bold mb-4">Dashboard en Tiempo Real</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div><h3 class="font-semibold mb-2">Empleados Fichados</h3><ul id="dashboard-empleados" class="space-y-1 text-sm"><li>Cargando...</li></ul></div><div><h3 class="font-semibold mb-2">Habitaciones Ocupadas</h3><ul id="dashboard-habitaciones" class="space-y-1 text-sm"><li>Cargando...</li></ul></div></div></div>`;
+            const dashboardHTML = `<div class="mb-8 p-6 bg-nautics-mid bg-opacity-50 rounded-lg border border-nautics-primary-blue"><h2 class="text-2xl font-bold mb-4">Dashboard de Flota en Tiempo Real</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div><h3 class="font-semibold mb-2 text-nautics-light">Tripulación de Guardia</h3><ul id="dashboard-empleados" class="space-y-1 text-sm"><li>Cargando...</li></ul></div><div><h3 class="font-semibold mb-2 text-nautics-light">Barcos Ocupados</h3><ul id="dashboard-barcos" class="space-y-1 text-sm"><li>Cargando...</li></ul></div></div></div>`; 
             const anunciosHTML = `
-                <div class="mb-8 p-6 bg-purple-900 bg-opacity-50 rounded-lg">
-                    <h2 class="text-2xl font-bold mb-4">Publicar Anuncio Global</h2>
-                    <textarea id="anuncioTexto" class="w-full p-2 text-black rounded mb-2" rows="3" placeholder="Escribe tu anuncio aquí..."></textarea>
+                <div class="mb-8 p-6 bg-nautics-mid bg-opacity-50 rounded-lg border border-nautics-primary-blue">
+                    <h2 class="text-2xl font-bold mb-4">Emitir Anuncio a la Flota</h2>
+                    <textarea id="anuncioTexto" class="w-full p-2 text-gray-900 rounded bg-nautics-light mb-2" rows="3" placeholder="Escribe tu anuncio aquí..."></textarea>
                     <div class="flex items-center justify-between gap-4 flex-wrap">
                         <div class="flex items-center gap-4">
-                            <select id="anuncioDuracion" class="px-3 py-2 text-black rounded">
+                            <select id="anuncioDuracion" class="px-3 py-2 text-gray-900 rounded bg-nautics-light">
                                 <option value="1">1 Hora</option>
                                 <option value="2">2 Horas</option>
                                 <option value="4">4 Horas</option>
@@ -375,12 +699,12 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <option value="24">24 Horas</option>
                                 <option value="0">Permanente</option>
                             </select>
-                            <button onclick="VanillaApp.publicarAnuncio()" class="btn">Publicar</button>
-                            <button onclick="VanillaApp.mostrarResultadosEncuesta()" class="btn" style="background-color:#4a044e;">Ver Resultados</button>
+                            <button onclick="VanillaApp.publicarAnuncio()" class="btn">Emitir</button>
+                            <button onclick="VanillaApp.mostrarResultadosEncuesta()" class="btn" style="background-color:var(--color-nautics-secondary-pink);">Ver Votaciones</button>
                         </div>
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 text-nautics-light">
                             <input type="checkbox" id="anuncioEsEncuesta" class="h-4 w-4">
-                            <label for="anuncioEsEncuesta">Añadir votación (Sí/No)</label>
+                            <label for="anuncioEsEncuesta">Añadir Votación de Flota (Sí/No)</label>
                         </div>
                     </div>
                 </div>`;
@@ -393,25 +717,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 const filaClass = enAusencia ? 'text-red-500' : '';
                 const directivaBtnStyle = e.directiva ? 'background-color:#16a34a;' : 'background-color:#555;'; 
                 const directivaBtn = `<button onclick="VanillaApp.toggleDirectiva('${e.id}')" class="btn text-xs py-1" style="${directivaBtnStyle}" title="Permiso para Convenios">Directiva</button>`;
-                const accionesJefeHTML = `<button onclick="VanillaApp.mostrarModalAusencias('${e.id}', true)" class="btn text-xs py-1" style="background-color:#4a044e;">Ausencias</button>${directivaBtn}<button onclick="VanillaApp.cambiarContrasena('${e.id}')" class="btn text-xs py-1">Pass</button><button onclick="VanillaApp.eliminarEmpleado('${e.id}')" class="text-red-500 hover:text-red-400 font-bold text-lg px-2">X</button>`;
-                tablaEmpleadosHTML += `<tr class="border-b border-purple-800 hover:bg-purple-900 ${filaClass}"><td class="p-3 capitalize">${e.id}</td><td class="p-3 font-mono">${this.formatearTiempo(f.hoy)}</td><td class="p-3 font-mono">${this.formatearTiempo(f.semana)}</td><td class="p-3 font-mono">${this.formatearTiempo(f.total)}</td><td class="p-3 font-mono text-center">${vH}</td><td class="p-3 font-mono text-center">${vT}</td><td class="p-3 text-center flex gap-1 justify-center">${accionesJefeHTML}</td></tr>`; 
+                const accionesJefeHTML = `<button onclick="VanillaApp.mostrarModalAusencias('${e.id}', true)" class="btn text-xs py-1" style="background-color:var(--color-nautics-secondary-pink);">Ausencias</button>${directivaBtn}<button onclick="VanillaApp.cambiarContrasena('${e.id}')" class="btn text-xs py-1">Contraseña</button><button onclick="VanillaApp.eliminarEmpleado('${e.id}')" class="text-red-500 hover:text-red-400 font-bold text-lg px-2">X</button>`;
+                tablaEmpleadosHTML += `<tr class="border-b border-nautics-mid hover:bg-nautics-mid ${filaClass}"><td class="p-3 capitalize">${e.id}</td><td class="p-3 font-mono">${this.formatearTiempo(f.hoy)}</td><td class="p-3 font-mono">${this.formatearTiempo(f.semana)}</td><td class="p-3 font-mono">${this.formatearTiempo(f.total)}</td><td class="p-3 font-mono text-center">${vH}</td><td class="p-3 font-mono text-center">${vT}</td><td class="p-3 text-center flex gap-1 justify-center">${accionesJefeHTML}</td></tr>`; 
             });
 
-            const gestionHTML = `<div class="mb-8 p-6 bg-purple-900 bg-opacity-50 rounded-lg"><h2 class="text-2xl font-bold mb-4">Gestionar Empleados</h2><div class="flex flex-col md:flex-row gap-4"><input type="text" id="newEmployeeName" class="flex-grow px-3 py-2 text-black rounded" placeholder="Nombre y apellido..."><input type="password" id="newEmployeePass" class="flex-grow px-3 py-2 text-black rounded" placeholder="Contraseña..."><button onclick="VanillaApp.anadirEmpleado()" class="btn">Añadir Empleado</button></div></div>`;
-            const tablaHTML = `<div class="overflow-x-auto bg-purple-900 bg-opacity-80 rounded-lg shadow-xl"><table class="w-full text-left"><thead class="bg-purple-800 text-purple-200 uppercase text-sm"><tr><th class="p-3">Empleado</th><th class="p-3">Hoy</th><th class="p-3">Semana</th><th class="p-3">Total</th><th class="p-3 text-center">Ventas Hoy</th><th class="p-3 text-center">Ventas Total</th><th class="p-3 text-center">Acciones</th></tr></thead><tbody>${tablaEmpleadosHTML}</tbody></table></div>`;
-            const libroNegroHTML = `<div class="mb-8 p-6 bg-purple-900 bg-opacity-50 rounded-lg"><h2 class="text-2xl font-bold mb-4">Libro Negro de Contactos</h2><div class="flex flex-col md:flex-row gap-4 mb-4"><input type="text" id="libroNombre" class="flex-grow px-3 py-2 text-black rounded" placeholder="Nombre del contacto..."><select id="libroRelacion" class="px-3 py-2 text-black rounded"><option value="Aliado">Aliado</option><option value="Rival">Rival</option><option value="Neutral">Neutral</option></select><input type="text" id="libroNotas" class="flex-grow px-3 py-2 text-black rounded" placeholder="Notas..."><button onclick="VanillaApp.anadirAlLibroNegro()" class="btn">Añadir</button></div><ul id="listaLibroNegro" class="space-y-2"></ul></div>`;
-            const listaNegraHTML = `<div class="mb-8 p-6 bg-purple-900 bg-opacity-50 rounded-lg"><h2 class="text-2xl font-bold mb-4">Lista Negra (Personas Vetadas)</h2><div class="flex flex-col md:flex-row gap-4 mb-4"><input type="text" id="vetadoNombre" class="flex-grow px-3 py-2 text-black rounded" placeholder="Nombre de la persona..."><input type="text" id="vetadoMotivo" class="flex-grow px-3 py-2 text-black rounded" placeholder="Motivo del veto..."><button onclick="VanillaApp.anadirAListaNegra()" class="btn">Vetar</button></div><ul id="listaDeVetados" class="space-y-2"></ul></div>`;
-            const inventarioLogHTML = `<div class="mb-8 p-6 bg-purple-900 bg-opacity-50 rounded-lg"><h2 class="text-2xl font-bold mb-4">Registro de Inventario</h2><div class="text-center mb-4"><button class="btn" onclick="VanillaApp.toggleInventarioLog()">Mostrar/Ocultar Registro</button></div><ul id="listaInventarioLog" class="space-y-4" style="display: none;"></ul></div>`;
+            const gestionHTML = `<div class="mb-8 p-6 bg-nautics-mid bg-opacity-50 rounded-lg border border-nautics-primary-blue"><h2 class="text-2xl font-bold mb-4">Gestión de Tripulación</h2><div class="flex flex-col md:flex-row gap-4"><input type="text" id="newEmployeeName" class="flex-grow px-3 py-2 text-gray-900 rounded bg-nautics-light" placeholder="Nombre y Apellido del nuevo tripulante..."><input type="password" id="newEmployeePass" class="flex-grow px-3 py-2 text-gray-900 rounded bg-nautics-light" placeholder="Contraseña de acceso..."><button onclick="VanillaApp.anadirEmpleado()" class="btn">Añadir Tripulante</button></div></div>`;
+            const tablaHTML = `<div class="overflow-x-auto bg-nautics-dark bg-opacity-80 rounded-lg shadow-xl border border-nautics-primary-blue"><table class="w-full text-left text-nautics-text"><thead class="bg-nautics-mid text-nautics-light uppercase text-sm"><tr><th class="p-3">Tripulante</th><th class="p-3">Hoy</th><th class="p-3">Semana</th><th class="p-3">Total</th><th class="p-3 text-center">Trans. Hoy</th><th class="p-3 text-center">Trans. Total</th><th class="p-3 text-center">Acciones de Mando</th></tr></thead><tbody>${tablaEmpleadosHTML}</tbody></table></div>`;
+            const libroNegroHTML = `<div class="mb-8 p-6 bg-nautics-mid bg-opacity-50 rounded-lg border border-nautics-primary-blue"><h2 class="text-2xl font-bold mb-4">Bitácora de Contactos Clave</h2><div class="flex flex-col md:flex-row gap-4 mb-4"><input type="text" id="libroNombre" class="flex-grow px-3 py-2 text-gray-900 rounded bg-nautics-light" placeholder="Nombre del contacto..."><select id="libroRelacion" class="px-3 py-2 text-gray-900 rounded bg-nautics-light"><option value="Aliado">Aliado</option><option value="Rival">Rival</option><option value="Neutral">Neutral</option></select><input type="text" id="libroNotas" class="flex-grow px-3 py-2 text-gray-900 rounded bg-nautics-light" placeholder="Notas..."><button onclick="VanillaApp.anadirAlLibroNegro()" class="btn">Registrar</button></div><ul id="listaLibroNegro" class="space-y-2 text-nautics-light"></ul></div>`;
+            const listaNegraHTML = `<div class="mb-8 p-6 bg-nautics-mid bg-opacity-50 rounded-lg border border-nautics-primary-blue"><h2 class="text-2xl font-bold mb-4">Lista de Piratas Vetados</h2><div class="flex flex-col md:flex-row gap-4 mb-4"><input type="text" id="vetadoNombre" class="flex-grow px-3 py-2 text-gray-900 rounded bg-nautics-light" placeholder="Nombre del pirata..."><input type="text" id="vetadoMotivo" class="flex-grow px-3 py-2 text-gray-900 rounded bg-nautics-light" placeholder="Motivo del veto..."><button onclick="VanillaApp.anadirAListaNegra()" class="btn" style="background-color: var(--color-nautics-secondary-pink);">Vetar</button></div><ul id="listaDeVetados" class="space-y-2 text-nautics-light"></ul></div>`;
+            const inventarioLogHTML = `<div class="mb-8 p-6 bg-nautics-mid bg-opacity-50 rounded-lg border border-nautics-primary-blue"><h2 class="text-2xl font-bold mb-4">Registro de Provisión de Flota</h2><div class="text-center mb-4"><button class="btn" onclick="VanillaApp.toggleInventarioLog()">Mostrar/Ocultar Bitácora</button></div><ul id="listaInventarioLog" class="space-y-4 text-nautics-light" style="display: none;"></ul></div>`;
             
             const informesHTML = `
-                <div class="mb-8 p-6 bg-purple-900 bg-opacity-50 rounded-lg">
-                    <h2 class="text-2xl font-bold mb-4">Informes Generales</h2>
+                <div class="mb-8 p-6 bg-nautics-mid bg-opacity-50 rounded-lg border border-nautics-primary-blue">
+                    <h2 class="text-2xl font-bold mb-4">Informes Generales de Mando</h2>
                     <div class="flex justify-center">
                         <button onclick="VanillaApp.descargarInformeExcel()" class="btn text-lg py-3 px-6" style="background-color: #166534;">Descargar Informe (Excel)</button>
                     </div>
                 </div>`;
 
-            document.getElementById('contenido').innerHTML = `<div class="max-w-7xl mx-auto"><h1 class="text-4xl font-bold text-center mb-8">Panel de Jefes</h1>${dashboardHTML}${anunciosHTML}${gestionHTML}${tablaHTML}${informesHTML}${libroNegroHTML}${listaNegraHTML}${inventarioLogHTML}<div class="text-center mt-8"><button onclick="VanillaApp.cerrarSesion()" class="btn">Cerrar Sesión y Volver</button></div></div>`;
+            document.getElementById('contenido').innerHTML = `<div class="max-w-7xl mx-auto"><h1 class="text-4xl font-bold text-center mb-8">Panel de Jefes de Flota</h1>${dashboardHTML}${anunciosHTML}${gestionHTML}${tablaHTML}${informesHTML}${libroNegroHTML}${listaNegraHTML}${inventarioLogHTML}<div class="text-center mt-8"><button onclick="VanillaApp.cerrarSesion()" class="btn">Regresar a Puerto Base</button></div></div>`;
             this.actualizarLibroNegro(); this.actualizarListaNegra(); this.actualizarInventarioLog();
             this.startDashboardTimer();
         },
@@ -420,32 +744,64 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 await this.cargarTodosLosFichajes();
                 const empleadosElem = document.getElementById('dashboard-empleados');
-                const habitacionesElem = document.getElementById('dashboard-habitaciones');
+                const barcosElem = document.getElementById('dashboard-barcos'); 
                 if (empleadosElem) {
                     const empleadosFichados = Object.entries(this.state.fichajes).filter(([_, data]) => data.fichado).map(([id, data]) => ({ id, ...data }));
                     if (empleadosFichados.length > 0) {
                         empleadosElem.innerHTML = empleadosFichados.map(e => `<li class="capitalize text-green-400">${e.id} (Desde: ${new Date(e.inicio).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })})</li>`).join('');
                     } else {
-                        empleadosElem.innerHTML = '<li class="text-gray-400">Nadie ha fichado.</li>';
+                        empleadosElem.innerHTML = '<li class="text-nautics-light">Nadie de guardia.</li>';
                     }
                 }
-                if (habitacionesElem) {
-                    const habitacionesOcupadas = this.state.habitaciones.filter(h => this.getEstadoHabitacion(h).estado === 'ocupada');
-                    if (habitacionesOcupadas.length > 0) {
-                        habitacionesElem.innerHTML = habitacionesOcupadas.map(h => {
-                            const estado = this.getEstadoHabitacion(h);
-                            const finReserva = new Date(estado.reservaActual.fin).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-                            return `<li class="text-yellow-400">${h.nombre} - Por: <span class="capitalize">${estado.reservaActual.cliente}</span> (hasta ${finReserva})</li>`;
+                if (barcosElem) { 
+                    const barcosOcupados = this.state.barcos.filter(h => this.getEstadoBarco(h).estado === 'ocupada'); 
+                    if (barcosOcupados.length > 0) {
+                        barcosElem.innerHTML = barcosOcupados.map(h => {
+                            const estado = this.getEstadoBarco(h); 
+                            const finReserva = new Date(estado.reservaActual.fin.toMillis ? estado.reservaActual.fin.toMillis() : estado.reservaActual.fin).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                            return `<li class="text-nautics-accent-pink">${h.nombre} - Alquilado por: <span class="capitalize">${estado.reservaActual.cliente}</span> (hasta ${finReserva})</li>`; 
                         }).join('');
                     } else {
-                        habitacionesElem.innerHTML = '<li class="text-gray-400">Ninguna habitación ocupada.</li>';
+                        barcosElem.innerHTML = '<li class="text-nautics-light">Ningún barco alquilado.</li>';
                     }
                 }
             } catch(e) { console.error("Error actualizando el dashboard:", e); }
         },
-        async verificarAccesoAdmin() { await this.cargarTodosLosEmpleados(); await this.cargarTodosLosFichajes(); await this.cargarTodasLasVentas(); await this.cargarInventarioLog(); await this.cargarLibroNegro(); await this.cargarListaNegra(); await this.mostrarPanelAdmin(); },
-        async verificarAccesoVIP() { const nombre = document.getElementById('nombreInput')?.value.trim().toLowerCase(); const pass = document.getElementById('passInput')?.value; if (!nombre || !pass) return alert("Nombre y contraseña son requeridos."); try { const fichajeDoc = await Firebase.getDoc(Firebase.doc(db, 'fichajes', nombre)); if (fichajeDoc.exists() && fichajeDoc.data().fichado) { await Firebase.updateDoc(fichajeDoc.ref, { fichado: false, inicio: null }); } } catch(e) { console.error("Error en el failsafe de fichaje:", e); } const empleadoDoc = await Firebase.getDoc(Firebase.doc(db, 'empleados', nombre)); if (empleadoDoc.exists()) { const empleado = empleadoDoc.data(); if (this.hashPassword(pass) === empleado.passHash) { sessionStorage.setItem('currentUser', nombre); await this.mostrarPanelEmpleados(nombre); } else { alert('Contraseña incorrecta.'); } } else { alert('Nombre de usuario no encontrado.'); } },
-        cerrarSesion() { this.stopAllTimers(); if (typeof this.state.unsubscribeHabitaciones === 'function') { this.state.unsubscribeHabitaciones(); } sessionStorage.removeItem('currentUser'); this.mostrarInicio(); },
+        async verificarAccesoAdmin() { await this.cargarTodosLosEmpleados(); await this.cargarTodosLosFichajes(); await this.cargarTodasLasVentas(); await this.cargarInventarioLog(); await this.cargarLibroNegro(); await this.cargarListaNegra(); await this.cargarClienteVentas(); await this.mostrarPanelAdmin(); }, // Added cargarClienteVentas
+        async verificarAccesoVIP() { 
+            const nombre = document.getElementById('nombreInput')?.value.trim().toLowerCase(); 
+            const pass = document.getElementById('passInput')?.value; 
+            if (!nombre || !pass) {
+                alert("Nombre y contraseña son requeridos.");
+                return;
+            }
+            console.log("Intentando verificar acceso VIP para:", nombre); 
+            try { 
+                const fichajeDoc = await Firebase.getDoc(Firebase.doc(db, 'fichajes', nombre)); 
+                if (fichajeDoc.exists() && fichajeDoc.data().fichado) { 
+                    console.log("Empleado ya fichado, intentando desfichar (failsafe)."); 
+                    await Firebase.updateDoc(fichajeDoc.ref, { fichado: false, inicio: null }); 
+                } 
+            } catch(e) { console.error("Error en el failsafe de fichaje:", e); } 
+            
+            const empleadoDoc = await Firebase.getDoc(Firebase.doc(db, 'empleados', nombre)); 
+            if (empleadoDoc.exists()) { 
+                const empleado = empleadoDoc.data(); 
+                console.log("Empleado encontrado:", empleado); 
+                if (this.hashPassword(pass) === empleado.passHash) { 
+                    sessionStorage.setItem('currentUser', nombre); 
+                    console.log("Acceso VIP exitoso, mostrando panel."); 
+                    await this.mostrarPanelEmpleados(nombre); 
+                } else { 
+                    alert('Contraseña incorrecta.'); 
+                    console.warn("Contraseña incorrecta para:", nombre); 
+                } 
+            } else { 
+                alert('Nombre de tripulante no encontrado.'); 
+                console.warn("Nombre de usuario no encontrado:", nombre); 
+            } 
+        },
+        cerrarSesion() { this.stopAllTimers(); if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); } sessionStorage.removeItem('currentUser'); this.mostrarInicio(); },
         async gestionarReseteoDatos(nombre, esVenta = false) {
             const ahora = new Date(), hoyStr = ahora.toISOString().split('T')[0], semanaNum = this.getWeekNumber(ahora);
             if (esVenta) {
@@ -474,8 +830,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 return datosF;
             }
         },
-        async fichar(nombre) { let d = await this.gestionarReseteoDatos(nombre); if (!d.fichado) { d.fichado = true; d.inicio = Date.now(); this.state.fichajes[nombre] = d; try { await Firebase.setDoc(Firebase.doc(db, 'fichajes', nombre), d, { merge: true }); await this.mostrarPanelEmpleados(nombre); } catch (e) { console.error(e); } } },
-        async desfichar(nombre, silent = false) { this.stopPanelTimers(); let d = await this.gestionarReseteoDatos(nombre); if (d.fichado) { const t = Date.now() - d.inicio; d.hoy = (d.hoy || 0) + t; d.semana = (d.semana || 0) + t; d.total = (d.total || 0) + t; d.fichado = false; d.inicio = null; this.state.fichajes[nombre] = d; try { await Firebase.setDoc(Firebase.doc(db, 'fichajes', nombre), d, { merge: true }); if (!silent) await this.mostrarPanelEmpleados(nombre); } catch (e) { console.error(e); } } },
+        async fichar(nombre) { 
+            console.log("Fichando:", nombre); 
+            let d = await this.gestionarReseteoDatos(nombre); 
+            if (!d.fichado) { 
+                d.fichado = true; d.inicio = Date.now(); this.state.fichajes[nombre] = d; 
+                try { 
+                    await Firebase.setDoc(Firebase.doc(db, 'fichajes', nombre), d, { merge: true }); 
+                    console.log("Fichaje guardado en Firebase."); 
+                    await this.mostrarPanelEmpleados(nombre); 
+                } catch (e) { 
+                    console.error("Error al fichar:", e); 
+                    alert("Error al fichar: " + e.message); 
+                } 
+            } else {
+                alert("Ya estás de guardia."); 
+            }
+        },
+        async desfichar(nombre, silent = false) { 
+            console.log("Desfichando:", nombre); 
+            this.stopPanelTimers(); 
+            let d = await this.gestionarReseteoDatos(nombre); 
+            if (d.fichado) { 
+                const t = Date.now() - d.inicio; 
+                d.hoy = (d.hoy || 0) + t; d.semana = (d.semana || 0) + t; d.total = (d.total || 0) + t; 
+                d.fichado = false; d.inicio = null; this.state.fichajes[nombre] = d; 
+                try { 
+                    await Firebase.setDoc(Firebase.doc(db, 'fichajes', nombre), d, { merge: true }); 
+                    console.log("Desfichaje guardado en Firebase."); 
+                    if (!silent) await this.mostrarPanelEmpleados(nombre); 
+                } catch (e) { 
+                    console.error("Error al desfichar:", e); 
+                    alert("Error al desfichar: " + e.message); 
+                } 
+            } else if (!silent) {
+                alert("No estás de guardia para desfichar."); 
+            }
+        },
         
         async solicitarAusencia(nombreEmpleado) {
             const inicioStr = document.getElementById('ausenciaInicio').value; const finStr = document.getElementById('ausenciaFin').value;
@@ -489,8 +880,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const ausenciasActuales = (empleadoDoc.exists() && Array.isArray(empleadoDoc.data().ausencias)) ? empleadoDoc.data().ausencias : [];
                 ausenciasActuales.push(nuevoPeriodo);
                 await Firebase.updateDoc(empleadoRef, { ausencias: ausenciasActuales });
-                alert('Ausencia registrada.'); this.mostrarModalAusencias(nombreEmpleado);
-            } catch (e) { console.error("Error:", e); alert('Hubo un error.'); }
+                alert('Permiso de ausencia registrado.'); this.mostrarModalAusencias(nombreEmpleado);
+            } catch (e) { console.error("Error:", e); alert('Hubo un error al registrar el permiso de ausencia: ' + e.message); }
         },
         async eliminarAusencia(nombreEmpleado, index, esJefe) {
             if (!confirm('¿Seguro?')) return;
@@ -501,17 +892,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(index >= 0 && index < ausenciasActuales.length) {
                     ausenciasActuales.splice(index, 1);
                     await Firebase.updateDoc(empleadoRef, { ausencias: ausenciasActuales });
-                    alert('Ausencia eliminada.'); this.mostrarModalAusencias(nombreEmpleado, esJefe);
+                    alert('Permiso de ausencia revocado.'); this.mostrarModalAusencias(nombreEmpleado, esJefe);
                 }
-            } catch(e) { console.error("Error:", e); alert('Hubo un error.'); }
+            } catch(e) { console.error("Error:", e); alert('Hubo un error al revocar el permiso de ausencia: ' + e.message); }
         },
         async modificarVenta(productoId, nombreEmpleado, cantidad) {
             const cantNum = parseInt(cantidad); if (isNaN(cantNum)) return;
             let datosVenta = await this.gestionarReseteoDatos(nombreEmpleado, true);
+            const producto = this.state.productos.find(p => p.id === productoId);
+            const precioProducto = producto ? producto.precio : 50; 
+
             if (!datosVenta.productos[productoId]) datosVenta.productos[productoId] = { hoy: 0, total: 0 };
             if (datosVenta.productos[productoId].hoy + cantNum < 0) return;
             datosVenta.productos[productoId].hoy += cantNum;
             datosVenta.productos[productoId].total += cantNum;
+            datosVenta.productos[productoId].valorHoy = (datosVenta.productos[productoId].valorHoy || 0) + (cantNum * precioProducto); 
+            datosVenta.productos[productoId].valorTotal = (datosVenta.productos[productoId].valorTotal || 0) + (cantNum * precioProducto); 
             this.state.ventas[nombreEmpleado] = datosVenta;
             try {
                 await Firebase.setDoc(Firebase.doc(db, 'ventas', nombreEmpleado), datosVenta);
@@ -521,39 +917,142 @@ document.addEventListener('DOMContentLoaded', () => {
                     if(descElem) descElem.textContent = `Hoy: ${datosVenta.productos[productoId].hoy} | Total: ${datosVenta.productos[productoId].total}`;
                     if(totalHoyElem) totalHoyElem.textContent = datosVenta.productos[productoId].hoy;
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error("Error al modificar venta:", e); alert("Error al modificar venta: " + e.message); }
         },
-        async darPackDiarioVentas(nombre) { const hoyStr = new Date().toISOString().split('T')[0]; const fichajeRef = Firebase.doc(db, 'fichajes', nombre); try { const fichajeDoc = await Firebase.getDoc(fichajeRef); if (fichajeDoc.exists() && fichajeDoc.data().ultimoPackDiario === hoyStr) { alert('Ya has recibido el pack de hoy.'); return; } await this.modificarVenta('golosinas_picantes', nombre, 5); await this.modificarVenta('refresco_manzana', nombre, 5); await Firebase.updateDoc(fichajeRef, { ultimoPackDiario: hoyStr }); const packBtn = document.getElementById('packDiarioBtn'); if(packBtn){ packBtn.disabled = true; packBtn.textContent = 'Pack ya recibido'; packBtn.style.backgroundColor = '#581c87'; } } catch(e) { console.error("Error:", e); }},
-        async ocuparHabitacionAhora(id, nombreEmpleado) { const hab = this.state.habitaciones.find(h => h.id === id); if (hab && this.getEstadoHabitacion(hab).estado === 'disponible') { const ahora = Date.now(); hab.reservas.push({ id: ahora, cliente: 'Ocupación Directa', inicio: ahora, fin: ahora + 30 * 60 * 1000 }); try { await Firebase.setDoc(Firebase.doc(db, 'habitaciones', String(hab.id)), hab); } catch (e) { console.error(e); } }},
-        async anadirTiempoHabitacion(id, nombreEmpleado) { const hab = this.state.habitaciones.find(h => h.id === id); const r = hab.reservas.find(res => Date.now() >= res.inicio && Date.now() < res.fin); if (hab && r) { r.fin += 30 * 60 * 1000; try { await Firebase.setDoc(Firebase.doc(db, 'habitaciones', String(hab.id)), hab); } catch (e) { console.error(e); } } },
-        async liberarHabitacion(id, nombreEmpleado) { const hab = this.state.habitaciones.find(h => h.id === id); const index = hab.reservas.findIndex(r => Date.now() >= r.inicio && Date.now() < r.fin); if (index > -1) { if(confirm(`Liberar habitación?`)) { hab.reservas.splice(index, 1); try { await Firebase.setDoc(Firebase.doc(db, 'habitaciones', String(hab.id)), hab); } catch (e) { console.error(e); } } } },
-        async reservarHabitacion(id) { const cliente = document.getElementById(`cliente-hab-${id}`).value.trim(), fecha = document.getElementById(`fecha-hab-${id}`).value, hora = document.getElementById(`hora-hab-${id}`).value, duracion = parseInt(document.getElementById(`duracion-hab-${id}`).value); if (!cliente || !fecha || !hora || isNaN(duracion)) return alert('Rellena todos los campos'); const inicio = new Date(`${fecha}T${hora}`); const fin = new Date(inicio.getTime() + duracion*60*60*1000); const hab = this.state.habitaciones.find(h => h.id === id); if(hab.reservas.some(r => inicio < r.fin && fin > r.inicio)) return alert('Conflicto de horario'); hab.reservas.push({id: Date.now(), cliente, inicio: inicio.getTime(), fin: fin.getTime()}); try { await Firebase.setDoc(Firebase.doc(db,'habitaciones', String(id)), hab); alert('Reserva confirmada'); this.mostrarPanelHabitaciones(); } catch(e) {console.error(e)} },
-        async anadirEmpleado() { const nombreInput = document.getElementById('newEmployeeName'); const passInput = document.getElementById('newEmployeePass'); const nombre = nombreInput.value.trim().toLowerCase(); const pass = passInput.value; if (!nombre || !pass) { return alert('El nombre y la contraseña son obligatorios.'); } try { await Firebase.setDoc(Firebase.doc(db, 'empleados', nombre), { nombre: nombre, passHash: this.hashPassword(pass), directiva: false, ausencias: [] }); alert(`Empleado ${nombre} añadido correctamente.`); nombreInput.value = ''; passInput.value = ''; await this.cargarTodosLosEmpleados(); await this.mostrarPanelAdmin(); } catch (e) { alert('Error al añadir el empleado.'); } },
-        async toggleDirectiva(empleadoId) { const empleadoRef = Firebase.doc(db, 'empleados', empleadoId); try { const empleadoDoc = await Firebase.getDoc(empleadoRef); if (empleadoDoc.exists()) { const currentStatus = empleadoDoc.data().directiva || false; await Firebase.updateDoc(empleadoRef, { directiva: !currentStatus }); await this.cargarTodosLosEmpleados(); await this.mostrarPanelAdmin(); } } catch (e) { console.error("Error:", e); }},
-        async cambiarContrasena(nombre) { const nuevaPass = prompt(`Introduce la nueva contraseña para ${nombre}:`); if (nuevaPass) { try { await Firebase.updateDoc(Firebase.doc(db, 'empleados', nombre), { passHash: this.hashPassword(nuevaPass) }); alert(`Contraseña de ${nombre} actualizada.`); } catch (e) { alert("Error."); } } },
-        async eliminarEmpleado(nombre) { if (confirm(`¿Estás SEGURO de que quieres eliminar a ${nombre}? Esta acción es irreversible.`)) { try { await Firebase.deleteDoc(Firebase.doc(db, 'empleados', nombre)); await Firebase.deleteDoc(Firebase.doc(db, 'fichajes', nombre)); await Firebase.deleteDoc(Firebase.doc(db, 'ventas', nombre)); alert(`${nombre} ha sido eliminado.`); await this.cargarTodosLosEmpleados(); await this.cargarTodosLosFichajes(); await this.cargarTodasLasVentas(); await this.mostrarPanelAdmin(); } catch (e) { alert("Error."); } } },
-        async actualizarControlesLocal() { const abrirBtn = document.getElementById('abrirLocalBtn'); const cerrarBtn = document.getElementById('cerrarLocalBtn'); const tiempoElem = document.getElementById('tiempoAbiertoLocal'); const ultimoCierreInfo = document.getElementById('ultimoCierreInfo'); if (!abrirBtn) return; try { const docSnap = await Firebase.getDoc(Firebase.doc(db, "control_local", "estado")); if (docSnap.exists()) { const estado = docSnap.data(); if (estado.abierto) { abrirBtn.disabled = true; cerrarBtn.disabled = false; this.startLocalOpenTimer(estado.inicioApertura.toMillis()); ultimoCierreInfo.innerHTML = ''; } else { abrirBtn.disabled = false; cerrarBtn.disabled = true; if(this.state.timers.localOpen) clearInterval(this.state.timers.localOpen); this.state.timers.localOpen = null; tiempoElem.textContent = "00:00:00"; let infoHTML = ''; if (estado.ultimoCierre) { infoHTML += `<div>Último cierre: ${estado.ultimoCierre.toDate().toLocaleString('es-ES')}</div>`; } if (estado.duracionUltimaApertura) { infoHTML += `<div class="mt-1">Duración: ${this.formatearTiempoHorasDecimal(estado.duracionUltimaApertura)} horas</div>`; } ultimoCierreInfo.innerHTML = infoHTML; } } else { abrirBtn.disabled = false; cerrarBtn.disabled = true; } } catch (e) { console.error("Error:", e); } },
-        async abrirLocal() { try { await Firebase.setDoc(Firebase.doc(db, "control_local", "estado"), { abierto: true, inicioApertura: Firebase.serverTimestamp(), }, { merge: true }); await this.actualizarControlesLocal(); } catch (e) { console.error("Error:", e); }},
-        async cerrarLocal() { try { const controlDoc = await Firebase.getDoc(Firebase.doc(db, "control_local", "estado")); let duracion = 0; if (controlDoc.exists() && controlDoc.data().inicioApertura) { duracion = Date.now() - controlDoc.data().inicioApertura.toMillis(); } await this.cargarTodosLosFichajes(); for (const nombre in this.state.fichajes) { if (this.state.fichajes[nombre].fichado) { await this.desfichar(nombre, true); } } await Firebase.setDoc(Firebase.doc(db, "control_local", "estado"), { abierto: false, ultimoCierre: Firebase.serverTimestamp(), duracionUltimaApertura: duracion }, { merge: true }); await this.actualizarControlesLocal(); } catch (e) { console.error("Error:", e); }},
-        async mostrarPanelInventario() { this.stopAllTimers(); this.ajustarPosicionChatbot(false); const nombreEmpleado = sessionStorage.getItem('currentUser'); this.state.inventoryFiles = [null, null, null]; let uploadBoxesHTML = ''; for (let i = 0; i < 3; i++) { uploadBoxesHTML += `<div id="inventory-box-${i}" class="inventory-upload-box" tabindex="0"><span class="placeholder-text text-purple-300 text-center">Haz clic aquí y pega una imagen con<br/><strong>Ctrl+V</strong></span><img id="inventory-img-${i}" class="hidden"><button id="inventory-remove-${i}" class="remove-btn">&times;</button></div>`; } document.getElementById('contenido').innerHTML = `<div class="max-w-4xl mx-auto p-6 bg-purple-900 bg-opacity-90 rounded-lg shadow-lg"><div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-bold">Gestión de Inventario</h2><button class="btn" onclick="VanillaApp.mostrarPanelEmpleados('${nombreEmpleado}')">Volver al Panel</button></div><div class="bg-purple-800 p-6 rounded-lg text-center"><h3 class="text-xl font-semibold mb-4">Añadir Nuevo Inventario (hasta 3 imágenes)</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">${uploadBoxesHTML}</div><button id="upload-inventory-btn" class="btn text-lg py-2 px-6" style="background-color: #16a34a;">Guardar Inventario</button><div id="upload-status" class="mt-4 text-yellow-400"></div></div></div>`; for (let i = 0; i < 3; i++) { const box = document.getElementById(`inventory-box-${i}`); const img = document.getElementById(`inventory-img-${i}`); const removeBtn = document.getElementById(`inventory-remove-${i}`); const handleFile = (file) => { if (file && file.type.startsWith('image/')) { this.state.inventoryFiles[i] = file; img.src = URL.createObjectURL(file); img.classList.remove('hidden'); box.classList.add('has-image'); }}; box.addEventListener('paste', e => { e.preventDefault(); handleFile(e.clipboardData.files[0]); }); removeBtn.addEventListener('click', e => { e.stopPropagation(); this.state.inventoryFiles[i] = null; img.src = ''; img.classList.add('hidden'); box.classList.remove('has-image'); }); } document.getElementById('upload-inventory-btn').onclick = () => this.subirInventario(); },
-        async subirInventario() { const empleado = sessionStorage.getItem('currentUser'); const filesToUpload = this.state.inventoryFiles.filter(f => f !== null); const statusElem = document.getElementById('upload-status'); const uploadBtn = document.getElementById('upload-inventory-btn'); if (filesToUpload.length === 0 || !empleado) { statusElem.textContent = "Añade al menos una imagen."; return; } statusElem.textContent = `Subiendo ${filesToUpload.length} imagen(es)...`; uploadBtn.disabled = true; try { const uploadPromises = filesToUpload.map(file => { const filePath = `inventario/${Date.now()}_${file.name}`; const storageRef = Firebase.ref(storage, filePath); return Firebase.uploadBytes(storageRef, file).then(snapshot => Firebase.getDownloadURL(snapshot.ref)); }); const imageUrls = await Promise.all(uploadPromises); const datosInventario = { imagenes: imageUrls, subidoPor: empleado, timestamp: Firebase.serverTimestamp() }; await Firebase.setDoc(Firebase.doc(db, "inventario_actual", "estado"), datosInventario); await Firebase.addDoc(Firebase.collection(db, "inventario_log"), datosInventario); statusElem.textContent = "¡Inventario guardado!"; setTimeout(() => { if (document.getElementById('upload-status')) this.mostrarPanelInventario(); }, 2000); } catch (e) { console.error("Error:", e); statusElem.textContent = "Error al subir."; uploadBtn.disabled = false; } },
+        async darPackDiarioVentas(nombre) { const hoyStr = new Date().toISOString().split('T')[0]; const fichajeRef = Firebase.doc(db, 'fichajes', nombre); try { const fichajeDoc = await Firebase.getDoc(fichajeRef); if (fichajeDoc.exists() && fichajeDoc.data().ultimoPackDiario === hoyStr) { alert('Ya has recibido las raciones del día.'); return; } await this.modificarVenta('golosinas_picantes', nombre, 5); await this.modificarVenta('refresco_manzana', nombre, 5); await Firebase.updateDoc(fichajeRef, { ultimoPackDiario: hoyStr }); const packBtn = document.getElementById('packDiarioBtn'); if(packBtn){ packBtn.disabled = true; packBtn.textContent = 'Raciones del día recibidas'; packBtn.style.backgroundColor = 'var(--color-nautics-mid)'; } } catch(e) { console.error("Error al dar pack diario:", e); alert("Error al dar pack diario: " + e.message); }},
+        async ocuparBarcoAhora(id, nombreEmpleado, durationMinutes) { 
+            console.log(`Intentando alquilar barco ${id} por ${durationMinutes} minutos:`, nombreEmpleado); 
+            const boat = this.state.barcos.find(h => h.id === id); 
+            if (boat && this.getEstadoBarco(boat).estado === 'disponible') { 
+                const ahora = Date.now(); 
+                boat.reservas.push({ id: ahora, cliente: nombreEmpleado, inicio: ahora, fin: ahora + durationMinutes * 60 * 1000 }); 
+                try { 
+                    await Firebase.setDoc(Firebase.doc(db, 'barcos', String(boat.id)), boat); 
+                    console.log(`Barco ${id} alquilado exitosamente por ${durationMinutes} minutos.`); 
+                } catch (e) { 
+                    console.error("Error al alquilar barco:", e); 
+                    alert("Error al alquilar barco: " + e.message); 
+                } 
+            } else {
+                alert("El barco no está disponible para alquiler.");
+            }
+        }, 
+        async anadirTiempoBarco(id, nombreEmpleado, addMinutes) { 
+            console.log(`Intentando añadir ${addMinutes} minutos al barco:`, id); 
+            const boat = this.state.barcos.find(h => h.id === id); 
+            const r = boat.reservas.find(res => Date.now() >= (res.inicio.toMillis ? res.inicio.toMillis() : res.inicio) && Date.now() < (res.fin.toMillis ? res.fin.toMillis() : res.fin)); 
+            if (boat && r) { 
+                r.fin = (r.fin.toMillis ? r.fin.toMillis() : r.fin) + addMinutes * 60 * 1000; 
+                try { 
+                    await Firebase.setDoc(Firebase.doc(db, 'barcos', String(boat.id)), boat); 
+                    console.log(`Tiempo añadido al barco ${id} en Firebase.`); 
+                } catch (e) { 
+                    console.error("Error al añadir tiempo:", e); 
+                    alert("Error al añadir tiempo al barco: " + e.message); 
+                } 
+            } else {
+                alert("No hay un alquiler activo para añadir tiempo.");
+            }
+        }, 
+        async liberarBarco(id, nombreEmpleado) { 
+            console.log("Intentando liberar barco:", id); 
+            const boat = this.state.barcos.find(h => h.id === id); 
+            const index = boat.reservas.findIndex(r => Date.now() >= (r.inicio.toMillis ? r.inicio.toMillis() : r.inicio) && Date.now() < (r.fin.toMillis ? r.fin.toMillis() : r.fin)); 
+            if (index > -1) { 
+                if(confirm(`¿Liberar barco?`)) { 
+                    boat.reservas.splice(index, 1); 
+                    try { 
+                        await Firebase.setDoc(Firebase.doc(db, 'barcos', String(boat.id)), boat); 
+                        console.log("Barco liberado exitosamente en Firebase."); 
+                    } catch (e) { 
+                        console.error("Error al liberar barco:", e); 
+                        alert("Error al liberar barco: " + e.message); 
+                    } 
+                } 
+            } else {
+                alert("No hay un barco ocupado para liberar.");
+            }
+        }, 
+        async reservarBarco(id) { 
+            const cliente = document.getElementById(`cliente-boat-${id}`).value.trim();
+            const fecha = document.getElementById(`fecha-boat-${id}`).value;
+            const hora = document.getElementById(`hora-boat-${id}`).value;
+            const duracionMinutes = parseInt(document.getElementById(`duracion-boat-${id}`).value); 
+            
+            if (!cliente || !fecha || !hora || isNaN(duracionMinutes)) {
+                return alert('Rellena todos los campos para el alquiler.'); 
+            }
+            
+            const inicio = new Date(`${fecha}T${hora}`); 
+            const fin = new Date(inicio.getTime() + duracionMinutes * 60 * 1000); 
+            const boat = this.state.barcos.find(h => h.id === id); 
+            
+            if(boat.reservas.some(r => inicio < (r.fin.toMillis ? r.fin.toMillis() : r.fin) && fin > (r.inicio.toMillis ? r.inicio.toMillis() : r.inicio))) { 
+                return alert('Conflicto de horario. Este barco ya está reservado en ese periodo.'); 
+            }
+            
+            boat.reservas.push({id: Date.now(), cliente, inicio: inicio.getTime(), fin: fin.getTime()}); 
+            try { 
+                await Firebase.setDoc(Firebase.doc(db,'barcos', String(id)), boat); 
+                alert('Alquiler confirmado'); 
+                this.mostrarPanelBarcos(); 
+            } catch(e) {
+                console.error("Error al reservar barco:", e);
+                alert("Error al reservar barco: " + e.message);
+            } 
+        }, 
+        async anadirEmpleado() { 
+            const nombreInput = document.getElementById('newEmployeeName'); 
+            const passInput = document.getElementById('newEmployeePass'); 
+            const nombre = nombreInput.value.trim().toLowerCase(); 
+            const pass = passInput.value; 
+            
+            if (!nombre || !pass) { 
+                return alert('El nombre y la contraseña del tripulante son obligatorios.'); 
+            } 
+            console.log("Intentando añadir tripulante:", nombre); 
+            try { 
+                await Firebase.setDoc(Firebase.doc(db, 'empleados', nombre), { 
+                    nombre: nombre, 
+                    passHash: this.hashPassword(pass), 
+                    directiva: false, 
+                    ausencias: [] 
+                }); 
+                alert(`Tripulante ${nombre} añadido correctamente.`); 
+                nombreInput.value = ''; 
+                passInput.value = ''; 
+                await this.cargarTodosLosEmpleados(); 
+                await this.mostrarPanelAdmin(); 
+            } catch (e) { 
+                console.error("Error al añadir empleado:", e); 
+                alert('Error al añadir el tripulante: ' + e.message); 
+            } 
+        },
+        async toggleDirectiva(empleadoId) { const empleadoRef = Firebase.doc(db, 'empleados', empleadoId); try { const empleadoDoc = await Firebase.getDoc(empleadoRef); if (empleadoDoc.exists()) { const currentStatus = empleadoDoc.data().directiva || false; await Firebase.updateDoc(empleadoRef, { directiva: !currentStatus }); await this.cargarTodosLosEmpleados(); await this.mostrarPanelAdmin(); } } catch (e) { console.error("Error al cambiar directiva:", e); alert("Error al cambiar permiso de directiva: " + e.message); }},
+        async cambiarContrasena(nombre) { const nuevaPass = prompt(`Introduce la nueva contraseña para ${nombre}:`); if (nuevaPass) { try { await Firebase.updateDoc(Firebase.doc(db, 'empleados', nombre), { passHash: this.hashPassword(nuevaPass) }); alert(`Contraseña de ${nombre} actualizada.`); } catch (e) { console.error("Error al cambiar contraseña:", e); alert("Error al cambiar contraseña: " + e.message); } } },
+        async eliminarEmpleado(nombre) { if (confirm(`¿Estás SEGURO de que quieres eliminar a ${nombre} de la tripulación? Esta acción es irreversible.`)) { try { await Firebase.deleteDoc(Firebase.doc(db, 'empleados', nombre)); await Firebase.deleteDoc(Firebase.doc(db, 'fichajes', nombre)); await Firebase.deleteDoc(Firebase.doc(db, 'ventas', nombre)); alert(`${nombre} ha sido eliminado de la tripulación.`); await this.cargarTodosLosEmpleados(); await this.cargarTodosLosFichajes(); await this.cargarTodasLasVentas(); await this.mostrarPanelAdmin(); } catch (e) { console.error("Error al eliminar empleado:", e); alert("Error al eliminar el tripulante: " + e.message); } } },
+        async actualizarControlesLocal() { const abrirBtn = document.getElementById('abrirLocalBtn'); const cerrarBtn = document.getElementById('cerrarLocalBtn'); const tiempoElem = document.getElementById('tiempoAbiertoLocal'); const ultimoCierreInfo = document.getElementById('ultimoCierreInfo'); if (!abrirBtn) return; try { const docSnap = await Firebase.getDoc(Firebase.doc(db, "control_local", "estado")); if (docSnap.exists()) { const estado = docSnap.data(); if (estado.abierto) { abrirBtn.disabled = true; cerrarBtn.disabled = false; this.startLocalOpenTimer(estado.inicioApertura.toMillis()); ultimoCierreInfo.innerHTML = ''; } else { abrirBtn.disabled = false; cerrarBtn.disabled = true; if(this.state.timers.localOpen) clearInterval(this.state.timers.localOpen); this.state.timers.localOpen = null; tiempoElem.textContent = "00:00:00"; let infoHTML = ''; if (estado.ultimoCierre) { infoHTML += `<div>Último cierre: ${estado.ultimoCierre.toDate().toLocaleString('es-ES')}</div>`; } if (estado.duracionUltimaApertura) { infoHTML += `<div class="mt-1">Duración: ${this.formatearTiempoHorasDecimal(estado.duracionUltimaApertura)} horas</div>`; } ultimoCierreInfo.innerHTML = infoHTML; } } else { abrirBtn.disabled = false; cerrarBtn.disabled = true; } } catch (e) { console.error("Error al actualizar controles local:", e); alert("Error al actualizar controles de local: " + e.message); } },
+        async abrirLocal() { try { await Firebase.setDoc(Firebase.doc(db, "control_local", "estado"), { abierto: true, inicioApertura: Firebase.serverTimestamp(), }, { merge: true }); await this.actualizarControlesLocal(); } catch (e) { console.error("Error al abrir local:", e); alert("Error al abrir la flota: " + e.message); }},
+        async cerrarLocal() { try { const controlDoc = await Firebase.getDoc(Firebase.doc(db, "control_local", "estado")); let duracion = 0; if (controlDoc.exists() && controlDoc.data().inicioApertura) { duracion = Date.now() - controlDoc.data().inicioApertura.toMillis(); } await this.cargarTodosLosFichajes(); for (const nombre in this.state.fichajes) { if (this.state.fichajes[nombre].fichado) { await this.desfichar(nombre, true); } } await Firebase.setDoc(Firebase.doc(db, "control_local", "estado"), { abierto: false, ultimoCierre: Firebase.serverTimestamp(), duracionUltimaApertura: duracion }, { merge: true }); await this.actualizarControlesLocal(); } catch (e) { console.error("Error al cerrar local:", e); alert("Error al cerrar la flota: " + e.message); }},
+        async mostrarPanelInventario() { this.stopAllTimers(); this.ajustarPosicionChatbot(false); const nombreEmpleado = sessionStorage.getItem('currentUser'); this.state.inventoryFiles = [null, null, null]; let uploadBoxesHTML = ''; for (let i = 0; i < 3; i++) { uploadBoxesHTML += `<div id="inventory-box-${i}" class="inventory-upload-box" tabindex="0"><span class="placeholder-text text-nautics-light text-center">Haz clic aquí y pega una imagen con<br/><strong>Ctrl+V</strong></span><img id="inventory-img-${i}" class="hidden"><button id="inventory-remove-${i}" class="remove-btn">&times;</button></div>`; } document.getElementById('contenido').innerHTML = `<div class="max-w-4xl mx-auto p-6 bg-nautics-dark bg-opacity-90 rounded-lg shadow-lg"><div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-bold">Inventario de Provisión</h2><button class="btn" onclick="VanillaApp.mostrarPanelEmpleados('${nombreEmpleado}')">Volver al Panel de Tripulación</button></div><div class="bg-nautics-mid p-6 rounded-lg text-center"><h3 class="text-xl font-semibold mb-4">Añadir Nuevo Inventario (hasta 3 imágenes)</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">${uploadBoxesHTML}</div><button id="upload-inventory-btn" class="btn text-lg py-2 px-6" style="background-color: var(--color-nautics-secondary-pink);">Guardar Inventario</button><div id="upload-status" class="mt-4 text-nautics-accent-pink"></div></div></div>`; for (let i = 0; i < 3; i++) { const box = document.getElementById(`inventory-box-${i}`); const img = document.getElementById(`inventory-img-${i}`); const removeBtn = document.getElementById(`inventory-remove-${i}`); const handleFile = (file) => { if (file && file.type.startsWith('image/')) { this.state.inventoryFiles[i] = file; img.src = URL.createObjectURL(file); img.classList.remove('hidden'); box.classList.add('has-image'); }}; box.addEventListener('paste', e => { e.preventDefault(); handleFile(e.clipboardData.files[0]); }); removeBtn.addEventListener('click', e => { e.stopPropagation(); this.state.inventoryFiles[i] = null; img.src = ''; img.classList.add('hidden'); box.classList.remove('has-image'); }); } document.getElementById('upload-inventory-btn').onclick = () => this.subirInventario(); },
+        async subirInventario() { const empleado = sessionStorage.getItem('currentUser'); const filesToUpload = this.state.inventoryFiles.filter(f => f !== null); const statusElem = document.getElementById('upload-status'); const uploadBtn = document.getElementById('upload-inventory-btn'); if (filesToUpload.length === 0 || !empleado) { statusElem.textContent = "Añade al menos una imagen."; return; } statusElem.textContent = `Subiendo ${filesToUpload.length} imagen(es)...`; uploadBtn.disabled = true; try { const uploadPromises = filesToUpload.map(file => { const filePath = `inventario/${Date.now()}_${file.name}`; const storageRef = Firebase.ref(storage, filePath); return Firebase.uploadBytes(storageRef, file).then(snapshot => Firebase.getDownloadURL(snapshot.ref)); }); const imageUrls = await Promise.all(uploadPromises); const datosInventario = { imagenes: imageUrls, subidoPor: empleado, timestamp: Firebase.serverTimestamp() }; await Firebase.setDoc(Firebase.doc(db, "inventario_actual", "estado"), datosInventario); await Firebase.addDoc(Firebase.collection(db, "inventario_log"), datosInventario); statusElem.textContent = "¡Inventario guardado!"; setTimeout(() => { if (document.getElementById('upload-status')) this.mostrarPanelInventario(); }, 2000); } catch (e) { console.error("Error al subir inventario:", e); statusElem.textContent = "Error al subir: " + e.message; uploadBtn.disabled = false; } },
         toggleInventarioLog() { const lista = document.getElementById('listaInventarioLog'); if (lista) { lista.style.display = lista.style.display === 'none' ? 'block' : 'none'; } },
         mostrarImagenAmpliada(imageUrl) { const overlay = document.getElementById('image-overlay'); const overlayImage = document.getElementById('overlay-image'); if(overlay && overlayImage) { overlayImage.src = imageUrl; overlay.style.display = 'flex'; }},
-        async mostrarPanelConvenios(esDirectiva) { this.stopAllTimers(); const nombreEmpleado = sessionStorage.getItem('currentUser'); const adminControls = esDirectiva ? `<div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-bold">Gestión de Convenios</h2><div><button class="btn" style="background-color: #c44;" onclick="VanillaApp.setTodosConveniosRojo()">Poner Todos en Rojo</button><button class="btn" onclick="VanillaApp.mostrarPanelEmpleados('${nombreEmpleado}')">Volver al Panel</button></div></div><div class="bg-purple-800 p-4 rounded-lg mb-6 flex flex-col md:flex-row gap-4"><input id="convenioNombreInput" type="text" class="flex-grow px-3 py-2 text-black rounded" placeholder="Nombre del nuevo convenio"/><button onclick="VanillaApp.crearConvenio()" class="btn" style="background-color: #16a34a;">Crear Panel de Convenio</button></div>` : `<div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-bold">Convenios</h2><button class="btn" onclick="VanillaApp.mostrarPanelEmpleados('${nombreEmpleado}')">Volver al Panel</button></div>`; document.getElementById('contenido').innerHTML = `<div class="max-w-7xl mx-auto p-6 bg-purple-900 bg-opacity-90 rounded-lg shadow-lg">${adminControls}<div id="contenedorConvenios" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div></div>`; await this.cargarConvenios(esDirectiva); },
-        async cargarConvenios(esDirectiva) { const contenedor = document.getElementById('contenedorConvenios'); if (!contenedor) return; contenedor.innerHTML = ''; try { const q = await Firebase.getDocs(Firebase.query(Firebase.collection(db, 'convenios'), Firebase.orderBy('nombre'))); q.forEach(docu => { const c = { id: docu.id, ...docu.data() }; const p = document.createElement('div'); p.className = "bg-purple-800 p-4 rounded-lg shadow-md flex flex-col"; let panelControls = ''; if (esDirectiva) { panelControls = `<div class="flex justify-between items-center mb-3"><h3 class="text-xl font-semibold mb-0 capitalize">${c.nombre}</h3><div class="flex gap-2"><div class="status-indicator bg-green-500 ${c.status === 'green' ? 'active' : ''}" onclick="VanillaApp.setConvenioStatus('${c.id}', 'green')"></div><div class="status-indicator bg-red-500 ${c.status === 'red' ? 'active' : ''}" onclick="VanillaApp.setConvenioStatus('${c.id}', 'red')"></div></div></div><div class="flex-grow mb-4 bg-black bg-opacity-20 rounded min-h-[200px] flex items-center justify-center">${c.imagenURL ? `<img src="${c.imagenURL}" class="panel-image rounded cursor-pointer" onclick="VanillaApp.mostrarImagenAmpliada('${c.imagenURL}')"/>` : '<span class="text-purple-300 text-center">Sin imagen</span>'}</div><label class="btn text-xs py-1 text-center cursor-pointer">Subir/Cambiar Imagen<input type="file" class="hidden" accept="image/*" onchange="VanillaApp.subirImagenConvenio('${c.id}', this.files[0])"></label><button onclick="VanillaApp.eliminarConvenio('${c.id}')" class="btn text-xs py-1 mt-2" style="background-color:#c44">Eliminar</button>`; } else { panelControls = `<h3 class="text-xl font-semibold mb-3 capitalize">${c.nombre}</h3><div class="flex-grow mb-4 bg-black bg-opacity-20 rounded min-h-[200px] flex items-center justify-center">${c.imagenURL ? `<img src="${c.imagenURL}" class="panel-image rounded cursor-pointer" onclick="VanillaApp.mostrarImagenAmpliada('${c.imagenURL}')"/>` : '<span class="text-purple-300 text-center">Sin imagen</span>'}</div>`; } p.innerHTML = panelControls; contenedor.appendChild(p); }); } catch (e) { console.error(e); } },
-        async crearConvenio() { const i = document.getElementById('convenioNombreInput'); const n = i.value.trim(); if (!n) return; try { await Firebase.addDoc(Firebase.collection(db, 'convenios'), { nombre: n, imagenURL: null, imagenPath: null, status: 'neutral' }); i.value = ''; await this.cargarConvenios(true); } catch (e) { console.error(e); } },
-        async eliminarConvenio(id) { if (confirm("¿Seguro?")) { try { const d = await Firebase.getDoc(Firebase.doc(db, 'convenios', id)); if (d.exists() && d.data().imagenPath) { await Firebase.deleteObject(Firebase.ref(storage, d.data().imagenPath)); } await Firebase.deleteDoc(Firebase.doc(db, 'convenios', id)); await this.cargarConvenios(true); } catch (e) { console.error(e); } } },
-        async setConvenioStatus(convenioId, newStatus) { try { await Firebase.updateDoc(Firebase.doc(db, 'convenios', convenioId), { status: newStatus }); await this.cargarConvenios(true); } catch (e) { console.error("Error:", e); }},
-        async setTodosConveniosRojo() { if (!confirm("¿Marcar TODOS como hostiles?")) return; const batch = Firebase.writeBatch(db); try { const conveniosSnapshot = await Firebase.getDocs(Firebase.collection(db, 'convenios')); conveniosSnapshot.forEach(doc => { batch.update(doc.ref, { status: 'red' }); }); await batch.commit(); await this.cargarConvenios(true); alert("Convenios actualizados."); } catch (e) { console.error("Error:", e); }},
-        async subirImagenConvenio(id, file) { if (!file) return; const p = `convenios/${id}/${file.name}`; const s = Firebase.ref(storage, p); try { const docSnap = await Firebase.getDoc(Firebase.doc(db, 'convenios', id)); if (docSnap.exists() && docSnap.data().imagenPath) { try { await Firebase.deleteObject(Firebase.ref(storage, docSnap.data().imagenPath)); } catch (e) { console.warn("La imagen anterior no se pudo borrar:", e.code); } } await Firebase.uploadBytes(s, file); const url = await Firebase.getDownloadURL(s); await Firebase.updateDoc(Firebase.doc(db, 'convenios', id), { imagenURL: url, imagenPath: p }); if (document.getElementById('contenedorConvenios')) this.cargarConvenios(true); } catch (e) { console.error("Error:", e); } },
-        async mostrarListaNegraPublica() { await this.cargarListaNegra(); let msg = "--- LISTA NEGRA ---\n\n"; this.state.listaNegra.length === 0 ? msg += "Nadie vetado." : this.state.listaNegra.forEach(p => { msg += `- ${p.nombre} (Motivo: ${p.motivo})\n`; }); alert(msg); },
-        async actualizarLibroNegro() { await this.cargarLibroNegro(); const l = document.getElementById('listaLibroNegro'); if (!l) return; l.innerHTML = ''; this.state.libroNegro.forEach(c => { l.innerHTML += `<li class="flex justify-between items-center p-2 bg-purple-800 rounded"><span><strong class="capitalize">${c.nombre}</strong> (${c.relacion}) - ${c.notas}</span><button onclick="VanillaApp.eliminarDelLibro('${c.docId}')" class="text-red-500 font-bold px-2">X</button></li>`; }); },
-        async anadirAlLibroNegro() { const n = document.getElementById('libroNombre').value.trim(), r = document.getElementById('libroRelacion').value, o = document.getElementById('libroNotas').value.trim(); if (n) { try { const newDoc = await Firebase.addDoc(Firebase.collection(db, 'libroNegro'), { nombre: n, relacion: r, notas: o }); this.state.libroNegro.push({ docId: newDoc.id, nombre: n, relacion: r, notas: o }); this.actualizarLibroNegro(); document.getElementById('libroNombre').value = ''; document.getElementById('libroNotas').value = ''; } catch(e) { console.error(e); } } },
-        async eliminarDelLibro(docId) { try { await Firebase.deleteDoc(Firebase.doc(db, 'libroNegro', docId)); this.state.libroNegro = this.state.libroNegro.filter(c => c.docId !== docId); this.actualizarLibroNegro(); } catch(e) { console.error(e); } },
+        async mostrarPanelConvenios(esDirectiva) { this.stopAllTimers(); const nombreEmpleado = sessionStorage.getItem('currentUser'); const adminControls = esDirectiva ? `<div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-bold">Gestión de Acuerdos Navales</h2><div><button class="btn" style="background-color: #dc2626;" onclick="VanillaApp.setTodosConveniosRojo()">Marcar Todos como Hostiles</button><button class="btn" onclick="VanillaApp.mostrarPanelEmpleados('${nombreEmpleado}')">Volver a Panel de Tripulación</button></div></div><div class="bg-nautics-mid p-4 rounded-lg mb-6 flex flex-col md:flex-row gap-4"><input id="convenioNombreInput" class="flex-grow px-3 py-2 text-gray-900 rounded bg-nautics-light" placeholder="Nombre del nuevo acuerdo naval"/><button onclick="VanillaApp.crearConvenio()" class="btn" style="background-color: var(--color-nautics-secondary-pink);">Establecer Nuevo Acuerdo</button></div>` : `<div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-bold">Acuerdos Navales</h2><button class="btn" onclick="VanillaApp.mostrarPanelEmpleados('${nombreEmpleado}')">Volver a Panel de Tripulación</button></div>`; document.getElementById('contenido').innerHTML = `<div class="max-w-7xl mx-auto p-6 bg-nautics-dark bg-opacity-90 rounded-lg shadow-lg">${adminControls}<div id="contenedorConvenios" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div></div>`; await this.cargarConvenios(esDirectiva); },
+        async cargarConvenios(esDirectiva) { const contenedor = document.getElementById('contenedorConvenios'); if (!contenedor) return; contenedor.innerHTML = ''; try { const q = await Firebase.getDocs(Firebase.query(Firebase.collection(db, 'convenios'), Firebase.orderBy('nombre'))); q.forEach(docu => { const c = { id: docu.id, ...docu.data() }; const p = document.createElement('div'); p.className = "bg-nautics-mid p-4 rounded-lg shadow-md flex flex-col"; let panelControls = ''; if (esDirectiva) { panelControls = `<div class="flex justify-between items-center mb-3"><h3 class="text-xl font-semibold mb-0 capitalize">${c.nombre}</h3><div class="flex gap-2"><div class="status-indicator bg-green-500 ${c.status === 'green' ? 'active' : ''}" onclick="VanillaApp.setConvenioStatus('${c.id}', 'green')"></div><div class="status-indicator bg-red-500 ${c.status === 'red' ? 'active' : ''}" onclick="VanillaApp.setConvenioStatus('${c.id}', 'red')"></div></div></div><div class="flex-grow mb-4 bg-nautics-dark bg-opacity-20 rounded min-h-[200px] flex items-center justify-center">${c.imagenURL ? `<img src="${c.imagenURL}" class="panel-image rounded cursor-pointer" onclick="VanillaApp.mostrarImagenAmpliada('${c.imagenURL}')"/>` : '<span class="text-nautics-light text-center">Sin imagen</span>'}</div><label class="btn text-xs py-1 text-center cursor-pointer" style="background-color: var(--color-nautics-secondary-pink);">Subir/Cambiar Imagen<input type="file" class="hidden" accept="image/*" onchange="VanillaApp.subirImagenConvenio('${c.id}', this.files[0])"></label><button onclick="VanillaApp.eliminarConvenio('${c.id}')" class="btn text-xs py-1 mt-2" style="background-color:#dc2626">Romper Acuerdo</button>`; } else { panelControls = `<h3 class="text-xl font-semibold mb-3 capitalize">${c.nombre}</h3><div class="flex-grow mb-4 bg-nautics-dark bg-opacity-20 rounded min-h-[200px] flex items-center justify-center">${c.imagenURL ? `<img src="${c.imagenURL}" class="panel-image rounded cursor-pointer" onclick="VanillaApp.mostrarImagenAmpliada('${c.imagenURL}')"/>` : '<span class="text-nautics-light text-center">Sin imagen</span>'}</div>`; } p.innerHTML = panelControls; contenedor.appendChild(p); }); } catch (e) { console.error("Error al cargar convenios:", e); } },
+        async crearConvenio() { const i = document.getElementById('convenioNombreInput'); const n = i.value.trim(); if (!n) return; try { await Firebase.addDoc(Firebase.collection(db, 'convenios'), { nombre: n, imagenURL: null, imagenPath: null, status: 'neutral' }); i.value = ''; await this.cargarConvenios(true); } catch (e) { console.error("Error al crear convenio:", e); alert("Error al crear acuerdo naval: " + e.message); } },
+        async eliminarConvenio(id) { if (confirm("¿Seguro que quieres romper este acuerdo?")) { try { const d = await Firebase.getDoc(Firebase.doc(db, 'convenios', id)); if (d.exists() && d.data().imagenPath) { await Firebase.deleteObject(Firebase.ref(storage, d.data().imagenPath)); } await Firebase.deleteDoc(Firebase.doc(db, 'convenios', id)); await this.cargarConvenios(true); } catch (e) { console.error("Error al eliminar convenio:", e); alert("Error al romper acuerdo naval: " + e.message); } } },
+        async setConvenioStatus(convenioId, newStatus) { try { await Firebase.updateDoc(Firebase.doc(db, 'convenios', convenioId), { status: newStatus }); await this.cargarConvenios(true); } catch (e) { console.error("Error al establecer status de convenio:", e); alert("Error al establecer estado de acuerdo: " + e.message); }},
+        async setTodosConveniosRojo() { if (!confirm("¿Marcar TODOS los acuerdos como hostiles (rojo)?")) return; const batch = Firebase.writeBatch(db); try { const conveniosSnapshot = await Firebase.getDocs(Firebase.collection(db, 'convenios')); conveniosSnapshot.forEach(doc => { batch.update(doc.ref, { status: 'red' }); }); await batch.commit(); await this.cargarConvenios(true); alert("Acuerdos actualizados a hostiles."); } catch (e) { console.error("Error al establecer todos los convenios a rojo:", e); alert("Error al marcar acuerdos como hostiles: " + e.message); } },
+        async subirImagenConvenio(id, file) { if (!file) return; const p = `convenios/${id}/${file.name}`; const s = Firebase.ref(storage, p); try { const docSnap = await Firebase.getDoc(Firebase.doc(db, 'convenios', id)); if (docSnap.exists() && docSnap.data().imagenPath) { try { await Firebase.deleteObject(Firebase.ref(storage, docSnap.data().imagenPath)); } catch (e) { console.warn("La imagen anterior no se pudo borrar:", e.code); } } await Firebase.uploadBytes(s, file); const url = await Firebase.getDownloadURL(s); await Firebase.updateDoc(Firebase.doc(db, 'convenios', id), { imagenURL: url, imagenPath: p }); if (document.getElementById('contenedorConvenios')) this.cargarConvenios(true); } catch (e) { console.error("Error al subir imagen convenio:", e); alert("Error al subir imagen de acuerdo: " + e.message); } },
+        async mostrarListaNegraPublica() { await this.cargarListaNegra(); let msg = "--- LISTA NEGRA DE PIRATAS ---\n\n"; this.state.listaNegra.length === 0 ? msg += "Nadie vetado de los mares." : this.state.listaNegra.forEach(p => { msg += `- ${p.nombre} (Motivo: ${p.motivo})\n`; }); alert(msg); },
+        async actualizarLibroNegro() { await this.cargarLibroNegro(); const l = document.getElementById('listaLibroNegro'); if (!l) return; l.innerHTML = ''; this.state.libroNegro.forEach(c => { l.innerHTML += `<li class="flex justify-between items-center p-2 bg-nautics-mid rounded"><span><strong class="capitalize">${c.nombre}</strong> (${c.relacion}) - ${c.notas}</span><button onclick="VanillaApp.eliminarDelLibro('${c.docId}')" class="text-red-500 font-bold px-2">X</button></li>`; }); },
+        async anadirAlLibroNegro() { const n = document.getElementById('libroNombre').value.trim(), r = document.getElementById('libroRelacion').value, o = document.getElementById('libroNotas').value.trim(); if (n) { try { const newDoc = await Firebase.addDoc(Firebase.collection(db, 'libroNegro'), { nombre: n, relacion: r, notas: o }); this.state.libroNegro.push({ docId: newDoc.id, nombre: n, relacion: r, notas: o }); this.actualizarLibroNegro(); document.getElementById('libroNombre').value = ''; document.getElementById('libroNotas').value = ''; } catch(e) { console.error("Error al añadir al libro negro:", e); alert("Error al añadir a la bitácora: " + e.message); } } },
+        async eliminarDelLibro(docId) { try { await Firebase.deleteDoc(Firebase.doc(db, 'libroNegro', docId)); this.state.libroNegro = this.state.libroNegro.filter(c => c.docId !== docId); this.actualizarLibroNegro(); } catch(e) { console.error("Error al eliminar del libro negro:", e); alert("Error al eliminar de la bitácora: " + e.message); } },
         async actualizarListaNegra() { await this.cargarListaNegra(); const l = document.getElementById('listaDeVetados'); if (!l) return; l.innerHTML = ''; this.state.listaNegra.forEach(p => { l.innerHTML += `<li class="flex justify-between items-center p-2 bg-red-900 bg-opacity-50 rounded"><span><strong class="capitalize">${p.nombre}</strong> - ${p.motivo}</span><button onclick="VanillaApp.eliminarDeListaNegra('${p.docId}')" class="text-white font-bold px-2">X</button></li>`; }); },
-        async anadirAListaNegra() { const n = document.getElementById('vetadoNombre').value.trim(), m = document.getElementById('vetadoMotivo').value.trim(); if (n && m) { try { const newDoc = await Firebase.addDoc(Firebase.collection(db, 'listaNegra'), { nombre: n, motivo: m }); this.state.listaNegra.push({ docId: newDoc.id, nombre: n, motivo: m }); this.actualizarListaNegra(); document.getElementById('vetadoNombre').value = ''; document.getElementById('vetadoMotivo').value = ''; } catch(e) { console.error(e); } } },
-        async eliminarDeListaNegra(docId) { try { await Firebase.deleteDoc(Firebase.doc(db, 'listaNegra', docId)); this.state.listaNegra = this.state.listaNegra.filter(p => p.docId !== docId); this.actualizarListaNegra(); } catch(e) { console.error(e); } },
-        async actualizarInventarioLog() { await this.cargarInventarioLog(); const contenedor = document.getElementById('listaInventarioLog'); if (!contenedor) return; contenedor.innerHTML = ''; if (this.state.inventarioLog.length === 0) { contenedor.innerHTML = '<li>No hay registros de inventario.</li>'; return; } this.state.inventarioLog.forEach(log => { const fecha = log.timestamp.toDate().toLocaleString('es-ES'); const imgsHTML = log.imagenes ? log.imagenes.map(url => `<img src="${url}" class="w-24 h-24 object-cover rounded cursor-pointer" onclick="VanillaApp.mostrarImagenAmpliada('${url}')" />`).join('') : ''; contenedor.innerHTML += `<li class="flex items-start gap-4 p-3 bg-purple-800 rounded"><div class="flex gap-2 flex-wrap">${imgsHTML}</div><div><p>Subido por: <strong class="capitalize">${log.subidoPor}</strong></p><p>Fecha: <strong class="font-mono">${fecha}</strong></p></div></li>`; }); },
+        async anadirAListaNegra() { const n = document.getElementById('vetadoNombre').value.trim(), m = document.getElementById('vetadoMotivo').value.trim(); if (n && m) { try { const newDoc = await Firebase.addDoc(Firebase.collection(db, 'listaNegra'), { nombre: n, motivo: m }); this.state.listaNegra.push({ docId: newDoc.id, nombre: n, motivo: m }); this.actualizarListaNegra(); document.getElementById('vetadoNombre').value = ''; document.getElementById('vetadoMotivo').value = ''; } catch(e) { console.error("Error al añadir a lista negra:", e); alert("Error al vetar pirata: " + e.message); } } },
+        async eliminarDeListaNegra(docId) { try { await Firebase.deleteDoc(Firebase.doc(db, 'listaNegra', docId)); this.state.listaNegra = this.state.listaNegra.filter(p => p.docId !== docId); this.actualizarListaNegra(); } catch(e) { console.error("Error al eliminar de lista negra:", e); alert("Error al desvetar pirata: " + e.message); } },
+        async actualizarInventarioLog() { await this.cargarInventarioLog(); const contenedor = document.getElementById('listaInventarioLog'); if (!contenedor) return; contenedor.innerHTML = ''; if (this.state.inventarioLog.length === 0) { contenedor.innerHTML = '<li>No hay registros de inventario de flota.</li>'; return; } this.state.inventarioLog.forEach(log => { const fecha = log.timestamp.toDate().toLocaleString('es-ES'); const imgsHTML = log.imagenes ? log.imagenes.map(url => `<img src="${url}" class="w-24 h-24 object-cover rounded cursor-pointer" onclick="VanillaApp.mostrarImagenAmpliada('${url}')" />`).join('') : ''; contenedor.innerHTML += `<li class="flex items-start gap-4 p-3 bg-nautics-mid rounded"><div class="flex gap-2 flex-wrap">${imgsHTML}</div><div><p>Subido por: <strong class="capitalize">${log.subidoPor}</strong></p><p>Fecha: <strong class="font-mono">${fecha}</strong></p></div></li>`; }); },
         toggleInventarioLog() { const lista = document.getElementById('listaInventarioLog'); if (lista) { lista.style.display = lista.style.display === 'none' ? 'block' : 'none'; } },
         
         addMessageToChat(content, sender) {
@@ -572,7 +1071,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const files = this.state.chatFiles;
             const currentUser = sessionStorage.getItem('currentUser');
 
-            if (!messageText && files.length === 0) return;
+            if (!messageText && files.length === 0) return; 
 
             let messageHTML = messageText ? `<p>${messageText.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</p>` : '';
             chatbotInput.value = '';
@@ -601,7 +1100,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById(tempId).innerHTML = finalHTML;
                 } catch (e) {
                     console.error("Error subiendo imágenes al chat:", e);
-                    document.getElementById(tempId).innerHTML += "<p class='text-red-400 text-xs'>Error al subir imágenes.</p>";
+                    document.getElementById(tempId).innerHTML += "<p class='text-red-400 text-xs'>Error al subir imágenes: " + e.message + "</p>";
                 }
             } else {
                 this.addMessageToChat(messageHTML, 'user');
@@ -610,41 +1109,142 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.chatFiles = [];
             this.renderChatPreviews();
 
-            setTimeout(() => {
-                let mockReply = "Lo siento, cariño, no te he entendido. ¿Puedes repetirlo?";
+            setTimeout(async () => { // Marked as async
+                let mockReply = "Lo siento, almirante, mi brújula no me indica esa dirección. ¿Puedes ser más específico?"; 
                 const userMsg = messageText.toLowerCase();
 
                 const keywords = {
-                    fichar: ["fichar", "entrar", "inicio", "trabajar"],
-                    empleado: ["empleado", "panel", "área", "zona"],
-                    producto: ["producto", "vender", "catálogo", "precios"],
-                    habitacion: ["habitacion", "cuarto", "suite", "reservar"],
-                    hola: ["hola", "buenas", "buenos", "ey"]
+                    fichar: ["fichar", "entrar", "inicio", "guardia", "trabajar"],
+                    empleado: ["empleado", "tripulacion", "panel", "área", "zona"],
+                    producto: ["producto", "provisiones", "vender", "catálogo", "precios"],
+                    barco: ["barco", "flota", "navio", "submarino", "alquilar"],
+                    hola: ["hola", "buenas", "buenos", "ey", "ahoy"],
+                    vender: ["vender", "comprar", "dar", "entregar"] // Added for sales
                 };
 
-                if (!messageText) {
-                    this.addMessageToChat("¡Qué buena pinta tiene eso, amor!", 'bot');
-                    return;
-                }
+                // New logic for sales
+                const salesRegex = /(.*?) (\d+)\s*(cebos|cañas)(?: y (\d+)\s*(cebos|cañas))?/;
+                const match = userMsg.match(salesRegex);
 
-                if (keywords.fichar.some(k => userMsg.includes(k))) {
+                if (match && keywords.vender.some(k => userMsg.includes(k))) {
+                    const clientName = match[1].trim();
+                    const item1Quantity = parseInt(match[2]);
+                    const item1Type = match[3];
+                    const item2Quantity = match[4] ? parseInt(match[4]) : 0;
+                    const item2Type = match[5];
+                    
+                    if (!clientName.includes(' ')) { // Basic check for full name (name and surname)
+                        mockReply = "¡Almirante! Para registrar la venta, necesito el nombre y **apellido** del cliente.";
+                    } else {
+                        const salesPromises = [];
+                        let ceboSoldToday = false;
+
+                        // Process first item
+                        if (item1Type === 'cebos') {
+                            const clientDoc = await Firebase.getDoc(Firebase.doc(db, 'clientesVentas', clientName));
+                            const clientData = clientDoc.exists() ? clientDoc.data() : { ultimaCompraCebos: null, compras: [] };
+                            const lastCeboPurchaseDate = clientData.ultimaCompraCebos ? new Date(clientData.ultimaCompraCebos.toDate()).toDateString() : null;
+                            const todayDate = new Date().toDateString();
+
+                            if (lastCeboPurchaseDate === todayDate) {
+                                mockReply = `¡Almirante! El cliente ${clientName} ya compró cebos hoy. No podemos venderle más hasta mañana.`;
+                                ceboSoldToday = true;
+                            } else {
+                                salesPromises.push(Firebase.setDoc(Firebase.doc(db, 'clientesVentas', clientName), {
+                                    ultimaCompraCebos: Firebase.serverTimestamp(),
+                                    compras: Firebase.Firebase.arrayUnion({
+                                        producto: 'cebo',
+                                        cantidad: item1Quantity,
+                                        timestamp: Firebase.serverTimestamp(),
+                                        empleado: currentUser
+                                    })
+                                }, { merge: true }));
+                                mockReply = `¡Cebos registrados para ${clientName}!`;
+                            }
+                        } else if (item1Type === 'cañas') {
+                            salesPromises.push(Firebase.setDoc(Firebase.doc(db, 'clientesVentas', clientName), {
+                                compras: Firebase.Firebase.arrayUnion({
+                                    producto: 'caña',
+                                    cantidad: item1Quantity,
+                                    timestamp: Firebase.serverTimestamp(),
+                                    empleado: currentUser
+                                })
+                            }, { merge: true }));
+                            mockReply = `¡Cañas registradas para ${clientName}!`;
+                        }
+
+                        // Process second item if present and not a cebo already sold
+                        if (item2Quantity > 0 && !ceboSoldToday) {
+                            if (item2Type === 'cebos') {
+                                const clientDoc = await Firebase.getDoc(Firebase.doc(db, 'clientesVentas', clientName));
+                                const clientData = clientDoc.exists() ? clientDoc.data() : { ultimaCompraCebos: null, compras: [] };
+                                const lastCeboPurchaseDate = clientData.ultimaCompraCebos ? new Date(clientData.ultimaCompraCebos.toDate()).toDateString() : null;
+                                const todayDate = new Date().toDateString();
+
+                                if (lastCeboPurchaseDate === todayDate) {
+                                    mockReply += ` ¡Atención! ${clientName} ya compró cebos hoy, no puedo registrar más.`;
+                                } else {
+                                    salesPromises.push(Firebase.setDoc(Firebase.doc(db, 'clientesVentas', clientName), {
+                                        ultimaCompraCebos: Firebase.serverTimestamp(),
+                                        compras: Firebase.Firebase.arrayUnion({
+                                            producto: 'cebo',
+                                            cantidad: item2Quantity,
+                                            timestamp: Firebase.serverTimestamp(),
+                                            empleado: currentUser
+                                        })
+                                    }, { merge: true }));
+                                    mockReply += ` Y cebos también registrados para ${clientName}.`;
+                                }
+                            } else if (item2Type === 'cañas') {
+                                salesPromises.push(Firebase.setDoc(Firebase.doc(db, 'clientesVentas', clientName), {
+                                    compras: Firebase.Firebase.arrayUnion({
+                                        producto: 'caña',
+                                        cantidad: item2Quantity,
+                                        timestamp: Firebase.serverTimestamp(),
+                                        empleado: currentUser
+                                    })
+                                }, { merge: true }));
+                                mockReply += ` Y cañas también registradas para ${clientName}.`;
+                            }
+                        }
+
+                        try {
+                            if (salesPromises.length > 0) {
+                                await Promise.all(salesPromises);
+                                mockReply = `¡Venta registrada para ${clientName}!: ${item1Quantity} ${item1Type}.`
+                                if (item2Quantity > 0 && item2Type) {
+                                    mockReply += ` Y ${item2Quantity} ${item2Type}.`;
+                                }
+                                this.cargarClienteVentas(); // Refresh client sales data
+                            }
+                        } catch (e) {
+                            console.error("Error al registrar venta de cliente:", e);
+                            mockReply = "¡Rayos! No pude registrar la venta. Error: " + e.message;
+                        }
+                    }
+                }
+                // End new logic for sales
+
+                else if (!messageText && files.length > 0) { 
+                    mockReply = "¡Qué buena pinta tienen esas fotos, almirante!";
+                } else if (keywords.fichar.some(k => userMsg.includes(k))) {
                     if(currentUser) {
                         this.fichar(currentUser);
-                        mockReply = "¡A trabajar! Fichaje de entrada registrado, bombón.";
+                        mockReply = "¡A la guardia! Registro de inicio de turno completado, capitán.";
                     } else {
-                        mockReply = "Necesitas iniciar sesión para poder fichar, cielo.";
+                        mockReply = "Necesitas iniciar sesión para poder iniciar guardia, capitán.";
                     }
                 } else if (keywords.empleado.some(k => userMsg.includes(k))) {
-                    mockReply = "Claro, te llevo ahora mismo a tu zona, amor.";
+                    mockReply = "¡Por supuesto, al panel de tripulación al instante, almirante!";
                     this.irAPanelEmpleado();
                 } else if (keywords.producto.some(k => userMsg.includes(k))) {
-                    mockReply = "¡Marchando un vistazo a nuestros tesoros!";
+                    mockReply = "¡Zarpo a revisar nuestras provisiones y equipo, almirante!";
                     this.mostrarPanelProductos();
-                } else if (keywords.habitacion.some(k => userMsg.includes(k))) {
-                    mockReply = "Te enseño ahora mismo nuestras suites del placer...";
-                    this.mostrarPanelHabitaciones();
+                } else if (keywords.barco.some(k => userMsg.includes(k))) {
+                    mockReply = "¡Nuestra flota te espera! Mostrando los barcos disponibles...";
+                    this.mostrarPanelBarcos();
                 } else if (keywords.hola.some(k => userMsg.includes(k))) {
-                    mockReply = `¡Hola, ${currentUser || 'cielo'}! Soy Luna, ¿en qué puedo ayudarte hoy?`;
+                    mockReply = `¡Ahoy, ${currentUser || 'capitán'}! Soy Jack Sparrow, ¿en qué puedo ayudarte hoy?`;
                 }
                 
                 this.addMessageToChat(mockReply, 'bot');
@@ -703,10 +1303,10 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const anuncioRef = Firebase.doc(db, "configuracion", "anuncio_global");
                 await Firebase.setDoc(anuncioRef, anuncioData);
-                alert("Anuncio publicado con éxito.");
+                alert("Anuncio a la flota emitido con éxito.");
                 document.getElementById('anuncioTexto').value = '';
                 document.getElementById('anuncioEsEncuesta').checked = false;
-            } catch (e) { console.error("Error al publicar anuncio:", e); alert("No se pudo publicar el anuncio."); }
+            } catch (e) { console.error("Error al emitir anuncio:", e); alert("No se pudo emitir el anuncio a la flota: " + e.message); }
         },
         iniciarListenerAnuncios() {
             const anuncioRef = Firebase.doc(db, "configuracion", "anuncio_global");
@@ -718,15 +1318,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     if (anuncio.expiraEn > ahora) {
                         const currentUser = sessionStorage.getItem('currentUser');
-                        let contenidoHTML = `<h3 class="text-xl text-purple-300 border-b-2 border-purple-700 pb-2 mb-4">Anuncio</h3><p class="text-base flex-grow">${anuncio.texto}</p>`;
+                        let contenidoHTML = `<h3 class="text-xl text-nautics-light border-b-2 border-nautics-mid pb-2 mb-4">Anuncio de la Flota</h3><p class="text-base flex-grow">${anuncio.texto}</p>`;
                         if (anuncio.esEncuesta) {
                             const haVotado = currentUser && anuncio.votos && anuncio.votos[currentUser];
                             contenidoHTML += `
                                 <div class="mt-4">
-                                    <h4 class="text-md font-semibold mb-2">¿Confirmas?</h4>
+                                    <h4 class="text-md font-semibold mb-2">¿Confirmas la votación?</h4>
                                     <div class="flex justify-between gap-2">
-                                        <button class="votacion-btn" onclick="VanillaApp.votarEnAnuncio('si')" ${haVotado ? 'disabled' : ''}>✅ Sí</button>
-                                        <button class="votacion-btn" onclick="VanillaApp.votarEnAnuncio('no')" ${haVotado ? 'disabled' : ''}>❌ No</button>
+                                        <button class="votacion-btn" onclick="VanillaApp.votarEnAnuncio('si')" ${haVotado ? 'disabled' : ''}>✅ A favor</button>
+                                        <button class="votacion-btn" onclick="VanillaApp.votarEnAnuncio('no')" ${haVotado ? 'disabled' : ''}>❌ En contra</button>
                                     </div>
                                 </div>
                             `;
@@ -750,7 +1350,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         async votarEnAnuncio(voto) {
             const currentUser = sessionStorage.getItem('currentUser');
-            if (!currentUser) return alert("Debes iniciar sesión para poder votar.");
+            if (!currentUser) return alert("Debes iniciar sesión para poder votar, tripulante.");
             
             const anuncioRef = Firebase.doc(db, "configuracion", "anuncio_global");
             try {
@@ -759,7 +1359,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             } catch (e) {
                 console.error("Error al registrar el voto:", e);
-                alert("No se pudo registrar tu voto.");
+                alert("No se pudo registrar tu voto: " + e.message);
             }
         },
         async mostrarResultadosEncuesta() {
@@ -767,7 +1367,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const docSnap = await Firebase.getDoc(anuncioRef);
 
             if (!docSnap.exists() || !docSnap.data().esEncuesta) {
-                return alert("No hay ninguna encuesta activa en este momento.");
+                return alert("No hay ninguna votación de flota activa en este momento.");
             }
 
             const anuncio = docSnap.data();
@@ -784,21 +1384,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             let resultadosHTML = `
-                <h3 class="text-xl font-bold mb-4">Resultados para: "${anuncio.texto}"</h3>
+                <h3 class="text-xl font-bold mb-4">Resultados de Votación: "${anuncio.texto}"</h3>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <h4 class="font-semibold text-green-400 mb-2">Han votado SÍ (✅):</h4>
-                        <ul class="list-disc list-inside">${votosSi.map(e => `<li class="capitalize">${e}</li>`).join('') || '<li>Nadie ha votado sí.</li>'}</ul>
+                        <h4 class="font-semibold text-green-400 mb-2">A favor (✅):</h4>
+                        <ul class="list-disc list-inside">${votosSi.map(e => `<li class="capitalize">${e}</li>`).join('') || '<li>Nadie ha votado a favor.</li>'}</ul>
                     </div>
                     <div>
-                        <h4 class="font-semibold text-red-400 mb-2">Han votado NO (❌):</h4>
-                        <ul class="list-disc list-inside">${votosNo.map(e => `<li class="capitalize">${e}</li>`).join('') || '<li>Nadie ha votado no.</li>'}</ul>
+                        <h4 class="font-semibold text-red-400 mb-2">En contra (❌):</h4>
+                        <ul class="list-disc list-inside">${votosNo.map(e => `<li class="capitalize">${e}</li>`).join('') || '<li>Nadie ha votado en contra.</li>'}</ul>
                     </div>
                 </div>
             `;
             
             const overlay = document.getElementById('image-overlay');
-            overlay.innerHTML = `<div class="bg-purple-900 p-8 rounded-lg max-w-2xl w-full relative">${resultadosHTML}<span id="overlay-close-btn-resultados" class="cursor-pointer absolute top-2 right-4 text-2xl">&times;</span></div>`;
+            overlay.innerHTML = `<div class="bg-nautics-dark p-8 rounded-lg max-w-2xl w-full relative">${resultadosHTML}<span id="overlay-close-btn-resultados" class="cursor-pointer absolute top-2 right-4 text-2xl">&times;</span></div>`;
             overlay.style.display = 'flex';
             overlay.querySelector('#overlay-close-btn-resultados').onclick = () => {
                 overlay.style.display = 'none';
@@ -807,55 +1407,82 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         },
 
-        iniciarListenerHabitaciones() {
-            const q = Firebase.query(Firebase.collection(db, "habitaciones"), Firebase.orderBy("id"));
-            this.state.unsubscribeHabitaciones = Firebase.onSnapshot(q, (snapshot) => {
-                const habitacionesNuevas = [];
-                snapshot.forEach(doc => habitacionesNuevas.push(doc.data()));
-                this.state.habitaciones = habitacionesNuevas;
+        iniciarListenerBarcos() { 
+            const q = Firebase.query(Firebase.collection(db, "barcos"), Firebase.orderBy("id")); 
+            this.state.unsubscribeBarcos = Firebase.onSnapshot(q, (snapshot) => { 
+                const barcosNuevos = []; 
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const reservasConvertidas = data.reservas ? data.reservas.map(res => ({
+                        ...res,
+                        inicio: res.inicio && typeof res.inicio.toMillis === 'function' ? res.inicio.toMillis() : res.inicio,
+                        fin: res.fin && typeof res.fin.toMillis === 'function' ? res.fin.toMillis() : res.fin
+                    })) : [];
+                    barcosNuevos.push({ ...data, reservas: reservasConvertidas }); 
+                });
+                this.state.barcos = barcosNuevos; 
 
-                const panelHabitaciones = document.getElementById('panel-habitaciones');
-                if (panelHabitaciones) {
+                const panelBarcos = document.getElementById('panel-barcos'); 
+                if (panelBarcos) {
                     const currentUser = sessionStorage.getItem('currentUser');
-                    let habitacionesHTML = this.state.habitaciones.map(hab => {
-                        const estadoActual = this.getEstadoHabitacion(hab);
+                    let barcosHTML = this.state.barcos.map(boat => { 
+                        const estadoActual = this.getEstadoBarco(boat); 
+                        const imagenHTML = `<img src="${boat.imagen}" alt="${boat.nombre}" class="barco-img mb-4" onerror="this.style.display='none'">`; 
                         let controles = (estadoActual.estado === 'disponible') 
-                            ? `<button class="btn text-sm py-2 w-full" onclick="VanillaApp.ocuparHabitacionAhora(${hab.id}, '${currentUser}')">Ocupar (30 min)</button>` 
-                            : `<div class="font-mono text-xl mb-2" id="timer-hab-${hab.id}">--:--:--</div><div class="flex gap-2"><button class="btn text-xs py-1 flex-grow" onclick="VanillaApp.anadirTiempoHabitacion(${hab.id}, '${currentUser}')">+30 min</button><button class="btn text-xs py-1 flex-grow" style="background-color:#c44" onclick="VanillaApp.liberarHabitacion(${hab.id}, '${currentUser}')">Liberar</button></div>`;
-                        return `<div class="bg-purple-800 p-4 rounded-lg text-center flex flex-col justify-between"><div><p class="font-bold text-lg">${hab.nombre}</p><p class="text-sm ${estadoActual.estado === 'ocupada' ? 'text-red-400' : 'text-green-400'} mb-2">${estadoActual.texto}</p></div><div>${controles}</div></div>`;
+                            ? `<div class="flex flex-col gap-2"><button class="btn text-sm py-2 w-full" onclick="VanillaApp.ocuparBarcoAhora(${boat.id}, '${currentUser}', 30)">Paseo (30 min)</button><button class="btn text-sm py-2 w-full" onclick="VanillaApp.ocuparBarcoAhora(${boat.id}, '${currentUser}', 45)" style="background-color: var(--color-nautics-secondary-pink);">Alquiler (45 min)</button></div>` 
+                            : `<div class="font-mono text-xl mb-2" id="timer-boat-${boat.id}">--:--:--</div><div class="flex gap-2"><button class="btn text-xs py-1 flex-grow" onclick="VanillaApp.anadirTiempoBarco(${boat.id}, '${currentUser}', 30)">+30 min</button><button class="btn text-xs py-1 flex-grow" style="background-color:#dc2626" onclick="VanillaApp.liberarBarco(${boat.id}, '${currentUser}')">Liberar</button></div>`;
+                        return `<div class="bg-nautics-mid p-4 rounded-lg text-center flex flex-col justify-between"><div><p class="font-bold text-lg">${boat.nombre}</p><p class="text-sm ${estadoActual.estado === 'ocupada' ? 'text-red-400' : 'text-green-400'} mb-2">${estadoActual.texto}</p></div><div>${controles}</div></div>`;
                     }).join('');
-                    panelHabitaciones.innerHTML = habitacionesHTML;
+                    panelBarcos.innerHTML = barcosHTML; 
                 }
+            }, (error) => {
+                console.error("Error al escuchar cambios en barcos:", error);
             });
         },
         async init() {
-            console.log("Iniciando aplicación Vanilla...");
+            console.log("Iniciando aplicación Nautics...");
             this.iniciarListenerAnuncios();
-            this.iniciarListenerHabitaciones();
+            this.iniciarListenerBarcos(); 
             await this.cargarTodosLosEmpleados();
             await this.cargarTodosLosFichajes();
-            
+            await this.cargarTodasLasVentas();
+            await this.cargarClienteVentas(); // Load client sales data on init
+
             const chatButtonWrapper = document.getElementById('chatbot-button-wrapper');
             const chatContainer = document.getElementById('chatbot-container');
             const closeButton = document.getElementById('chatbot-close');
             const minimizeButton = document.getElementById('chatbot-minimize');
-            chatButtonWrapper.addEventListener('click', () => {
-                chatContainer.style.display = 'flex';
-                chatButtonWrapper.style.display = 'none';
-            });
-            const closeChat = () => {
-                chatContainer.style.display = 'none';
-                chatButtonWrapper.style.display = 'block';
-            };
-            closeButton.addEventListener('click', closeChat);
-            minimizeButton.addEventListener('click', closeChat);
             
-            document.getElementById('overlay-close-btn').addEventListener('click', () => { document.getElementById('image-overlay').style.display = 'none'; });
-            document.getElementById('chatbot-send').addEventListener('click', () => this.handleSendMessage());
-            document.getElementById('chatbot-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') this.handleSendMessage(); });
-            document.getElementById('chatbot-input-container').addEventListener('paste', (e) => this.handleChatPaste(e));
+            if (chatButtonWrapper) {
+                chatButtonWrapper.addEventListener('click', () => {
+                    if (chatContainer) chatContainer.style.display = 'flex';
+                    chatButtonWrapper.style.display = 'none';
+                });
+            }
+            const closeChat = () => {
+                if (chatContainer) chatContainer.style.display = 'none';
+                if (chatButtonWrapper) chatButtonWrapper.style.display = 'block';
+            };
+            if (closeButton) closeButton.addEventListener('click', closeChat);
+            if (minimizeButton) minimizeButton.addEventListener('click', closeChat);
+            
+            const overlayCloseBtn = document.getElementById('overlay-close-btn');
+            if (overlayCloseBtn) {
+                overlayCloseBtn.addEventListener('click', () => { 
+                    const imageOverlay = document.getElementById('image-overlay');
+                    if (imageOverlay) imageOverlay.style.display = 'none'; 
+                });
+            }
 
-            this.addMessageToChat('¡Hola! Soy Luna, tu asistente en Nautics. ¿En qué puedo ayudarte?', 'bot');
+            const chatbotSendBtn = document.getElementById('chatbot-send');
+            const chatbotInputElem = document.getElementById('chatbot-input');
+            const chatbotInputContainer = document.getElementById('chatbot-input-container');
+
+            if (chatbotSendBtn) chatbotSendBtn.addEventListener('click', () => this.handleSendMessage());
+            if (chatbotInputElem) chatbotInputElem.addEventListener('keypress', (e) => { if (e.key === 'Enter') this.handleSendMessage(); });
+            if (chatbotInputContainer) chatbotInputContainer.addEventListener('paste', (e) => this.handleChatPaste(e));
+
+            this.addMessageToChat('¡Ahoy! Soy Jack Sparrow, tu asistente en Nautics. ¿En qué puedo ayudarte?', 'bot'); 
 
             const currentUser = sessionStorage.getItem('currentUser');
             if (currentUser) {
@@ -863,15 +1490,32 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 this.mostrarInicio();
             }
+
+            // Set up interval to reset cebo purchase restrictions daily
+            setInterval(async () => {
+                const now = new Date();
+                if (now.getHours() === 0 && now.getMinutes() === 0 && now.getSeconds() < 10) { // Execute shortly after midnight
+                    console.log("Reseteando restricciones de compra de cebos...");
+                    const clientsSnapshot = await Firebase.getDocs(Firebase.collection(db, 'clientesVentas'));
+                    const batch = Firebase.writeBatch(db);
+                    clientsSnapshot.forEach(doc => {
+                        batch.update(doc.ref, { ultimaCompraCebos: null }); // Reset to null or update date to previous day
+                    });
+                    await batch.commit();
+                    console.log("Restricciones de compra de cebos reseteadas para todos los clientes.");
+                    this.cargarClienteVentas(); // Refresh local state
+                }
+            }, 1000 * 60); // Check every minute
         },
 
         async descargarInformeExcel() {
-            alert("Preparando los informes. La descarga comenzará en breve.");
-
+            alert("Preparando los informes de la flota. La descarga comenzará en breve.");
+            
             await this.cargarTodosLosEmpleados();
             await this.cargarTodosLosFichajes();
             await this.cargarTodasLasVentas();
             await this.cargarInventarioLog();
+            await this.cargarClienteVentas(); // Ensure client sales are loaded for the report
 
             const wb = XLSX.utils.book_new();
 
@@ -881,7 +1525,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             if (datosHorarios.length > 0) {
                 const wsHorarios = XLSX.utils.json_to_sheet(datosHorarios);
-                XLSX.utils.book_append_sheet(wb, wsHorarios, "Horarios Empleados");
+                XLSX.utils.book_append_sheet(wb, wsHorarios, "Horarios Tripulación");
             }
 
             const datosVentas = [];
@@ -893,7 +1537,28 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (datosVentas.length > 0) {
                 const wsVentas = XLSX.utils.json_to_sheet(datosVentas);
-                XLSX.utils.book_append_sheet(wb, wsVentas, "Ventas");
+                XLSX.utils.book_append_sheet(wb, wsVentas, "Transacciones");
+            }
+
+            // New: Add client sales to Excel report
+            const datosClienteVentas = [];
+            for (const clientName in this.state.clientesVentas) {
+                const clientData = this.state.clientesVentas[clientName];
+                if (clientData.compras && Array.isArray(clientData.compras)) {
+                    clientData.compras.forEach(compra => {
+                        datosClienteVentas.push({
+                            Cliente: clientName,
+                            Producto: compra.producto,
+                            Cantidad: compra.cantidad,
+                            Fecha_Compra: new Date(compra.timestamp.toDate()).toLocaleString('es-ES'),
+                            Empleado: compra.empleado || 'N/A'
+                        });
+                    });
+                }
+            }
+            if (datosClienteVentas.length > 0) {
+                const wsClienteVentas = XLSX.utils.json_to_sheet(datosClienteVentas);
+                XLSX.utils.book_append_sheet(wb, wsClienteVentas, "Ventas a Clientes");
             }
 
             const datosAusencias = [];
@@ -903,10 +1568,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         datosAusencias.push({ Empleado: e.nombre, Inicio_Ausencia: new Date(a.inicio).toLocaleDateString('es-ES'), Fin_Ausencia: new Date(a.fin).toLocaleDateString('es-ES') });
                     });
                 }
-            });
+                });
             if (datosAusencias.length > 0) {
                 const wsAusencias = XLSX.utils.json_to_sheet(datosAusencias);
-                XLSX.utils.book_append_sheet(wb, wsAusencias, "Ausencias");
+                XLSX.utils.book_append_sheet(wb, wsAusencias, "Permisos de Ausencia");
             }
             
             const datosInventario = this.state.inventarioLog.map(log => ({
@@ -916,20 +1581,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }));
             if (datosInventario.length > 0) {
                 const wsInventario = XLSX.utils.json_to_sheet(datosInventario);
-                XLSX.utils.book_append_sheet(wb, wsInventario, "Inventario");
+                XLSX.utils.book_append_sheet(wb, wsInventario, "Inventario de Flota");
             }
 
             const datosReservas = [];
-            this.state.habitaciones.forEach(h => {
+            this.state.barcos.forEach(h => { 
                 if (h.reservas && h.reservas.length > 0) {
                     h.reservas.forEach(r => {
-                        datosReservas.push({ Habitacion: h.nombre, Cliente: r.cliente, Inicio_Reserva: new Date(r.inicio).toLocaleString('es-ES'), Fin_Reserva: new Date(r.fin).toLocaleString('es-ES') });
+                        datosReservas.push({ Barco: h.nombre, Cliente: r.cliente, Inicio_Alquiler: new Date(r.inicio.toMillis ? r.inicio.toMillis() : r.inicio).toLocaleString('es-ES'), Fin_Alquiler: new Date(r.fin.toMillis ? r.fin.toMillis() : r.fin).toLocaleString('es-ES') }); 
                     });
                 }
             });
             if (datosReservas.length > 0) {
                 const wsReservas = XLSX.utils.json_to_sheet(datosReservas);
-                XLSX.utils.book_append_sheet(wb, wsReservas, "Reservas Habitaciones");
+                XLSX.utils.book_append_sheet(wb, wsReservas, "Alquileres de Barcos"); 
             }
 
             const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
