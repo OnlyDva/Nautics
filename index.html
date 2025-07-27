@@ -165,8 +165,7 @@
     window.db = getFirestore(firebaseApp);
     window.storage = getStorage(firebaseApp);
     window.Firebase = {
-        collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, query, orderBy, addDoc, serverTimestamp, where, writeBatch, onSnapshot,
-        ref, uploadBytes, getDownloadURL, deleteObject
+        collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, query, orderBy, addDoc, serverTimestamp, where, writeBatch, onSnapshot
     };
 </script>
 </head>
@@ -767,7 +766,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch(e) { console.error("Error actualizando el dashboard:", e); }
         },
-        async verificarAccesoAdmin() { await this.cargarTodosLosEmpleados(); await this.cargarTodosLosFichajes(); await this.cargarTodasLasVentas(); await this.cargarInventarioLog(); await this.cargarLibroNegro(); await this.cargarListaNegra(); await this.cargarClienteVentas(); await this.mostrarPanelAdmin(); }, // Added cargarClienteVentas
+        async verificarAccesoAdmin() { await this.cargarTodosLosEmpleados(); await this.cargarTodosLosFichajes(); await this.cargarTodasLasVentas(); await this.cargarInventarioLog(); await this.cargarLibroNegro(); await this.cargarListaNegra(); await this.cargarClienteVentas(); await this.mostrarPanelAdmin(); }, 
         async verificarAccesoVIP() { 
             const nombre = document.getElementById('nombreInput')?.value.trim().toLowerCase(); 
             const pass = document.getElementById('passInput')?.value; 
@@ -1029,7 +1028,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } 
         },
         async toggleDirectiva(empleadoId) { const empleadoRef = Firebase.doc(db, 'empleados', empleadoId); try { const empleadoDoc = await Firebase.getDoc(empleadoRef); if (empleadoDoc.exists()) { const currentStatus = empleadoDoc.data().directiva || false; await Firebase.updateDoc(empleadoRef, { directiva: !currentStatus }); await this.cargarTodosLosEmpleados(); await this.mostrarPanelAdmin(); } } catch (e) { console.error("Error al cambiar directiva:", e); alert("Error al cambiar permiso de directiva: " + e.message); }},
-        async cambiarContrasena(nombre) { const nuevaPass = prompt(`Introduce la nueva contraseña para ${nombre}:`); if (nuevaPass) { try { await Firebase.updateDoc(Firebase.doc(db, 'empleados', nombre), { passHash: this.hashPassword(nuevaPass) }); alert(`Contraseña de ${nombre} actualizada.`); } catch (e) { console.error("Error al cambiar contraseña:", e); alert("Error al cambiar contraseña: " + e.message); } } },
+        async cambiarContrasena(nombre) { const nuevaPass = prompt(`Introduce la nueva contraseña para ${nombre}:`); if (nuevaPass) { try { await Firebase.updateDoc(Firebase.doc(db, 'empleados', nombre), { passHash: this.hashPassword(nuevaPass) }); alert(`Contraseña de ${nombre} actualizada.`); }  catch (e) { console.error("Error al cambiar contraseña:", e); alert("Error al cambiar contraseña: " + e.message); } } },
         async eliminarEmpleado(nombre) { if (confirm(`¿Estás SEGURO de que quieres eliminar a ${nombre} de la tripulación? Esta acción es irreversible.`)) { try { await Firebase.deleteDoc(Firebase.doc(db, 'empleados', nombre)); await Firebase.deleteDoc(Firebase.doc(db, 'fichajes', nombre)); await Firebase.deleteDoc(Firebase.doc(db, 'ventas', nombre)); alert(`${nombre} ha sido eliminado de la tripulación.`); await this.cargarTodosLosEmpleados(); await this.cargarTodosLosFichajes(); await this.cargarTodasLasVentas(); await this.mostrarPanelAdmin(); } catch (e) { console.error("Error al eliminar empleado:", e); alert("Error al eliminar el tripulante: " + e.message); } } },
         async actualizarControlesLocal() { const abrirBtn = document.getElementById('abrirLocalBtn'); const cerrarBtn = document.getElementById('cerrarLocalBtn'); const tiempoElem = document.getElementById('tiempoAbiertoLocal'); const ultimoCierreInfo = document.getElementById('ultimoCierreInfo'); if (!abrirBtn) return; try { const docSnap = await Firebase.getDoc(Firebase.doc(db, "control_local", "estado")); if (docSnap.exists()) { const estado = docSnap.data(); if (estado.abierto) { abrirBtn.disabled = true; cerrarBtn.disabled = false; this.startLocalOpenTimer(estado.inicioApertura.toMillis()); ultimoCierreInfo.innerHTML = ''; } else { abrirBtn.disabled = false; cerrarBtn.disabled = true; if(this.state.timers.localOpen) clearInterval(this.state.timers.localOpen); this.state.timers.localOpen = null; tiempoElem.textContent = "00:00:00"; let infoHTML = ''; if (estado.ultimoCierre) { infoHTML += `<div>Último cierre: ${estado.ultimoCierre.toDate().toLocaleString('es-ES')}</div>`; } if (estado.duracionUltimaApertura) { infoHTML += `<div class="mt-1">Duración: ${this.formatearTiempoHorasDecimal(estado.duracionUltimaApertura)} horas</div>`; } ultimoCierreInfo.innerHTML = infoHTML; } } else { abrirBtn.disabled = false; cerrarBtn.disabled = true; } } catch (e) { console.error("Error al actualizar controles local:", e); alert("Error al actualizar controles de local: " + e.message); } },
         async abrirLocal() { try { await Firebase.setDoc(Firebase.doc(db, "control_local", "estado"), { abierto: true, inicioApertura: Firebase.serverTimestamp(), }, { merge: true }); await this.actualizarControlesLocal(); } catch (e) { console.error("Error al abrir local:", e); alert("Error al abrir la flota: " + e.message); }},
@@ -1109,24 +1108,16 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.chatFiles = [];
             this.renderChatPreviews();
 
-            setTimeout(async () => { // Marked as async
+            setTimeout(async () => {
                 let mockReply = "Lo siento, almirante, mi brújula no me indica esa dirección. ¿Puedes ser más específico?"; 
                 const userMsg = messageText.toLowerCase();
 
-                const keywords = {
-                    fichar: ["fichar", "entrar", "inicio", "guardia", "trabajar"],
-                    empleado: ["empleado", "tripulacion", "panel", "área", "zona"],
-                    producto: ["producto", "provisiones", "vender", "catálogo", "precios"],
-                    barco: ["barco", "flota", "navio", "submarino", "alquilar"],
-                    hola: ["hola", "buenas", "buenos", "ey", "ahoy"],
-                    vender: ["vender", "comprar", "dar", "entregar"] // Added for sales
-                };
-
-                // New logic for sales
-                const salesRegex = /(.*?) (\d+)\s*(cebos|cañas)(?: y (\d+)\s*(cebos|cañas))?/;
+                // Regex para capturar "nombre apellido cantidad cebos/cañas [y cantidad cebos/cañas]"
+                // Más flexible: puede empezar con "vender a", "vender" o directamente con el nombre.
+                const salesRegex = /(?:vender a |vender )?([a-z]+\s[a-z]+) (\d+)\s*(cebos|cañas)(?: y (\d+)\s*(cebos|cañas))?/;
                 const match = userMsg.match(salesRegex);
 
-                if (match && keywords.vender.some(k => userMsg.includes(k))) {
+                if (match) { // If a sales pattern is detected
                     const clientName = match[1].trim();
                     const item1Quantity = parseInt(match[2]);
                     const item1Type = match[3];
@@ -1135,9 +1126,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     if (!clientName.includes(' ')) { // Basic check for full name (name and surname)
                         mockReply = "¡Almirante! Para registrar la venta, necesito el nombre y **apellido** del cliente.";
-                    } else {
+                    } else if (!currentUser) {
+                        mockReply = "¡Capitán, solo la tripulación autorizada puede registrar ventas! Por favor, inicia sesión.";
+                    }
+                    else {
                         const salesPromises = [];
                         let ceboSoldToday = false;
+                        let responseMessages = [];
 
                         // Process first item
                         if (item1Type === 'cebos') {
@@ -1147,75 +1142,78 @@ document.addEventListener('DOMContentLoaded', () => {
                             const todayDate = new Date().toDateString();
 
                             if (lastCeboPurchaseDate === todayDate) {
-                                mockReply = `¡Almirante! El cliente ${clientName} ya compró cebos hoy. No podemos venderle más hasta mañana.`;
+                                responseMessages.push(`¡Almirante! El cliente ${clientName} ya compró cebos hoy. No podemos venderle más hasta mañana.`);
                                 ceboSoldToday = true;
                             } else {
                                 salesPromises.push(Firebase.setDoc(Firebase.doc(db, 'clientesVentas', clientName), {
                                     ultimaCompraCebos: Firebase.serverTimestamp(),
-                                    compras: Firebase.Firebase.arrayUnion({
+                                    compras: Firebase.arrayUnion({
                                         producto: 'cebo',
                                         cantidad: item1Quantity,
                                         timestamp: Firebase.serverTimestamp(),
                                         empleado: currentUser
                                     })
                                 }, { merge: true }));
-                                mockReply = `¡Cebos registrados para ${clientName}!`;
+                                responseMessages.push(`¡${item1Quantity} cebos registrados para ${clientName}!`);
                             }
                         } else if (item1Type === 'cañas') {
                             salesPromises.push(Firebase.setDoc(Firebase.doc(db, 'clientesVentas', clientName), {
-                                compras: Firebase.Firebase.arrayUnion({
+                                compras: Firebase.arrayUnion({
                                     producto: 'caña',
                                     cantidad: item1Quantity,
                                     timestamp: Firebase.serverTimestamp(),
                                     empleado: currentUser
                                 })
                             }, { merge: true }));
-                            mockReply = `¡Cañas registradas para ${clientName}!`;
+                            responseMessages.push(`¡${item1Quantity} cañas registradas para ${clientName}!`);
                         }
 
-                        // Process second item if present and not a cebo already sold
-                        if (item2Quantity > 0 && !ceboSoldToday) {
+                        // Process second item if present and not a cebo already sold (if the first was cebos)
+                        if (item2Quantity > 0 && item2Type) {
                             if (item2Type === 'cebos') {
-                                const clientDoc = await Firebase.getDoc(Firebase.doc(db, 'clientesVentas', clientName));
-                                const clientData = clientDoc.exists() ? clientDoc.data() : { ultimaCompraCebos: null, compras: [] };
-                                const lastCeboPurchaseDate = clientData.ultimaCompraCebos ? new Date(clientData.ultimaCompraCebos.toDate()).toDateString() : null;
-                                const todayDate = new Date().toDateString();
-
-                                if (lastCeboPurchaseDate === todayDate) {
-                                    mockReply += ` ¡Atención! ${clientName} ya compró cebos hoy, no puedo registrar más.`;
+                                if (ceboSoldToday) { // If cebos already sold in the first part, don't sell again
+                                    responseMessages.push(`¡Atención! ${clientName} ya compró cebos hoy, no puedo registrar más cebos.`);
                                 } else {
-                                    salesPromises.push(Firebase.setDoc(Firebase.doc(db, 'clientesVentas', clientName), {
-                                        ultimaCompraCebos: Firebase.serverTimestamp(),
-                                        compras: Firebase.Firebase.arrayUnion({
-                                            producto: 'cebo',
-                                            cantidad: item2Quantity,
-                                            timestamp: Firebase.serverTimestamp(),
-                                            empleado: currentUser
-                                        })
-                                    }, { merge: true }));
-                                    mockReply += ` Y cebos también registrados para ${clientName}.`;
+                                    const clientDoc = await Firebase.getDoc(Firebase.doc(db, 'clientesVentas', clientName));
+                                    const clientData = clientDoc.exists() ? clientDoc.data() : { ultimaCompraCebos: null, compras: [] };
+                                    const lastCeboPurchaseDate = clientData.ultimaCompraCebos ? new Date(clientData.ultimaCompraCebos.toDate()).toDateString() : null;
+                                    const todayDate = new Date().toDateString();
+
+                                    if (lastCeboPurchaseDate === todayDate) {
+                                        responseMessages.push(`¡Atención! ${clientName} ya compró cebos hoy, no puedo registrar más cebos.`);
+                                    } else {
+                                        salesPromises.push(Firebase.setDoc(Firebase.doc(db, 'clientesVentas', clientName), {
+                                            ultimaCompraCebos: Firebase.serverTimestamp(),
+                                            compras: Firebase.arrayUnion({
+                                                producto: 'cebo',
+                                                cantidad: item2Quantity,
+                                                timestamp: Firebase.serverTimestamp(),
+                                                empleado: currentUser
+                                            })
+                                        }, { merge: true }));
+                                        responseMessages.push(`¡${item2Quantity} cebos también registrados para ${clientName}.`);
+                                    }
                                 }
                             } else if (item2Type === 'cañas') {
                                 salesPromises.push(Firebase.setDoc(Firebase.doc(db, 'clientesVentas', clientName), {
-                                    compras: Firebase.Firebase.arrayUnion({
+                                    compras: Firebase.arrayUnion({
                                         producto: 'caña',
                                         cantidad: item2Quantity,
                                         timestamp: Firebase.serverTimestamp(),
                                         empleado: currentUser
                                     })
                                 }, { merge: true }));
-                                mockReply += ` Y cañas también registradas para ${clientName}.`;
+                                responseMessages.push(`¡${item2Quantity} cañas también registradas para ${clientName}.`);
                             }
                         }
 
                         try {
                             if (salesPromises.length > 0) {
                                 await Promise.all(salesPromises);
-                                mockReply = `¡Venta registrada para ${clientName}!: ${item1Quantity} ${item1Type}.`
-                                if (item2Quantity > 0 && item2Type) {
-                                    mockReply += ` Y ${item2Quantity} ${item2Type}.`;
-                                }
+                                mockReply = responseMessages.join(" ");
                                 this.cargarClienteVentas(); // Refresh client sales data
+                            } else {
+                                mockReply = responseMessages.join(" "); // If no sales were processed due to restrictions, still show the message.
                             }
                         } catch (e) {
                             console.error("Error al registrar venta de cliente:", e);
@@ -1224,27 +1222,38 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
                 // End new logic for sales
-
                 else if (!messageText && files.length > 0) { 
                     mockReply = "¡Qué buena pinta tienen esas fotos, almirante!";
-                } else if (keywords.fichar.some(k => userMsg.includes(k))) {
-                    if(currentUser) {
-                        this.fichar(currentUser);
-                        mockReply = "¡A la guardia! Registro de inicio de turno completado, capitán.";
-                    } else {
-                        mockReply = "Necesitas iniciar sesión para poder iniciar guardia, capitán.";
+                } 
+                // General keyword responses (only if no sales pattern was matched)
+                else {
+                    const keywords = {
+                        fichar: ["fichar", "entrar", "inicio", "guardia", "trabajar"],
+                        empleado: ["empleado", "tripulacion", "panel", "área", "zona"],
+                        producto: ["producto", "provisiones", "vender", "catálogo", "precios"],
+                        barco: ["barco", "flota", "navio", "submarino", "alquilar"],
+                        hola: ["hola", "buenas", "buenos", "ey", "ahoy"]
+                    };
+
+                    if (keywords.fichar.some(k => userMsg.includes(k))) {
+                        if(currentUser) {
+                            this.fichar(currentUser);
+                            mockReply = "¡A la guardia! Registro de inicio de turno completado, capitán.";
+                        } else {
+                            mockReply = "Necesitas iniciar sesión para poder iniciar guardia, capitán.";
+                        }
+                    } else if (keywords.empleado.some(k => userMsg.includes(k))) {
+                        mockReply = "¡Por supuesto, al panel de tripulación al instante, almirante!";
+                        this.irAPanelEmpleado();
+                    } else if (keywords.producto.some(k => userMsg.includes(k))) {
+                        mockReply = "¡Zarpo a revisar nuestras provisiones y equipo, almirante!";
+                        this.mostrarPanelProductos();
+                    } else if (keywords.barco.some(k => userMsg.includes(k))) {
+                        mockReply = "¡Nuestra flota te espera! Mostrando los barcos disponibles...";
+                        this.mostrarPanelBarcos();
+                    } else if (keywords.hola.some(k => userMsg.includes(k))) {
+                        mockReply = `¡Ahoy, ${currentUser || 'capitán'}! Soy Jack Sparrow, ¿en qué puedo ayudarte hoy?`;
                     }
-                } else if (keywords.empleado.some(k => userMsg.includes(k))) {
-                    mockReply = "¡Por supuesto, al panel de tripulación al instante, almirante!";
-                    this.irAPanelEmpleado();
-                } else if (keywords.producto.some(k => userMsg.includes(k))) {
-                    mockReply = "¡Zarpo a revisar nuestras provisiones y equipo, almirante!";
-                    this.mostrarPanelProductos();
-                } else if (keywords.barco.some(k => userMsg.includes(k))) {
-                    mockReply = "¡Nuestra flota te espera! Mostrando los barcos disponibles...";
-                    this.mostrarPanelBarcos();
-                } else if (keywords.hola.some(k => userMsg.includes(k))) {
-                    mockReply = `¡Ahoy, ${currentUser || 'capitán'}! Soy Jack Sparrow, ¿en qué puedo ayudarte hoy?`;
                 }
                 
                 this.addMessageToChat(mockReply, 'bot');
@@ -1494,18 +1503,22 @@ document.addEventListener('DOMContentLoaded', () => {
             // Set up interval to reset cebo purchase restrictions daily
             setInterval(async () => {
                 const now = new Date();
-                if (now.getHours() === 0 && now.getMinutes() === 0 && now.getSeconds() < 10) { // Execute shortly after midnight
+                // Check if it's midnight (00:00) and within a small window to ensure it runs once
+                if (now.getHours() === 0 && now.getMinutes() === 0 && now.getSeconds() >= 0 && now.getSeconds() < 10) { 
                     console.log("Reseteando restricciones de compra de cebos...");
                     const clientsSnapshot = await Firebase.getDocs(Firebase.collection(db, 'clientesVentas'));
                     const batch = Firebase.writeBatch(db);
                     clientsSnapshot.forEach(doc => {
-                        batch.update(doc.ref, { ultimaCompraCebos: null }); // Reset to null or update date to previous day
+                        // Only reset if there was a purchase recorded
+                        if (doc.data().ultimaCompraCebos) {
+                            batch.update(doc.ref, { ultimaCompraCebos: null }); 
+                        }
                     });
                     await batch.commit();
                     console.log("Restricciones de compra de cebos reseteadas para todos los clientes.");
                     this.cargarClienteVentas(); // Refresh local state
                 }
-            }, 1000 * 60); // Check every minute
+            }, 1000 * 10); // Check every 10 seconds around midnight to ensure execution
         },
 
         async descargarInformeExcel() {
@@ -1550,7 +1563,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             Cliente: clientName,
                             Producto: compra.producto,
                             Cantidad: compra.cantidad,
-                            Fecha_Compra: new Date(compra.timestamp.toDate()).toLocaleString('es-ES'),
+                            Fecha_Compra: compra.timestamp && typeof compra.timestamp.toDate === 'function' ? compra.timestamp.toDate().toLocaleString('es-ES') : new Date(compra.timestamp).toLocaleString('es-ES'), // Handle potential different timestamp formats
                             Empleado: compra.empleado || 'N/A'
                         });
                     });
