@@ -1,0 +1,9 @@
+{
+  "name": "moore-club",
+  "version": "1.0.0",
+  "description": "Panel para Moore Club",
+  "scripts": {
+    "build": "echo 'No se necesita un paso de build'"
+  },
+  "author": "OmyDva"
+}

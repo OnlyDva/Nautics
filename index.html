@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Vanilla - La Tentación Empieza Aquí</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
+<style>
+    body { font-family: 'Inter', sans-serif; background: url('Mooreclub1.jpeg') center top no-repeat; background-size: cover; background-attachment: fixed; color: white; }
+    .bg-overlay { background-color: rgba(0, 0, 0, 0.85); }
+    .btn { background-color: #6b21a8; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 600; cursor: pointer; transition: background-color 0.3s; margin-right: 0.5rem; }
+    .btn:hover { background-color: #5b189b; }
+    .btn:disabled { background-color: #3b0764; cursor: not-allowed; }
+    
+    #anuncio-panel-lateral { 
+        position: fixed; 
+        top: 100px; 
+        left: 20px; 
+        width: 320px; 
+        max-height: 80vh;
+        background-color: rgba(18, 9, 31, 0.85);
+        backdrop-filter: blur(8px);
+        border: 1px solid #6b21a8;
+        border-radius: 10px;
+        padding: 1.5rem;
+        z-index: 9998; 
+        font-weight: bold; 
+        box-shadow: 4px 4px 20px rgba(0,0,0,0.6); 
+        transform: translateX(-120%);
+        transition: transform 0.4s ease-in-out;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+    }
+    #anuncio-panel-lateral.visible {
+        transform: translateX(0);
+    }
+    #anuncio-cerrar { font-size: 1.5rem; cursor: pointer; background: none; border: none; color: white; position: absolute; top: 10px; right: 15px; }
+    .votacion-btn { background-color: rgba(107, 33, 168, 0.5); border: 1px solid #a855f7; border-radius: 8px; padding: 0.5rem; margin-top: 0.5rem; width: 48%; font-size: 1rem; transition: background-color 0.2s; }
+    .votacion-btn:hover:not(:disabled) { background-color: rgba(107, 33, 168, 0.8); }
+    .votacion-btn:disabled { opacity: 0.6; cursor: not-allowed; background-color: #3b0764; }
+
+    .producto-card img, .producto-card svg { border-radius: 0.5rem; height: 96px; width: 96px; object-fit: cover; margin: auto; }
+    #contenido { min-height: 60vh; }
+    .panel-image { width: 100%; height: 100%; max-height: 200px; object-fit: contain; }
+    .status-indicator { width: 20px; height: 20px; border-radius: 50%; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+    .status-indicator:hover { transform: scale(1.1); }
+    .status-indicator.active { box-shadow: 0 0 0 3px white; }
+    .habitacion-img { width: 100%; height: 120px; object-fit: cover; border-radius: 0.375rem; }
+    .inventory-upload-box { width: 100%; height: 180px; background-color: rgba(0,0,0,0.2); border: 2px dashed #5b189b; border-radius: 0.5rem; display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; overflow: hidden; }
+    .inventory-upload-box:hover { background-color: rgba(0,0,0,0.4); }
+    .inventory-upload-box img { width: 100%; height: 100%; object-fit: cover; }
+    .inventory-upload-box .remove-btn { position: absolute; top: 5px; right: 5px; background-color: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-weight: bold; line-height: 24px; text-align: center; cursor: pointer; display: none; }
+    .inventory-upload-box.has-image .remove-btn { display: block; }
+    .inventory-upload-box.has-image .placeholder-text { display: none; }
+    #chatbot-button-wrapper { position: fixed; bottom: 40px; right: 40px; z-index: 1000; }
+    #chatbot-button { width: 140px; height: 140px; border-radius: 50%; overflow: hidden; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); cursor: pointer; transition: transform 0.3s ease; animation: pulse-small 2s infinite; }
+    #chatbot-button:hover { transform: scale(1.05); }
+    #chatbot-button img { width: 100%; height: 100%; object-fit: contain; z-index: 1001; position: relative; }
+    @keyframes pulse-small{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
+    #chatbot-bubble{position:absolute;bottom:150px;right:0;background-color:#a855f7;color:#fff;padding:12px 18px;border-radius:20px;border-bottom-right-radius:2px;box-shadow:0 4px 8px rgba(0,0,0,.3);white-space:nowrap;font-weight:600;cursor:pointer;opacity:0;visibility:hidden;transform:translateY(20px);transition:opacity .4s ease,transform .4s ease}#chatbot-bubble.visible{opacity:1;visibility:visible;transform:translateY(0)}
+    #chatbot-container{position:fixed;bottom:40px;right:40px;width:450px;height:600px;background-color:#1a1a2e;border-radius:10px;box-shadow:0 8px 20px rgba(0,0,0,.5);display:none;flex-direction:column;z-index:999;overflow:hidden;border:2px solid #6b21a8;box-sizing:border-box}#chatbot-header{background-color:#6b21a8;color:#fff;padding:10px 15px;font-weight:700;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;box-sizing:border-box;width:100%}#chatbot-close,#chatbot-minimize{background:0 0;border:none;color:#fff;font-size:1.2em;cursor:pointer;margin-left:10px;padding:0;line-height:1}
+    #chatbot-messages{flex-grow:1;padding:15px;overflow-y:auto;background-color:#2a2a4a;display:flex;flex-direction:column;min-height:0;box-sizing:border-box; background-image: url('Luna.png'); background-repeat: no-repeat; background-position: bottom 10px right 10px; background-size: 120px; background-blend-mode: luminosity; opacity: 0.8;}
+    .chat-message{margin-bottom:10px;padding:8px 12px;border-radius:15px;max-width:80%;line-height:1.4;word-wrap:break-word;box-sizing:border-box; position: relative; z-index: 2;}.user-message{background-color:#a855f7;align-self:flex-end;border-bottom-right-radius:2px}.bot-message{background-color:#4a4a6e;align-self:flex-start;border-bottom-left-radius:2px}#chatbot-input-container{padding:10px 15px;display:flex;align-items:center;gap:10px;background-color:#1a1a2e;flex-shrink:0;box-sizing:border-box;width:100%; position: relative; z-index: 1002;}
+    #chatbot-input{flex-grow:1;padding:10px;border-radius:20px;border:1px solid #6b21a8;background-color:#333355;color:#fff;box-sizing:border-box;min-width:0}
+    .chatbot-action-btn{background-color:transparent;color:#fff;border:none;border-radius:50%;width:40px;height:40px;display:flex;justify-content:center;align-items:center;cursor:pointer;font-size:1.5em;transition:background-color .3s;flex-shrink:0}.chatbot-action-btn:hover{background-color:#5b189b}
+    #image-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.85);display:none;justify-content:center;align-items:center;z-index:2000}#overlay-image{max-width:90%;max-height:90%;object-fit:contain;cursor:pointer}#overlay-close-btn{position:absolute;top:20px;right:35px;font-size:45px;color:#fff;cursor:pointer;line-height:1}
+    #chatbot-image-previews { display: flex; gap: 8px; padding: 0 15px 10px 15px; flex-wrap: wrap; background-color: #1a1a2e;}
+    .chat-preview-item { position: relative; }
+    .chat-preview-img { height: 50px; width: 50px; object-fit: cover; border-radius: 5px; }
+    .chat-preview-remove { position: absolute; top: -5px; right: -5px; background: #c44; color: white; border-radius: 50%; width: 18px; height: 18px; border: none; cursor: pointer; font-size: 12px; line-height: 18px; text-align: center; font-weight: bold; }
+    .chat-message img { max-width: 100%; border-radius: 10px; margin-top: 5px; }
+</style>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, query, orderBy, addDoc, serverTimestamp, where, writeBatch, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+    
+    const firebaseConfig = {
+      apiKey: "AIzaSyAjSUwa9HtVsxBhY__73XdLbWXHmlcIyUE",
+      authDomain: "moore-club.firebaseapp.com",
+      projectId: "moore-club",
+      storageBucket: "moore-club.firebasestorage.app",
+      messagingSenderId: "674972089844",
+      appId: "1:674972089844:web:9d6f9680bec8f6cff98da1",
+      measurementId: "G-RSPNMJ466D"
+    };
+    
+    const firebaseApp = initializeApp(firebaseConfig);
+    window.db = getFirestore(firebaseApp);
+    window.storage = getStorage(firebaseApp);
+    window.Firebase = {
+        collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, query, orderBy, addDoc, serverTimestamp, where, writeBatch, onSnapshot,
+        ref, uploadBytes, getDownloadURL, deleteObject
+    };
+</script>
+</head>
+<body class="text-purple-200">
+<div id="anuncio-panel-lateral"></div>
+<audio id="alarm-sound" src="alarm.mp3" preload="auto"></audio>
+<audio id="notification-sound" src="notification.mp3" preload="auto"></audio>
+
+<div class="bg-overlay min-h-screen">
+<nav class="bg-purple-900 text-white px-6 py-4 flex justify-between items-center">
+<h1 class="text-xl font-bold cursor-pointer" onclick="VanillaApp.mostrarInicio()">Vanilla</h1>
+<ul class="flex space-x-6 text-sm">
+<li><a class="hover:underline" href="#" onclick="VanillaApp.mostrarInicio()">Inicio</a></li>
+<li><a class="hover:underline" href="#" onclick="VanillaApp.irAPanelEmpleado()">Empleados</a></li>
+<li><a class="hover:underline" href="#" onclick="VanillaApp.mostrarPanelProductos()">Productos</a></li>
+<li><a class="hover:underline" href="#" onclick="VanillaApp.mostrarPanelHabitaciones()">Habitaciones</a></li>
+</ul>
+</nav>
+<main class="p-8" id="contenido"></main>
+</div>
+
+<div id="image-overlay"><span id="overlay-close-btn">&times;</span><img id="overlay-image" src="" alt="Imagen ampliada"></div>
+<div id="chatbot-button-wrapper"><div id="chatbot-bubble">Si necesitas alguna cosa amor, dime y te ayudo</div><div id="chatbot-button"><img alt="Asistente de Chat" src="Luna.png"/></div></div>
+<div id="chatbot-container">
+    <div id="chatbot-header">
+        <span>Asistente Vanilla</span>
+        <div><button id="chatbot-minimize" title="Minimizar">_</button><button id="chatbot-close" title="Cerrar">X</button></div>
+    </div>
+    <div id="chatbot-messages"></div>
+    <div id="chatbot-image-previews"></div>
+    <div id="chatbot-input-container">
+        <label for="chatbot-file-input" class="chatbot-action-btn" title="Subir imagen">+</label>
+        <input type="file" id="chatbot-file-input" accept="image/*" style="display: none;" />
+        <input id="chatbot-input" placeholder="Escribe tu mensaje..." type="text"/>
+        <button id="chatbot-send" class="chatbot-action-btn">➤</button>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const VanillaApp = {
+        state: {
+            productos: [ 
+                { id: 'tito_griego', nombre: 'Tito Dios Griego', imagen: 'Tito.png' }, { id: 'la_tita', nombre: 'La Tita', imagen: 'Tita.png' }, { id: 'mascara_cat', nombre: 'Máscara “Cat Vanilla”', imagen: 'Mascara.png' }, { id: 'pinzas_led', nombre: 'Pinzas LED “Sweet Pain”', imagen: 'Pinzas.png' }, { id: 'preservativos', nombre: '“Espadas del Deseo”', imagen: 'condones.png' },
+                { id: 'golosinas_picantes', nombre: 'Golosinas Picantes', imagen: 'Golosinas.png' },{ id: 'refresco_manzana', nombre: 'Refresco de Manzana', imagen: 'Refresco.png' },{ id: 'comida_reventa', nombre: 'Comida (Reventa)', imagen: 'comida reventa.png' },{ id: 'alcohol_reventa', nombre: 'Alcohol (Reventa)', imagen: 'alcohol de reventa.png' }
+            ],
+            datosHabitacionesBase: [
+                { id: 1, nombre: 'Habitacion Roja', imagen: 'habitacion roja.jpg' }, { id: 2, nombre: 'Habitacion Casino', imagen: 'Casino.jpg' }, { id: 3, nombre: 'Habitacion Gamer', imagen: 'gamer.jpg' },
+                { id: 4, nombre: 'Habitacion Japonesa', imagen: 'japonesa.jpg' }, { id: 5, nombre: 'Habitacion Cowboy', imagen: 'oeste.jpg' }, { id: 6, nombre: 'Habitacion Cueva', imagen: 'Cueva.jpg' },
+                { id: 7, nombre: 'Habitacion Egipcia', imagen: 'Egipcia.jpg' }, { id: 8, nombre: 'Habitación 8', imagen: 'placeholder.png' }, { id: 9, nombre: 'Habitación 9', imagen: 'placeholder.png' },{ id: 10, nombre: 'Habitación 10', imagen: 'placeholder.png' },
+            ],
+            empleados: [], fichajes: {}, ventas: {}, habitaciones: [], inventarioLog: [], libroNegro: [], listaNegra: [],
+            timers: { fichaje: null, habitaciones: null, dashboard: null, localOpen: null },
+            inventoryFiles: [null, null, null],
+            chatFiles: [],
+            ultimoAnuncioMostrado: null,
+            unsubscribeHabitaciones: null,
+        },
+
+        stopAllTimers() { Object.keys(this.state.timers).forEach(t => { if(this.state.timers[t]) clearInterval(this.state.timers[t]); this.state.timers[t] = null; }); },
+        stopPanelTimers() { if(this.state.timers.fichaje) clearInterval(this.state.timers.fichaje); if(this.state.timers.habitaciones) clearInterval(this.state.timers.habitaciones); this.state.timers.fichaje = null; this.state.timers.habitaciones = null;},
+        startClockInTimer(horaInicio, baseHoy, baseSemana, baseTotal) { this.stopPanelTimers(); this.state.timers.fichaje = setInterval(() => { const tiempoSesionElem = document.getElementById('tiempoSesion'); const tiempoHoyElem = document.getElementById('tiempoHoy'); const tiempoSemanaElem = document.getElementById('tiempoSemana'); const tiempoTotalElem = document.getElementById('tiempoTotal'); if (tiempoSesionElem && tiempoHoyElem && tiempoSemanaElem && tiempoTotalElem) { const tiempoSesion = Date.now() - horaInicio; tiempoHoyElem.textContent = this.formatearTiempo(baseHoy + tiempoSesion); tiempoSemanaElem.textContent = this.formatearTiempo(baseSemana + tiempoSesion); tiempoTotalElem.textContent = this.formatearTiempo(baseTotal + tiempoSesion); tiempoSesionElem.textContent = this.formatearTiempo(tiempoSesion); } }, 1000); },
+        startRoomsTimer() {
+            this.state.timers.habitaciones = setInterval(() => {
+                this.state.habitaciones.forEach(hab => {
+                    const ahora = Date.now();
+                    const reservaActual = hab.reservas ? hab.reservas.find(res => ahora >= res.inicio && ahora < res.fin) : null;
+                    const tiempoRestanteElem = document.getElementById(`timer-hab-${hab.id}`);
+                    if (tiempoRestanteElem) {
+                        if (reservaActual) {
+                            const restante = reservaActual.fin - ahora;
+                            if (restante > 0) {
+                                tiempoRestanteElem.textContent = this.formatearTiempo(restante);
+                            } else {
+                                tiempoRestanteElem.textContent = "¡TIEMPO AGOTADO!";
+                                tiempoRestanteElem.classList.add('text-red-500');
+                                if (!reservaActual.alarmaSonada) {
+                                    document.getElementById('alarm-sound').play().catch(e => console.warn("Interacción del usuario necesaria para reproducir audio."));
+                                    reservaActual.alarmaSonada = true;
+                                }
+                            }
+                        } else {
+                            tiempoRestanteElem.textContent = "--:--:--";
+                            tiempoRestanteElem.classList.remove('text-red-500');
+                        }
+                    }
+                });
+            }, 1000);
+        },
+        startDashboardTimer() { this.stopAllTimers(); this.actualizarDashboard(); this.state.timers.dashboard = setInterval(() => this.actualizarDashboard(), 5000); },
+        startLocalOpenTimer(horaInicio) { if (this.state.timers.localOpen) clearInterval(this.state.timers.localOpen); this.state.timers.localOpen = setInterval(() => { const timerElem = document.getElementById('tiempoAbiertoLocal'); if(timerElem) { const tiempoAbierto = Date.now() - horaInicio; timerElem.textContent = this.formatearTiempo(tiempoAbierto); } }, 1000);},
+        
+        hashPassword(str) { let hash = 0; if (typeof str !== 'string' || str.length === 0) return "hash_0"; for (let i = 0; i < str.length; i++) { const char = str.charCodeAt(i); hash = ((hash << 5) - hash) + char; hash |= 0; } return "hash_" + Math.abs(hash); },
+        formatearTiempo(ms) { if (isNaN(ms) || ms < 0) ms = 0; const s = Math.floor(ms / 1000), h = String(Math.floor(s / 3600)).padStart(2, '0'), m = String(Math.floor((s % 3600) / 60)).padStart(2, '0'), sec = String(s % 60).padStart(2, '0'); return `${h}:${m}:${sec}`; },
+        formatearTiempoHorasDecimal(ms) { if (isNaN(ms) || ms <= 0) return "0,0"; const horas = ms / (1000 * 60 * 60); return horas.toFixed(1).replace('.', ','); },
+        getEstadoHabitacion(hab) { const now = Date.now(); if (!hab || !hab.reservas) return { estado: 'disponible', texto: 'Disponible', reservaActual: null }; const r = hab.reservas.find(res => now >= res.inicio && now < res.fin); return r ? { estado: 'ocupada', texto: 'Ocupada', reservaActual: r } : { estado: 'disponible', texto: 'Disponible', reservaActual: null }; },
+        getWeekNumber(d) { d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7)); var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1)); return Math.ceil((((d - yearStart) / 86400000) + 1)/7); },
+        estaDeAusencia(empleado) {
+            if (!empleado || !empleado.ausencias || !Array.isArray(empleado.ausencias)) return false;
+            const ahora = Date.now();
+            return empleado.ausencias.some(periodo => 
+                periodo && typeof periodo.inicio === 'number' && typeof periodo.fin === 'number' &&
+                ahora >= periodo.inicio && ahora <= periodo.fin
+            );
+        },
+
+        async cargarTodosLosEmpleados() { try { const snapshot = await Firebase.getDocs(Firebase.query(Firebase.collection(db, 'empleados'), Firebase.orderBy('nombre'))); this.state.empleados = []; snapshot.forEach(doc => this.state.empleados.push({ id: doc.id, ...doc.data() })); } catch (e) { console.error("Error cargando empleados:", e); } },
+        async cargarTodosLosFichajes() { try { const snapshot = await Firebase.getDocs(Firebase.collection(db, 'fichajes')); let fichajesData = {}; snapshot.forEach(doc => { fichajesData[doc.id] = doc.data(); }); this.state.fichajes = fichajesData; } catch (e) { console.error("Error cargando fichajes:", e); } },
+        async cargarTodasLasVentas() { try { const snapshot = await Firebase.getDocs(Firebase.collection(db, 'ventas')); this.state.ventas = {}; snapshot.forEach(doc => { this.state.ventas[doc.id] = doc.data(); }); } catch (e) { console.error("Error cargando ventas:", e); } },
+        async cargarInventarioLog() { try { const q = Firebase.query(Firebase.collection(db, 'inventario_log'), Firebase.orderBy('timestamp', 'desc')); const snapshot = await Firebase.getDocs(q); this.state.inventarioLog = []; snapshot.forEach(doc => this.state.inventarioLog.push(doc.data())); } catch (e) { console.error("Error cargando log de inventario:", e); } },
+        async cargarLibroNegro() { try { const snapshot = await Firebase.getDocs(Firebase.collection(db, 'libroNegro')); this.state.libroNegro = []; snapshot.forEach(doc => this.state.libroNegro.push({docId: doc.id, ...doc.data()})); } catch (e) { console.error("Error cargando Libro Negro:", e); } },
+        async cargarListaNegra() { try { const snapshot = await Firebase.getDocs(Firebase.collection(db, 'listaNegra')); this.state.listaNegra = []; snapshot.forEach(doc => this.state.listaNegra.push({docId: doc.id, ...doc.data()})); } catch (e) { console.error("Error cargando Lista Negra:", e); } },
+        
+        async irAPanelEmpleado() { const currentUser = sessionStorage.getItem('currentUser'); if (currentUser) { await this.mostrarPanelEmpleados(currentUser); } else { this.mostrarLoginVIP(); }},
+        mostrarInicio() { this.stopAllTimers(); if (typeof this.state.unsubscribeHabitaciones === 'function') { this.state.unsubscribeHabitaciones(); } document.getElementById('contenido').innerHTML = `<div class="p-4 md:p-8 max-w-7xl mx-auto rounded-lg bg-purple-900 bg-opacity-90 shadow-lg"><header class="mb-8 text-center"><h1 class="text-5xl font-extrabold text-white drop-shadow-lg mb-2">Bienvenido a Vanilla</h1><p class="text-purple-300 text-lg">Donde la tentación y la elegancia se encuentran.</p></header><div class="flex flex-col md:flex-row items-center gap-8"><div class="md:w-5/12"><img src="Tito y Marta.png" alt="Tito y Marta" class="rounded-lg shadow-2xl w-full h-auto object-cover" /></div><div class="md:w-7/12 space-y-6"><div class="bg-purple-800 bg-opacity-50 p-4 rounded-lg"><h2 class="text-2xl font-bold text-white mb-2">Tito Giovanni</h2><p class="text-purple-200">El carismático maestro de ceremonias y corazón de Moore. Su elegancia y estilo inconfundible, siempre vestido de morado, garantizan una noche inolvidable. Es el anfitrión perfecto, el alma de la fiesta.</p></div><div class="bg-purple-800 bg-opacity-50 p-4 rounded-lg"><h2 class="text-2xl font-bold text-white mb-2">Marta</h2><p class="text-purple-200">La musa indiscutible del club. Con una actitud que cautiva y una sensualidad que desarma, Marta es la protagonista de los shows más aclamados. Su presencia en el escenario es pura magia y provocación.</p></div></div></div><div class="mt-10 flex justify-center gap-4"><button onclick="VanillaApp.mostrarLoginVIP()" class="btn">Área Empleados</button><button onclick="VanillaApp.mostrarLoginAdmin()" class="btn" style="background-color: #a855f7;">Jefes</button></div></div>`; this.ajustarPosicionChatbot(true); },
+        mostrarLoginVIP() {
+            this.stopAllTimers();
+            if (typeof this.state.unsubscribeHabitaciones === 'function') { this.state.unsubscribeHabitaciones(); }
+            document.getElementById('contenido').innerHTML = `
+                <div class="max-w-md mx-auto bg-black bg-opacity-30 p-8 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-bold mb-4 text-center">Acceso Empleados</h2>
+                    <div class="mb-4">
+                        <label class="block mb-2">Nombre completo:</label>
+                        <input id="nombreInput" type="text" class="w-full px-3 py-2 text-black rounded" placeholder="nombre y apellido en minúsculas" autocomplete="username" />
+                    </div>
+                    <div class="mb-4">
+                        <label class="block mb-2">Contraseña:</label>
+                        <input id="passInput" type="password" class="w-full px-3 py-2 text-black rounded" autocomplete="current-password" />
+                    </div>
+                    <div class="flex justify-between mt-6">
+                        <button onclick="VanillaApp.verificarAccesoVIP()" class="btn">Entrar</button>
+                        <button onclick="VanillaApp.mostrarInicio()" class="btn" style="background-color:#5b189b;">Volver</button>
+                    </div>
+                </div>`;
+            document.getElementById('passInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') this.verificarAccesoVIP(); });
+            this.ajustarPosicionChatbot(false);
+        },
+        mostrarLoginAdmin() {
+            this.stopAllTimers();
+            if (typeof this.state.unsubscribeHabitaciones === 'function') { this.state.unsubscribeHabitaciones(); }
+            document.getElementById('contenido').innerHTML = `
+                <div class="max-w-md mx-auto bg-black bg-opacity-50 p-8 rounded-lg shadow-lg border-2 border-purple-400">
+                    <h2 class="text-3xl font-bold mb-4 text-center text-purple-300">Acceso Privado - Jefes</h2>
+                    <input type="text" name="username" value="jefe-vanilla" autocomplete="username" style="display: none;">
+                    <label class="block mb-2">Contraseña de Jefes:</label>
+                    <input id="adminPassInput" type="password" class="w-full px-3 py-2 text-black rounded" autocomplete="current-password" />
+                    <div class="flex justify-between mt-6">
+                        <button onclick="VanillaApp.verificarAccesoAdmin()" class="btn">Entrar</button>
+                        <button onclick="VanillaApp.mostrarInicio()" class="btn" style="background-color:#5b189b;">Volver</button>
+                    </div>
+                </div>`;
+            document.getElementById('adminPassInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') this.verificarAccesoAdmin(); });
+            this.ajustarPosicionChatbot(false);
+        },
+        
+        crearTarjetaProducto(producto, esPanelVenta = false, nombreEmpleado = '') {
+            let totalVentasHoy = 0, totalVentasHist = 0;
+            if (this.state.ventas[nombreEmpleado] && this.state.ventas[nombreEmpleado].productos && this.state.ventas[nombreEmpleado].productos[producto.id]) {
+                totalVentasHoy = this.state.ventas[nombreEmpleado].productos[producto.id].hoy || 0;
+                totalVentasHist = this.state.ventas[nombreEmpleado].productos[producto.id].total || 0;
+            }
+            const desc = `<p class="text-xs mt-1" id="desc-${producto.id}">Hoy: ${totalVentasHoy} | Total: ${totalVentasHist}</p>`;
+            const inputVentasHTML = esPanelVenta 
+                ? `<div class="mt-2">
+                     <div class="flex items-center justify-center gap-2">
+                       <button onclick="VanillaApp.modificarVenta('${producto.id}', '${nombreEmpleado}', -1)" class="btn text-lg py-1 px-3">-</button>
+                       <span class="font-bold text-lg w-8 text-center" id="ventas-hoy-${producto.id}">${totalVentasHoy}</span>
+                       <button onclick="VanillaApp.modificarVenta('${producto.id}', '${nombreEmpleado}', 1)" class="btn text-lg py-1 px-3">+</button>
+                     </div>
+                     ${desc}
+                   </div>`
+                : `<p class="text-purple-300 text-lg font-bold mt-2">$50</p>`;
+            const placeholderSVG = `<svg class="mx-auto mb-2 text-gray-500" width="80" height="80" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"></path></svg>`;
+            const imagenHTML = producto.imagen && !producto.imagen.includes('placeholder') ? `<img src="${producto.imagen}" alt="${producto.nombre}" class="mx-auto mb-2 w-24 h-24 object-cover rounded" onerror="this.src='placeholder.png'"/>` : placeholderSVG;
+            return `<div class="producto-card bg-purple-800 rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div>${imagenHTML}<h3 class="text-white font-semibold leading-tight uppercase">${producto.nombre}</h3></div><div>${inputVentasHTML}</div></div>`;
+        },
+
+        mostrarPanelProductos() { this.stopAllTimers(); if (typeof this.state.unsubscribeHabitaciones === 'function') { this.state.unsubscribeHabitaciones(); } this.ajustarPosicionChatbot(false); const productosHTML = this.state.productos.filter(p => !p.id.includes('reventa')).map(p => this.crearTarjetaProducto(p, false)).join(''); const comidasHTML = `<div class="producto-card bg-purple-800 rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">Zumo</h3></div><div><p class="text-purple-300 text-lg font-bold mt-2">$35</p></div></div><div class="producto-card bg-purple-800 rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">Alcohol</h3></div><div><p class="text-purple-300 text-lg font-bold mt-2">$60</p></div></div>`; const serviciosHTML = `<div class="producto-card bg-purple-800 rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">Habitaciones</h3></div><div><p class="text-purple-300 text-lg font-bold mt-2">$2000</p></div></div><div class="producto-card bg-purple-800 rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">Bailarín/a Privado/a</h3></div><div><p class="text-purple-300 text-lg font-bold mt-2">$2000</p></div></div>`; const packsPropiosHTML = `<div class="producto-card bg-purple-800 rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">5 y 5</h3></div><div><p class="text-purple-300 text-lg font-bold mt-2">$350</p></div></div><div class="producto-card bg-purple-800 rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">10 y 10</h3></div><div><p class="text-purple-300 text-lg font-bold mt-2">$700</p></div></div>`; const packsReventaHTML = `<div class="producto-card bg-purple-800 rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">5 y 5</h3></div><div><p class="text-purple-300 text-lg font-bold mt-2">$400</p></div></div><div class="producto-card bg-purple-800 rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">10 y 10</h3></div><div><p class="text-purple-300 text-lg font-bold mt-2">$800</p></div></div>`; const packsNuevosHTML = `<div class="producto-card bg-purple-800 rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">Pack 100 y 100 (Reventa)</h3></div><div><p class="text-purple-300 text-lg font-bold mt-2">$3000</p></div></div><div class="producto-card bg-purple-800 rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div><h3 class="text-white font-semibold leading-tight mt-2 uppercase">Pack 100 y 100 (Empleado)</h3></div><div><p class="text-purple-300 text-lg font-bold mt-2">$6300</p></div></div>`; document.getElementById('contenido').innerHTML = `<h2 class="text-3xl font-bold mb-6 text-center uppercase">Productos y Servicios</h2><h3 class="text-2xl font-semibold mb-4 border-t border-purple-700 pt-6 uppercase">Productos</h3><div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">${productosHTML}</div><h3 class="text-2xl font-semibold mb-4 border-t border-purple-700 pt-6 mt-8 uppercase">Comidas y Bebidas</h3><div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6">${comidasHTML}</div><h3 class="text-2xl font-semibold mb-4 border-t border-purple-700 pt-6 mt-8 uppercase">Packs de Comida y Bebida Propia</h3><div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6">${packsPropiosHTML}</div><h3 class="text-2xl font-semibold mb-4 border-t border-purple-700 pt-6 mt-8 uppercase">Packs de Reventa</h3><div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6">${packsReventaHTML}</div><h3 class="text-2xl font-semibold mb-4 border-t border-purple-700 pt-6 mt-8 uppercase">Nuevos Packs</h3><div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6">${packsNuevosHTML}</div><h3 class="text-2xl font-semibold mb-4 border-t border-purple-700 pt-6 mt-8 uppercase">Servicios</h3><div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6">${serviciosHTML}</div><div class="text-center"><button onclick="VanillaApp.mostrarInicio()" class="btn mt-8">Volver</button></div>`; },
+        async mostrarPanelHabitaciones() { this.stopAllTimers(); if (typeof this.state.unsubscribeHabitaciones === 'function') { this.state.unsubscribeHabitaciones(); } let html = `<div class="max-w-7xl mx-auto text-center"><h1 class="text-4xl font-bold mb-8">Nuestras Habitaciones</h1><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`; this.state.habitaciones.forEach(hab => { const estadoActual = this.getEstadoHabitacion(hab); const imagenHTML = `<img src="${hab.imagen}" alt="${hab.nombre}" class="habitacion-img mb-4" onerror="this.style.display='none'">`; html += `<div class="border-2 ${estadoActual.estado === 'disponible' ? 'border-purple-600' : 'border-gray-600'} p-4 rounded-lg bg-purple-900 bg-opacity-50 flex flex-col">${imagenHTML}<div class="text-left flex-grow"><h2 class="text-2xl font-bold">${hab.nombre}</h2><p class="text-lg ${estadoActual.estado === 'disponible' ? 'text-green-400' : 'text-red-400'}">${estadoActual.texto}</p><div class="mt-2 text-sm"><p class="font-bold mb-1">Reservas para hoy:</p><ul class="list-disc list-inside space-y-1 h-20 overflow-y-auto text-xs">${hab.reservas.filter(r => new Date(r.inicio).toDateString() === new Date().toDateString()).sort((a,b)=>a.inicio-b.inicio).map(r => `<li>${new Date(r.inicio).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} - ${new Date(r.fin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} (${r.cliente})</li>`).join('') || '<li>Ninguna reserva hoy.</li>'}</ul></div></div><div id="form-hab-${hab.id}" class="mt-3 text-left border-t border-purple-800 pt-3"><h4 class="font-bold mb-2 text-center">Hacer una nueva reserva:</h4><input type="text" id="cliente-hab-${hab.id}" placeholder="Tu nombre" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><div class="flex gap-2"><input type="date" id="fecha-hab-${hab.id}" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><input type="time" id="hora-hab-${hab.id}" step="1800" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"></div><select id="duracion-hab-${hab.id}" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><option value="1">1 Hora</option><option value="2">2 Horas</option><option value="3">3 Horas</option></select><button class="btn w-full mt-2" onclick="VanillaApp.reservarHabitacion(${hab.id})">Confirmar Reserva</button></div></div>`; }); html += `</div><div class="text-center"><button onclick="VanillaApp.mostrarInicio()" class="btn mt-8">Volver</button></div></div>`; document.getElementById('contenido').innerHTML = html; const hoy = new Date(); const unaSemana = new Date(); unaSemana.setDate(hoy.getDate() + 7); const minDate = hoy.toISOString().split('T')[0]; const maxDate = unaSemana.toISOString().split('T')[0]; document.querySelectorAll('input[type="date"]').forEach(input => { input.min = minDate; input.max = maxDate; input.value = minDate; }); this.ajustarPosicionChatbot(false);},
+        
+        async mostrarPanelEmpleados(nombre) {
+            this.stopAllTimers();
+            this.ajustarPosicionChatbot(false);
+            const empleadoDoc = await Firebase.getDoc(Firebase.doc(db, 'empleados', nombre)); const empleadoData = empleadoDoc.exists() ? empleadoDoc.data() : {};
+            const datosFichaje = await this.gestionarReseteoDatos(nombre); await this.gestionarReseteoDatos(nombre, true);
+            let tiempoHoy = datosFichaje.hoy || 0, tiempoSemana = datosFichaje.semana || 0, tiempoTotal = datosFichaje.total || 0;
+            if (datosFichaje.fichado) { const t = Date.now() - datosFichaje.inicio; tiempoHoy += t; tiempoSemana += t; tiempoTotal += t; }
+            
+            const productosVentaHTML = this.state.productos.map(p => this.crearTarjetaProducto(p, true, nombre)).join('');
+            let habitacionesHTML = this.state.habitaciones.map(hab => {
+                const estadoActual = this.getEstadoHabitacion(hab);
+                let controles = (estadoActual.estado === 'disponible') 
+                    ? `<button class="btn text-sm py-2 w-full" onclick="VanillaApp.ocuparHabitacionAhora(${hab.id}, '${nombre}')">Ocupar (30 min)</button>` 
+                    : `<div class="font-mono text-xl mb-2" id="timer-hab-${hab.id}">--:--:--</div><div class="flex gap-2"><button class="btn text-xs py-1 flex-grow" onclick="VanillaApp.anadirTiempoHabitacion(${hab.id}, '${nombre}')">+30 min</button><button class="btn text-xs py-1 flex-grow" style="background-color:#c44" onclick="VanillaApp.liberarHabitacion(${hab.id}, '${nombre}')">Liberar</button></div>`;
+                return `<div class="bg-purple-800 p-4 rounded-lg text-center flex flex-col justify-between"><div><p class="font-bold text-lg">${hab.nombre}</p><p class="text-sm ${estadoActual.estado === 'ocupada' ? 'text-red-400' : 'text-green-400'} mb-2">${estadoActual.texto}</p></div><div>${controles}</div></div>`;
+            }).join('');
+
+            const botonConveniosHTML = `<button onclick="VanillaApp.mostrarPanelConvenios(${empleadoData.directiva || false})" class="btn text-xs py-1">Convenios</button>`;
+            const botonesAccionHTML = `<button onclick="VanillaApp.mostrarModalAusencias('${nombre}')" class="btn text-xs py-1">Ausencias</button>${botonConveniosHTML}<button onclick="VanillaApp.mostrarPanelInventario()" class="btn text-xs py-1">Inventario</button><button onclick="VanillaApp.mostrarListaNegraPublica()" class="btn text-xs py-1">Ver Vetados</button><button class="btn" style="background-color: #d63636;" onclick="VanillaApp.cerrarSesion()">Cerrar Sesión</button>`;
+            const hoyStr = new Date().toISOString().split('T')[0]; const packRecibido = datosFichaje.ultimoPackDiario === hoyStr;
+            const controlHTML = `<div class="bg-gray-800/50 p-4 rounded-lg mb-6 text-center border border-gray-700"><h3 class="text-lg font-semibold mb-4">Control Global y Personal</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div class="bg-gray-900/50 p-4 rounded-lg flex flex-col justify-center items-center"><p class="text-base font-bold mb-2">ESTADO DEL LOCAL</p><div class="flex justify-center items-center gap-4"><button id="abrirLocalBtn" class="btn bg-green-600 hover:bg-green-700">Abrir Local</button><button id="cerrarLocalBtn" class="btn bg-red-600 hover:bg-red-700">Cerrar Local</button></div><div class="mt-3"><p id="tiempoAbiertoLocal" class="font-mono text-2xl text-yellow-300">00:00:00</p><div id="ultimoCierreInfo" class="text-xs text-gray-400 mt-1"></div></div></div><div class="bg-gray-900/50 p-4 rounded-lg"><p class="text-base font-bold mb-2">FICHAJE PERSONAL</p><div class="grid grid-cols-2 gap-2 text-center h-full"><div class="p-1 rounded-lg bg-purple-900/50 flex flex-col justify-center"><p class="text-xs text-purple-300">SESIÓN</p><p id="tiempoSesion" class="font-mono text-lg">${this.formatearTiempo(0)}</p></div><div class="p-1 rounded-lg bg-purple-900/50 flex flex-col justify-center"><p class="text-xs text-purple-300">HOY</p><p id="tiempoHoy" class="font-mono text-lg">${this.formatearTiempo(tiempoHoy)}</p></div><div class="p-1 rounded-lg bg-purple-900/50 flex flex-col justify-center"><p class="text-xs text-purple-300">SEMANA</p><p id="tiempoSemana" class="font-mono text-lg">${this.formatearTiempo(tiempoSemana)}</p></div><div class="p-1 rounded-lg bg-purple-900/50 flex flex-col justify-center"><p class="text-xs text-purple-300">TOTAL</p><p id="tiempoTotal" class="font-mono text-lg">${this.formatearTiempo(tiempoTotal)}</p></div></div></div></div><div class="mt-6 flex justify-center items-center gap-4 border-t border-gray-700 pt-4"><button class="btn text-lg px-6 py-3" onclick="VanillaApp.fichar('${nombre}')">Fichar Entrada</button><button class="btn text-lg px-6 py-3" onclick="VanillaApp.desfichar('${nombre}')">Fichar Salida</button><button id="packDiarioBtn" class="btn text-base px-4 py-2" style="background-color: ${packRecibido ? '#581c87' : '#16a34a'};" onclick="VanillaApp.darPackDiarioVentas('${nombre}')" ${packRecibido ? 'disabled' : ''}>${packRecibido ? 'Pack ya recibido' : 'Pack Diario (Venta)'}</button></div></div>`;
+            document.getElementById('contenido').innerHTML = `<div class="p-6 bg-purple-900 bg-opacity-90 rounded-lg max-w-6xl mx-auto shadow-lg"><div class="flex justify-between items-center mb-6 flex-wrap gap-y-4"><h2 class="text-2xl font-bold">Panel de Fichaje: <span class="text-purple-300 capitalize">${nombre}</span></h2><div class="flex items-center gap-2 flex-wrap">${botonesAccionHTML}</div></div>${controlHTML}<h3 class="text-xl font-semibold mb-4 border-t border-purple-700 pt-6">Gestión de Habitaciones</h3><div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8" id="panel-habitaciones">${habitacionesHTML}</div> <h3 class="text-xl font-semibold mb-4 border-t border-purple-700 pt-6">Registrar Ventas</h3><div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4" id="productosVenta">${productosVentaHTML}</div></div>`;
+            
+            await this.actualizarControlesLocal();
+            this.startRoomsTimer();
+            if (datosFichaje.fichado) { this.startClockInTimer(datosFichaje.inicio, datosFichaje.hoy, datosFichaje.semana, datosFichaje.total); }
+            document.getElementById('abrirLocalBtn').onclick = () => this.abrirLocal(); 
+            document.getElementById('cerrarLocalBtn').onclick = () => this.cerrarLocal();
+        },
+
+        async mostrarModalAusencias(nombreEmpleado, esJefe = false) {
+            this.stopAllTimers();
+            const empleadoDoc = await Firebase.getDoc(Firebase.doc(db, 'empleados', nombreEmpleado));
+            const empleadoData = empleadoDoc.exists() ? empleadoDoc.data() : {};
+            const ausencias = empleadoData.ausencias || [];
+
+            let ausenciasHTML = ausencias.length === 0 
+                ? '<p class="text-center text-gray-400">No hay ausencias programadas.</p>'
+                : ausencias.map((ausencia, index) => {
+                    const inicio = new Date(ausencia.inicio).toLocaleDateString('es-ES');
+                    const fin = new Date(ausencia.fin).toLocaleDateString('es-ES');
+                    return `<li class="flex justify-between items-center p-2 bg-purple-800 rounded">
+                                <span>Del <strong>${inicio}</strong> al <strong>${fin}</strong></span>
+                                <button onclick="VanillaApp.eliminarAusencia('${nombreEmpleado}', ${index}, ${esJefe})" class="btn text-xs py-1" style="background-color:#c44">Eliminar</button>
+                            </li>`;
+                }).join('');
+
+            const hoy = new Date().toISOString().split('T')[0];
+            const volverBtn = esJefe 
+                ? `<button onclick="VanillaApp.verificarAccesoAdmin()" class="btn" style="background-color:#5b189b;">Volver</button>`
+                : `<button onclick="VanillaApp.mostrarPanelEmpleados('${nombreEmpleado}')" class="btn" style="background-color:#5b189b;">Volver</button>`;
+
+            const modalHTML = `
+                <div class="max-w-2xl mx-auto bg-purple-900 bg-opacity-95 p-8 rounded-lg shadow-lg border-2 border-purple-700">
+                    <h2 class="text-2xl font-bold mb-2 text-center">Gestionar Ausencias</h2>
+                    <p class="text-center text-purple-300 capitalize mb-6">${nombreEmpleado}</p>
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold mb-3 border-b border-purple-700 pb-2">Ausencias Programadas</h3>
+                        <ul class="space-y-2">${ausenciasHTML}</ul>
+                    </div>
+                    ${!esJefe ? `
+                    <div class="mb-4">
+                        <h3 class="text-lg font-semibold mb-3 border-b border-purple-700 pb-2">Solicitar Nueva Ausencia</h3>
+                        <div class="mb-4">
+                            <label for="ausenciaInicio" class="block mb-2">Fecha de Inicio:</label>
+                            <input type="date" id="ausenciaInicio" class="w-full px-3 py-2 text-black rounded" min="${hoy}">
+                        </div>
+                        <div class="mb-4">
+                            <label for="ausenciaFin" class="block mb-2">Fecha de Fin (opcional):</label>
+                            <input type="date" id="ausenciaFin" class="w-full px-3 py-2 text-black rounded" min="${hoy}">
+                        </div>
+                        <button onclick="VanillaApp.solicitarAusencia('${nombreEmpleado}')" class="btn w-full">Confirmar Ausencia</button>
+                    </div>` : ''}
+                    <div class="flex justify-end mt-6">${volverBtn}</div>
+                </div>`;
+            document.getElementById('contenido').innerHTML = modalHTML;
+        },
+        
+        async mostrarPanelAdmin() {
+            this.stopAllTimers(); if (typeof this.state.unsubscribeHabitaciones === 'function') { this.state.unsubscribeHabitaciones(); }
+            this.ajustarPosicionChatbot(false);
+            const dashboardHTML = `<div class="mb-8 p-6 bg-purple-900 bg-opacity-50 rounded-lg"><h2 class="text-2xl font-bold mb-4">Dashboard en Tiempo Real</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div><h3 class="font-semibold mb-2">Empleados Fichados</h3><ul id="dashboard-empleados" class="space-y-1 text-sm"><li>Cargando...</li></ul></div><div><h3 class="font-semibold mb-2">Habitaciones Ocupadas</h3><ul id="dashboard-habitaciones" class="space-y-1 text-sm"><li>Cargando...</li></ul></div></div></div>`;
+            const anunciosHTML = `
+                <div class="mb-8 p-6 bg-purple-900 bg-opacity-50 rounded-lg">
+                    <h2 class="text-2xl font-bold mb-4">Publicar Anuncio Global</h2>
+                    <textarea id="anuncioTexto" class="w-full p-2 text-black rounded mb-2" rows="3" placeholder="Escribe tu anuncio aquí..."></textarea>
+                    <div class="flex items-center justify-between gap-4 flex-wrap">
+                        <div class="flex items-center gap-4">
+                            <select id="anuncioDuracion" class="px-3 py-2 text-black rounded">
+                                <option value="1">1 Hora</option>
+                                <option value="2">2 Horas</option>
+                                <option value="4">4 Horas</option>
+                                <option value="6">6 Horas</option>
+                                <option value="8">8 Horas</option>
+                                <option value="24">24 Horas</option>
+                                <option value="0">Permanente</option>
+                            </select>
+                            <button onclick="VanillaApp.publicarAnuncio()" class="btn">Publicar</button>
+                            <button onclick="VanillaApp.mostrarResultadosEncuesta()" class="btn" style="background-color:#4a044e;">Ver Resultados</button>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="anuncioEsEncuesta" class="h-4 w-4">
+                            <label for="anuncioEsEncuesta">Añadir votación (Sí/No)</label>
+                        </div>
+                    </div>
+                </div>`;
+            
+            let tablaEmpleadosHTML = '';
+            this.state.empleados.forEach(e => {
+                const f = this.state.fichajes[e.id] || {}; const v = this.state.ventas[e.id] || {};
+                let vH = 0, vT = 0; if (v.productos) { for (const p in v.productos) { vH += v.productos[p].hoy || 0; vT += v.productos[p].total || 0; } }
+                const enAusencia = this.estaDeAusencia(e);
+                const filaClass = enAusencia ? 'text-red-500' : '';
+                const directivaBtnStyle = e.directiva ? 'background-color:#16a34a;' : 'background-color:#555;'; 
+                const directivaBtn = `<button onclick="VanillaApp.toggleDirectiva('${e.id}')" class="btn text-xs py-1" style="${directivaBtnStyle}" title="Permiso para Convenios">Directiva</button>`;
+                const accionesJefeHTML = `<button onclick="VanillaApp.mostrarModalAusencias('${e.id}', true)" class="btn text-xs py-1" style="background-color:#4a044e;">Ausencias</button>${directivaBtn}<button onclick="VanillaApp.cambiarContrasena('${e.id}')" class="btn text-xs py-1">Pass</button><button onclick="VanillaApp.eliminarEmpleado('${e.id}')" class="text-red-500 hover:text-red-400 font-bold text-lg px-2">X</button>`;
+                tablaEmpleadosHTML += `<tr class="border-b border-purple-800 hover:bg-purple-900 ${filaClass}"><td class="p-3 capitalize">${e.id}</td><td class="p-3 font-mono">${this.formatearTiempo(f.hoy)}</td><td class="p-3 font-mono">${this.formatearTiempo(f.semana)}</td><td class="p-3 font-mono">${this.formatearTiempo(f.total)}</td><td class="p-3 font-mono text-center">${vH}</td><td class="p-3 font-mono text-center">${vT}</td><td class="p-3 text-center flex gap-1 justify-center">${accionesJefeHTML}</td></tr>`; 
+            });
+
+            const gestionHTML = `<div class="mb-8 p-6 bg-purple-900 bg-opacity-50 rounded-lg"><h2 class="text-2xl font-bold mb-4">Gestionar Empleados</h2><div class="flex flex-col md:flex-row gap-4"><input type="text" id="newEmployeeName" class="flex-grow px-3 py-2 text-black rounded" placeholder="Nombre y apellido..."><input type="password" id="newEmployeePass" class="flex-grow px-3 py-2 text-black rounded" placeholder="Contraseña..."><button onclick="VanillaApp.anadirEmpleado()" class="btn">Añadir Empleado</button></div></div>`;
+            const tablaHTML = `<div class="overflow-x-auto bg-purple-900 bg-opacity-80 rounded-lg shadow-xl"><table class="w-full text-left"><thead class="bg-purple-800 text-purple-200 uppercase text-sm"><tr><th class="p-3">Empleado</th><th class="p-3">Hoy</th><th class="p-3">Semana</th><th class="p-3">Total</th><th class="p-3 text-center">Ventas Hoy</th><th class="p-3 text-center">Ventas Total</th><th class="p-3 text-center">Acciones</th></tr></thead><tbody>${tablaEmpleadosHTML}</tbody></table></div>`;
+            const libroNegroHTML = `<div class="mb-8 p-6 bg-purple-900 bg-opacity-50 rounded-lg"><h2 class="text-2xl font-bold mb-4">Libro Negro de Contactos</h2><div class="flex flex-col md:flex-row gap-4 mb-4"><input type="text" id="libroNombre" class="flex-grow px-3 py-2 text-black rounded" placeholder="Nombre del contacto..."><select id="libroRelacion" class="px-3 py-2 text-black rounded"><option value="Aliado">Aliado</option><option value="Rival">Rival</option><option value="Neutral">Neutral</option></select><input type="text" id="libroNotas" class="flex-grow px-3 py-2 text-black rounded" placeholder="Notas..."><button onclick="VanillaApp.anadirAlLibroNegro()" class="btn">Añadir</button></div><ul id="listaLibroNegro" class="space-y-2"></ul></div>`;
+            const listaNegraHTML = `<div class="mb-8 p-6 bg-purple-900 bg-opacity-50 rounded-lg"><h2 class="text-2xl font-bold mb-4">Lista Negra (Personas Vetadas)</h2><div class="flex flex-col md:flex-row gap-4 mb-4"><input type="text" id="vetadoNombre" class="flex-grow px-3 py-2 text-black rounded" placeholder="Nombre de la persona..."><input type="text" id="vetadoMotivo" class="flex-grow px-3 py-2 text-black rounded" placeholder="Motivo del veto..."><button onclick="VanillaApp.anadirAListaNegra()" class="btn">Vetar</button></div><ul id="listaDeVetados" class="space-y-2"></ul></div>`;
+            const inventarioLogHTML = `<div class="mb-8 p-6 bg-purple-900 bg-opacity-50 rounded-lg"><h2 class="text-2xl font-bold mb-4">Registro de Inventario</h2><div class="text-center mb-4"><button class="btn" onclick="VanillaApp.toggleInventarioLog()">Mostrar/Ocultar Registro</button></div><ul id="listaInventarioLog" class="space-y-4" style="display: none;"></ul></div>`;
+            
+            const informesHTML = `
+                <div class="mb-8 p-6 bg-purple-900 bg-opacity-50 rounded-lg">
+                    <h2 class="text-2xl font-bold mb-4">Informes Generales</h2>
+                    <div class="flex justify-center">
+                        <button onclick="VanillaApp.descargarInformeExcel()" class="btn text-lg py-3 px-6" style="background-color: #166534;">Descargar Informe (Excel)</button>
+                    </div>
+                </div>`;
+
+            document.getElementById('contenido').innerHTML = `<div class="max-w-7xl mx-auto"><h1 class="text-4xl font-bold text-center mb-8">Panel de Jefes</h1>${dashboardHTML}${anunciosHTML}${gestionHTML}${tablaHTML}${informesHTML}${libroNegroHTML}${listaNegraHTML}${inventarioLogHTML}<div class="text-center mt-8"><button onclick="VanillaApp.cerrarSesion()" class="btn">Cerrar Sesión y Volver</button></div></div>`;
+            this.actualizarLibroNegro(); this.actualizarListaNegra(); this.actualizarInventarioLog();
+            this.startDashboardTimer();
+        },
+        
+        async actualizarDashboard() {
+            try {
+                await this.cargarTodosLosFichajes();
+                const empleadosElem = document.getElementById('dashboard-empleados');
+                const habitacionesElem = document.getElementById('dashboard-habitaciones');
+                if (empleadosElem) {
+                    const empleadosFichados = Object.entries(this.state.fichajes).filter(([_, data]) => data.fichado).map(([id, data]) => ({ id, ...data }));
+                    if (empleadosFichados.length > 0) {
+                        empleadosElem.innerHTML = empleadosFichados.map(e => `<li class="capitalize text-green-400">${e.id} (Desde: ${new Date(e.inicio).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })})</li>`).join('');
+                    } else {
+                        empleadosElem.innerHTML = '<li class="text-gray-400">Nadie ha fichado.</li>';
+                    }
+                }
+                if (habitacionesElem) {
+                    const habitacionesOcupadas = this.state.habitaciones.filter(h => this.getEstadoHabitacion(h).estado === 'ocupada');
+                    if (habitacionesOcupadas.length > 0) {
+                        habitacionesElem.innerHTML = habitacionesOcupadas.map(h => {
+                            const estado = this.getEstadoHabitacion(h);
+                            const finReserva = new Date(estado.reservaActual.fin).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                            return `<li class="text-yellow-400">${h.nombre} - Por: <span class="capitalize">${estado.reservaActual.cliente}</span> (hasta ${finReserva})</li>`;
+                        }).join('');
+                    } else {
+                        habitacionesElem.innerHTML = '<li class="text-gray-400">Ninguna habitación ocupada.</li>';
+                    }
+                }
+            } catch(e) { console.error("Error actualizando el dashboard:", e); }
+        },
+        async verificarAccesoAdmin() { await this.cargarTodosLosEmpleados(); await this.cargarTodosLosFichajes(); await this.cargarTodasLasVentas(); await this.cargarInventarioLog(); await this.cargarLibroNegro(); await this.cargarListaNegra(); await this.mostrarPanelAdmin(); },
+        async verificarAccesoVIP() { const nombre = document.getElementById('nombreInput')?.value.trim().toLowerCase(); const pass = document.getElementById('passInput')?.value; if (!nombre || !pass) return alert("Nombre y contraseña son requeridos."); try { const fichajeDoc = await Firebase.getDoc(Firebase.doc(db, 'fichajes', nombre)); if (fichajeDoc.exists() && fichajeDoc.data().fichado) { await Firebase.updateDoc(fichajeDoc.ref, { fichado: false, inicio: null }); } } catch(e) { console.error("Error en el failsafe de fichaje:", e); } const empleadoDoc = await Firebase.getDoc(Firebase.doc(db, 'empleados', nombre)); if (empleadoDoc.exists()) { const empleado = empleadoDoc.data(); if (this.hashPassword(pass) === empleado.passHash) { sessionStorage.setItem('currentUser', nombre); await this.mostrarPanelEmpleados(nombre); } else { alert('Contraseña incorrecta.'); } } else { alert('Nombre de usuario no encontrado.'); } },
+        cerrarSesion() { this.stopAllTimers(); if (typeof this.state.unsubscribeHabitaciones === 'function') { this.state.unsubscribeHabitaciones(); } sessionStorage.removeItem('currentUser'); this.mostrarInicio(); },
+        async gestionarReseteoDatos(nombre, esVenta = false) {
+            const ahora = new Date(), hoyStr = ahora.toISOString().split('T')[0], semanaNum = this.getWeekNumber(ahora);
+            if (esVenta) {
+                let datosVentaDoc = await Firebase.getDoc(Firebase.doc(db, 'ventas', nombre));
+                let datosV = datosVentaDoc.exists() ? datosVentaDoc.data() : { productos: {}, fecha: '' };
+                if (!datosV.productos) datosV.productos = {};
+                if (datosV.fecha !== hoyStr) {
+                    datosV.fecha = hoyStr;
+                    Object.keys(datosV.productos).forEach(k => { datosV.productos[k].hoy = 0; });
+                }
+                this.state.ventas[nombre] = datosV;
+                return datosV;
+            } else {
+                let datosFichajeDoc = await Firebase.getDoc(Firebase.doc(db, 'fichajes', nombre));
+                let datosF = datosFichajeDoc.exists() ? datosFichajeDoc.data() : { total: 0, hoy: 0, semana: 0, fecha: hoyStr, numSemana: semanaNum, fichado: false, inicio: null };
+                if (datosF.fecha !== hoyStr) {
+                    datosF.hoy = 0;
+                    datosF.fecha = hoyStr;
+                    datosF.ultimoPackDiario = null;
+                }
+                if (datosF.numSemana !== semanaNum) {
+                    datosF.semana = 0;
+                    datosF.numSemana = semanaNum;
+                }
+                this.state.fichajes[nombre] = datosF;
+                return datosF;
+            }
+        },
+        async fichar(nombre) { let d = await this.gestionarReseteoDatos(nombre); if (!d.fichado) { d.fichado = true; d.inicio = Date.now(); this.state.fichajes[nombre] = d; try { await Firebase.setDoc(Firebase.doc(db, 'fichajes', nombre), d, { merge: true }); await this.mostrarPanelEmpleados(nombre); } catch (e) { console.error(e); } } },
+        async desfichar(nombre, silent = false) { this.stopPanelTimers(); let d = await this.gestionarReseteoDatos(nombre); if (d.fichado) { const t = Date.now() - d.inicio; d.hoy = (d.hoy || 0) + t; d.semana = (d.semana || 0) + t; d.total = (d.total || 0) + t; d.fichado = false; d.inicio = null; this.state.fichajes[nombre] = d; try { await Firebase.setDoc(Firebase.doc(db, 'fichajes', nombre), d, { merge: true }); if (!silent) await this.mostrarPanelEmpleados(nombre); } catch (e) { console.error(e); } } },
+        
+        async solicitarAusencia(nombreEmpleado) {
+            const inicioStr = document.getElementById('ausenciaInicio').value; const finStr = document.getElementById('ausenciaFin').value;
+            if (!inicioStr) return alert('Debes seleccionar una fecha de inicio.');
+            const inicio = new Date(inicioStr + 'T00:00:00Z'); const fin = new Date((finStr || inicioStr) + 'T23:59:59Z');
+            if (inicio > fin) return alert('La fecha de fin no puede ser anterior a la de inicio.');
+            const nuevoPeriodo = { inicio: inicio.getTime(), fin: fin.getTime() };
+            const empleadoRef = Firebase.doc(db, 'empleados', nombreEmpleado);
+            try {
+                const empleadoDoc = await Firebase.getDoc(empleadoRef);
+                const ausenciasActuales = (empleadoDoc.exists() && Array.isArray(empleadoDoc.data().ausencias)) ? empleadoDoc.data().ausencias : [];
+                ausenciasActuales.push(nuevoPeriodo);
+                await Firebase.updateDoc(empleadoRef, { ausencias: ausenciasActuales });
+                alert('Ausencia registrada.'); this.mostrarModalAusencias(nombreEmpleado);
+            } catch (e) { console.error("Error:", e); alert('Hubo un error.'); }
+        },
+        async eliminarAusencia(nombreEmpleado, index, esJefe) {
+            if (!confirm('¿Seguro?')) return;
+            const empleadoRef = Firebase.doc(db, 'empleados', nombreEmpleado);
+            try {
+                const empleadoDoc = await Firebase.getDoc(empleadoRef);
+                const ausenciasActuales = (empleadoDoc.exists() && Array.isArray(empleadoDoc.data().ausencias)) ? empleadoDoc.data().ausencias : [];
+                if(index >= 0 && index < ausenciasActuales.length) {
+                    ausenciasActuales.splice(index, 1);
+                    await Firebase.updateDoc(empleadoRef, { ausencias: ausenciasActuales });
+                    alert('Ausencia eliminada.'); this.mostrarModalAusencias(nombreEmpleado, esJefe);
+                }
+            } catch(e) { console.error("Error:", e); alert('Hubo un error.'); }
+        },
+        async modificarVenta(productoId, nombreEmpleado, cantidad) {
+            const cantNum = parseInt(cantidad); if (isNaN(cantNum)) return;
+            let datosVenta = await this.gestionarReseteoDatos(nombreEmpleado, true);
+            if (!datosVenta.productos[productoId]) datosVenta.productos[productoId] = { hoy: 0, total: 0 };
+            if (datosVenta.productos[productoId].hoy + cantNum < 0) return;
+            datosVenta.productos[productoId].hoy += cantNum;
+            datosVenta.productos[productoId].total += cantNum;
+            this.state.ventas[nombreEmpleado] = datosVenta;
+            try {
+                await Firebase.setDoc(Firebase.doc(db, 'ventas', nombreEmpleado), datosVenta);
+                if(document.getElementById('productosVenta')) {
+                    const descElem = document.getElementById(`desc-${productoId}`);
+                    const totalHoyElem = document.getElementById(`ventas-hoy-${productoId}`);
+                    if(descElem) descElem.textContent = `Hoy: ${datosVenta.productos[productoId].hoy} | Total: ${datosVenta.productos[productoId].total}`;
+                    if(totalHoyElem) totalHoyElem.textContent = datosVenta.productos[productoId].hoy;
+                }
+            } catch (e) { console.error(e); }
+        },
+        async darPackDiarioVentas(nombre) { const hoyStr = new Date().toISOString().split('T')[0]; const fichajeRef = Firebase.doc(db, 'fichajes', nombre); try { const fichajeDoc = await Firebase.getDoc(fichajeRef); if (fichajeDoc.exists() && fichajeDoc.data().ultimoPackDiario === hoyStr) { alert('Ya has recibido el pack de hoy.'); return; } await this.modificarVenta('golosinas_picantes', nombre, 5); await this.modificarVenta('refresco_manzana', nombre, 5); await Firebase.updateDoc(fichajeRef, { ultimoPackDiario: hoyStr }); const packBtn = document.getElementById('packDiarioBtn'); if(packBtn){ packBtn.disabled = true; packBtn.textContent = 'Pack ya recibido'; packBtn.style.backgroundColor = '#581c87'; } } catch(e) { console.error("Error:", e); }},
+        async ocuparHabitacionAhora(id, nombreEmpleado) { const hab = this.state.habitaciones.find(h => h.id === id); if (hab && this.getEstadoHabitacion(hab).estado === 'disponible') { const ahora = Date.now(); hab.reservas.push({ id: ahora, cliente: 'Ocupación Directa', inicio: ahora, fin: ahora + 30 * 60 * 1000 }); try { await Firebase.setDoc(Firebase.doc(db, 'habitaciones', String(hab.id)), hab); } catch (e) { console.error(e); } }},
+        async anadirTiempoHabitacion(id, nombreEmpleado) { const hab = this.state.habitaciones.find(h => h.id === id); const r = hab.reservas.find(res => Date.now() >= res.inicio && Date.now() < res.fin); if (hab && r) { r.fin += 30 * 60 * 1000; try { await Firebase.setDoc(Firebase.doc(db, 'habitaciones', String(hab.id)), hab); } catch (e) { console.error(e); } } },
+        async liberarHabitacion(id, nombreEmpleado) { const hab = this.state.habitaciones.find(h => h.id === id); const index = hab.reservas.findIndex(r => Date.now() >= r.inicio && Date.now() < r.fin); if (index > -1) { if(confirm(`Liberar habitación?`)) { hab.reservas.splice(index, 1); try { await Firebase.setDoc(Firebase.doc(db, 'habitaciones', String(hab.id)), hab); } catch (e) { console.error(e); } } } },
+        async reservarHabitacion(id) { const cliente = document.getElementById(`cliente-hab-${id}`).value.trim(), fecha = document.getElementById(`fecha-hab-${id}`).value, hora = document.getElementById(`hora-hab-${id}`).value, duracion = parseInt(document.getElementById(`duracion-hab-${id}`).value); if (!cliente || !fecha || !hora || isNaN(duracion)) return alert('Rellena todos los campos'); const inicio = new Date(`${fecha}T${hora}`); const fin = new Date(inicio.getTime() + duracion*60*60*1000); const hab = this.state.habitaciones.find(h => h.id === id); if(hab.reservas.some(r => inicio < r.fin && fin > r.inicio)) return alert('Conflicto de horario'); hab.reservas.push({id: Date.now(), cliente, inicio: inicio.getTime(), fin: fin.getTime()}); try { await Firebase.setDoc(Firebase.doc(db,'habitaciones', String(id)), hab); alert('Reserva confirmada'); this.mostrarPanelHabitaciones(); } catch(e) {console.error(e)} },
+        async anadirEmpleado() { const nombreInput = document.getElementById('newEmployeeName'); const passInput = document.getElementById('newEmployeePass'); const nombre = nombreInput.value.trim().toLowerCase(); const pass = passInput.value; if (!nombre || !pass) { return alert('El nombre y la contraseña son obligatorios.'); } try { await Firebase.setDoc(Firebase.doc(db, 'empleados', nombre), { nombre: nombre, passHash: this.hashPassword(pass), directiva: false, ausencias: [] }); alert(`Empleado ${nombre} añadido correctamente.`); nombreInput.value = ''; passInput.value = ''; await this.cargarTodosLosEmpleados(); await this.mostrarPanelAdmin(); } catch (e) { alert('Error al añadir el empleado.'); } },
+        async toggleDirectiva(empleadoId) { const empleadoRef = Firebase.doc(db, 'empleados', empleadoId); try { const empleadoDoc = await Firebase.getDoc(empleadoRef); if (empleadoDoc.exists()) { const currentStatus = empleadoDoc.data().directiva || false; await Firebase.updateDoc(empleadoRef, { directiva: !currentStatus }); await this.cargarTodosLosEmpleados(); await this.mostrarPanelAdmin(); } } catch (e) { console.error("Error:", e); }},
+        async cambiarContrasena(nombre) { const nuevaPass = prompt(`Introduce la nueva contraseña para ${nombre}:`); if (nuevaPass) { try { await Firebase.updateDoc(Firebase.doc(db, 'empleados', nombre), { passHash: this.hashPassword(nuevaPass) }); alert(`Contraseña de ${nombre} actualizada.`); } catch (e) { alert("Error."); } } },
+        async eliminarEmpleado(nombre) { if (confirm(`¿Estás SEGURO de que quieres eliminar a ${nombre}? Esta acción es irreversible.`)) { try { await Firebase.deleteDoc(Firebase.doc(db, 'empleados', nombre)); await Firebase.deleteDoc(Firebase.doc(db, 'fichajes', nombre)); await Firebase.deleteDoc(Firebase.doc(db, 'ventas', nombre)); alert(`${nombre} ha sido eliminado.`); await this.cargarTodosLosEmpleados(); await this.cargarTodosLosFichajes(); await this.cargarTodasLasVentas(); await this.mostrarPanelAdmin(); } catch (e) { alert("Error."); } } },
+        async actualizarControlesLocal() { const abrirBtn = document.getElementById('abrirLocalBtn'); const cerrarBtn = document.getElementById('cerrarLocalBtn'); const tiempoElem = document.getElementById('tiempoAbiertoLocal'); const ultimoCierreInfo = document.getElementById('ultimoCierreInfo'); if (!abrirBtn) return; try { const docSnap = await Firebase.getDoc(Firebase.doc(db, "control_local", "estado")); if (docSnap.exists()) { const estado = docSnap.data(); if (estado.abierto) { abrirBtn.disabled = true; cerrarBtn.disabled = false; this.startLocalOpenTimer(estado.inicioApertura.toMillis()); ultimoCierreInfo.innerHTML = ''; } else { abrirBtn.disabled = false; cerrarBtn.disabled = true; if(this.state.timers.localOpen) clearInterval(this.state.timers.localOpen); this.state.timers.localOpen = null; tiempoElem.textContent = "00:00:00"; let infoHTML = ''; if (estado.ultimoCierre) { infoHTML += `<div>Último cierre: ${estado.ultimoCierre.toDate().toLocaleString('es-ES')}</div>`; } if (estado.duracionUltimaApertura) { infoHTML += `<div class="mt-1">Duración: ${this.formatearTiempoHorasDecimal(estado.duracionUltimaApertura)} horas</div>`; } ultimoCierreInfo.innerHTML = infoHTML; } } else { abrirBtn.disabled = false; cerrarBtn.disabled = true; } } catch (e) { console.error("Error:", e); } },
+        async abrirLocal() { try { await Firebase.setDoc(Firebase.doc(db, "control_local", "estado"), { abierto: true, inicioApertura: Firebase.serverTimestamp(), }, { merge: true }); await this.actualizarControlesLocal(); } catch (e) { console.error("Error:", e); }},
+        async cerrarLocal() { try { const controlDoc = await Firebase.getDoc(Firebase.doc(db, "control_local", "estado")); let duracion = 0; if (controlDoc.exists() && controlDoc.data().inicioApertura) { duracion = Date.now() - controlDoc.data().inicioApertura.toMillis(); } await this.cargarTodosLosFichajes(); for (const nombre in this.state.fichajes) { if (this.state.fichajes[nombre].fichado) { await this.desfichar(nombre, true); } } await Firebase.setDoc(Firebase.doc(db, "control_local", "estado"), { abierto: false, ultimoCierre: Firebase.serverTimestamp(), duracionUltimaApertura: duracion }, { merge: true }); await this.actualizarControlesLocal(); } catch (e) { console.error("Error:", e); }},
+        async mostrarPanelInventario() { this.stopAllTimers(); this.ajustarPosicionChatbot(false); const nombreEmpleado = sessionStorage.getItem('currentUser'); this.state.inventoryFiles = [null, null, null]; let uploadBoxesHTML = ''; for (let i = 0; i < 3; i++) { uploadBoxesHTML += `<div id="inventory-box-${i}" class="inventory-upload-box" tabindex="0"><span class="placeholder-text text-purple-300 text-center">Haz clic aquí y pega una imagen con<br/><strong>Ctrl+V</strong></span><img id="inventory-img-${i}" class="hidden"><button id="inventory-remove-${i}" class="remove-btn">&times;</button></div>`; } document.getElementById('contenido').innerHTML = `<div class="max-w-4xl mx-auto p-6 bg-purple-900 bg-opacity-90 rounded-lg shadow-lg"><div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-bold">Gestión de Inventario</h2><button class="btn" onclick="VanillaApp.mostrarPanelEmpleados('${nombreEmpleado}')">Volver al Panel</button></div><div class="bg-purple-800 p-6 rounded-lg text-center"><h3 class="text-xl font-semibold mb-4">Añadir Nuevo Inventario (hasta 3 imágenes)</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">${uploadBoxesHTML}</div><button id="upload-inventory-btn" class="btn text-lg py-2 px-6" style="background-color: #16a34a;">Guardar Inventario</button><div id="upload-status" class="mt-4 text-yellow-400"></div></div></div>`; for (let i = 0; i < 3; i++) { const box = document.getElementById(`inventory-box-${i}`); const img = document.getElementById(`inventory-img-${i}`); const removeBtn = document.getElementById(`inventory-remove-${i}`); const handleFile = (file) => { if (file && file.type.startsWith('image/')) { this.state.inventoryFiles[i] = file; img.src = URL.createObjectURL(file); img.classList.remove('hidden'); box.classList.add('has-image'); }}; box.addEventListener('paste', e => { e.preventDefault(); handleFile(e.clipboardData.files[0]); }); removeBtn.addEventListener('click', e => { e.stopPropagation(); this.state.inventoryFiles[i] = null; img.src = ''; img.classList.add('hidden'); box.classList.remove('has-image'); }); } document.getElementById('upload-inventory-btn').onclick = () => this.subirInventario(); },
+        async subirInventario() { const empleado = sessionStorage.getItem('currentUser'); const filesToUpload = this.state.inventoryFiles.filter(f => f !== null); const statusElem = document.getElementById('upload-status'); const uploadBtn = document.getElementById('upload-inventory-btn'); if (filesToUpload.length === 0 || !empleado) { statusElem.textContent = "Añade al menos una imagen."; return; } statusElem.textContent = `Subiendo ${filesToUpload.length} imagen(es)...`; uploadBtn.disabled = true; try { const uploadPromises = filesToUpload.map(file => { const filePath = `inventario/${Date.now()}_${file.name}`; const storageRef = Firebase.ref(storage, filePath); return Firebase.uploadBytes(storageRef, file).then(snapshot => Firebase.getDownloadURL(snapshot.ref)); }); const imageUrls = await Promise.all(uploadPromises); const datosInventario = { imagenes: imageUrls, subidoPor: empleado, timestamp: Firebase.serverTimestamp() }; await Firebase.setDoc(Firebase.doc(db, "inventario_actual", "estado"), datosInventario); await Firebase.addDoc(Firebase.collection(db, "inventario_log"), datosInventario); statusElem.textContent = "¡Inventario guardado!"; setTimeout(() => { if (document.getElementById('upload-status')) this.mostrarPanelInventario(); }, 2000); } catch (e) { console.error("Error:", e); statusElem.textContent = "Error al subir."; uploadBtn.disabled = false; } },
+        toggleInventarioLog() { const lista = document.getElementById('listaInventarioLog'); if (lista) { lista.style.display = lista.style.display === 'none' ? 'block' : 'none'; } },
+        mostrarImagenAmpliada(imageUrl) { const overlay = document.getElementById('image-overlay'); const overlayImage = document.getElementById('overlay-image'); if(overlay && overlayImage) { overlayImage.src = imageUrl; overlay.style.display = 'flex'; }},
+        async mostrarPanelConvenios(esDirectiva) { this.stopAllTimers(); const nombreEmpleado = sessionStorage.getItem('currentUser'); const adminControls = esDirectiva ? `<div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-bold">Gestión de Convenios</h2><div><button class="btn" style="background-color: #c44;" onclick="VanillaApp.setTodosConveniosRojo()">Poner Todos en Rojo</button><button class="btn" onclick="VanillaApp.mostrarPanelEmpleados('${nombreEmpleado}')">Volver al Panel</button></div></div><div class="bg-purple-800 p-4 rounded-lg mb-6 flex flex-col md:flex-row gap-4"><input id="convenioNombreInput" type="text" class="flex-grow px-3 py-2 text-black rounded" placeholder="Nombre del nuevo convenio"/><button onclick="VanillaApp.crearConvenio()" class="btn" style="background-color: #16a34a;">Crear Panel de Convenio</button></div>` : `<div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-bold">Convenios</h2><button class="btn" onclick="VanillaApp.mostrarPanelEmpleados('${nombreEmpleado}')">Volver al Panel</button></div>`; document.getElementById('contenido').innerHTML = `<div class="max-w-7xl mx-auto p-6 bg-purple-900 bg-opacity-90 rounded-lg shadow-lg">${adminControls}<div id="contenedorConvenios" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div></div>`; await this.cargarConvenios(esDirectiva); },
+        async cargarConvenios(esDirectiva) { const contenedor = document.getElementById('contenedorConvenios'); if (!contenedor) return; contenedor.innerHTML = ''; try { const q = await Firebase.getDocs(Firebase.query(Firebase.collection(db, 'convenios'), Firebase.orderBy('nombre'))); q.forEach(docu => { const c = { id: docu.id, ...docu.data() }; const p = document.createElement('div'); p.className = "bg-purple-800 p-4 rounded-lg shadow-md flex flex-col"; let panelControls = ''; if (esDirectiva) { panelControls = `<div class="flex justify-between items-center mb-3"><h3 class="text-xl font-semibold mb-0 capitalize">${c.nombre}</h3><div class="flex gap-2"><div class="status-indicator bg-green-500 ${c.status === 'green' ? 'active' : ''}" onclick="VanillaApp.setConvenioStatus('${c.id}', 'green')"></div><div class="status-indicator bg-red-500 ${c.status === 'red' ? 'active' : ''}" onclick="VanillaApp.setConvenioStatus('${c.id}', 'red')"></div></div></div><div class="flex-grow mb-4 bg-black bg-opacity-20 rounded min-h-[200px] flex items-center justify-center">${c.imagenURL ? `<img src="${c.imagenURL}" class="panel-image rounded cursor-pointer" onclick="VanillaApp.mostrarImagenAmpliada('${c.imagenURL}')"/>` : '<span class="text-purple-300 text-center">Sin imagen</span>'}</div><label class="btn text-xs py-1 text-center cursor-pointer">Subir/Cambiar Imagen<input type="file" class="hidden" accept="image/*" onchange="VanillaApp.subirImagenConvenio('${c.id}', this.files[0])"></label><button onclick="VanillaApp.eliminarConvenio('${c.id}')" class="btn text-xs py-1 mt-2" style="background-color:#c44">Eliminar</button>`; } else { panelControls = `<h3 class="text-xl font-semibold mb-3 capitalize">${c.nombre}</h3><div class="flex-grow mb-4 bg-black bg-opacity-20 rounded min-h-[200px] flex items-center justify-center">${c.imagenURL ? `<img src="${c.imagenURL}" class="panel-image rounded cursor-pointer" onclick="VanillaApp.mostrarImagenAmpliada('${c.imagenURL}')"/>` : '<span class="text-purple-300 text-center">Sin imagen</span>'}</div>`; } p.innerHTML = panelControls; contenedor.appendChild(p); }); } catch (e) { console.error(e); } },
+        async crearConvenio() { const i = document.getElementById('convenioNombreInput'); const n = i.value.trim(); if (!n) return; try { await Firebase.addDoc(Firebase.collection(db, 'convenios'), { nombre: n, imagenURL: null, imagenPath: null, status: 'neutral' }); i.value = ''; await this.cargarConvenios(true); } catch (e) { console.error(e); } },
+        async eliminarConvenio(id) { if (confirm("¿Seguro?")) { try { const d = await Firebase.getDoc(Firebase.doc(db, 'convenios', id)); if (d.exists() && d.data().imagenPath) { await Firebase.deleteObject(Firebase.ref(storage, d.data().imagenPath)); } await Firebase.deleteDoc(Firebase.doc(db, 'convenios', id)); await this.cargarConvenios(true); } catch (e) { console.error(e); } } },
+        async setConvenioStatus(convenioId, newStatus) { try { await Firebase.updateDoc(Firebase.doc(db, 'convenios', convenioId), { status: newStatus }); await this.cargarConvenios(true); } catch (e) { console.error("Error:", e); }},
+        async setTodosConveniosRojo() { if (!confirm("¿Marcar TODOS como hostiles?")) return; const batch = Firebase.writeBatch(db); try { const conveniosSnapshot = await Firebase.getDocs(Firebase.collection(db, 'convenios')); conveniosSnapshot.forEach(doc => { batch.update(doc.ref, { status: 'red' }); }); await batch.commit(); await this.cargarConvenios(true); alert("Convenios actualizados."); } catch (e) { console.error("Error:", e); }},
+        async subirImagenConvenio(id, file) { if (!file) return; const p = `convenios/${id}/${file.name}`; const s = Firebase.ref(storage, p); try { const docSnap = await Firebase.getDoc(Firebase.doc(db, 'convenios', id)); if (docSnap.exists() && docSnap.data().imagenPath) { try { await Firebase.deleteObject(Firebase.ref(storage, docSnap.data().imagenPath)); } catch (e) { console.warn("La imagen anterior no se pudo borrar:", e.code); } } await Firebase.uploadBytes(s, file); const url = await Firebase.getDownloadURL(s); await Firebase.updateDoc(Firebase.doc(db, 'convenios', id), { imagenURL: url, imagenPath: p }); if (document.getElementById('contenedorConvenios')) this.cargarConvenios(true); } catch (e) { console.error("Error:", e); } },
+        async mostrarListaNegraPublica() { await this.cargarListaNegra(); let msg = "--- LISTA NEGRA ---\n\n"; this.state.listaNegra.length === 0 ? msg += "Nadie vetado." : this.state.listaNegra.forEach(p => { msg += `- ${p.nombre} (Motivo: ${p.motivo})\n`; }); alert(msg); },
+        async actualizarLibroNegro() { await this.cargarLibroNegro(); const l = document.getElementById('listaLibroNegro'); if (!l) return; l.innerHTML = ''; this.state.libroNegro.forEach(c => { l.innerHTML += `<li class="flex justify-between items-center p-2 bg-purple-800 rounded"><span><strong class="capitalize">${c.nombre}</strong> (${c.relacion}) - ${c.notas}</span><button onclick="VanillaApp.eliminarDelLibro('${c.docId}')" class="text-red-500 font-bold px-2">X</button></li>`; }); },
+        async anadirAlLibroNegro() { const n = document.getElementById('libroNombre').value.trim(), r = document.getElementById('libroRelacion').value, o = document.getElementById('libroNotas').value.trim(); if (n) { try { const newDoc = await Firebase.addDoc(Firebase.collection(db, 'libroNegro'), { nombre: n, relacion: r, notas: o }); this.state.libroNegro.push({ docId: newDoc.id, nombre: n, relacion: r, notas: o }); this.actualizarLibroNegro(); document.getElementById('libroNombre').value = ''; document.getElementById('libroNotas').value = ''; } catch(e) { console.error(e); } } },
+        async eliminarDelLibro(docId) { try { await Firebase.deleteDoc(Firebase.doc(db, 'libroNegro', docId)); this.state.libroNegro = this.state.libroNegro.filter(c => c.docId !== docId); this.actualizarLibroNegro(); } catch(e) { console.error(e); } },
+        async actualizarListaNegra() { await this.cargarListaNegra(); const l = document.getElementById('listaDeVetados'); if (!l) return; l.innerHTML = ''; this.state.listaNegra.forEach(p => { l.innerHTML += `<li class="flex justify-between items-center p-2 bg-red-900 bg-opacity-50 rounded"><span><strong class="capitalize">${p.nombre}</strong> - ${p.motivo}</span><button onclick="VanillaApp.eliminarDeListaNegra('${p.docId}')" class="text-white font-bold px-2">X</button></li>`; }); },
+        async anadirAListaNegra() { const n = document.getElementById('vetadoNombre').value.trim(), m = document.getElementById('vetadoMotivo').value.trim(); if (n && m) { try { const newDoc = await Firebase.addDoc(Firebase.collection(db, 'listaNegra'), { nombre: n, motivo: m }); this.state.listaNegra.push({ docId: newDoc.id, nombre: n, motivo: m }); this.actualizarListaNegra(); document.getElementById('vetadoNombre').value = ''; document.getElementById('vetadoMotivo').value = ''; } catch(e) { console.error(e); } } },
+        async eliminarDeListaNegra(docId) { try { await Firebase.deleteDoc(Firebase.doc(db, 'listaNegra', docId)); this.state.listaNegra = this.state.listaNegra.filter(p => p.docId !== docId); this.actualizarListaNegra(); } catch(e) { console.error(e); } },
+        async actualizarInventarioLog() { await this.cargarInventarioLog(); const contenedor = document.getElementById('listaInventarioLog'); if (!contenedor) return; contenedor.innerHTML = ''; if (this.state.inventarioLog.length === 0) { contenedor.innerHTML = '<li>No hay registros de inventario.</li>'; return; } this.state.inventarioLog.forEach(log => { const fecha = log.timestamp.toDate().toLocaleString('es-ES'); const imgsHTML = log.imagenes ? log.imagenes.map(url => `<img src="${url}" class="w-24 h-24 object-cover rounded cursor-pointer" onclick="VanillaApp.mostrarImagenAmpliada('${url}')" />`).join('') : ''; contenedor.innerHTML += `<li class="flex items-start gap-4 p-3 bg-purple-800 rounded"><div class="flex gap-2 flex-wrap">${imgsHTML}</div><div><p>Subido por: <strong class="capitalize">${log.subidoPor}</strong></p><p>Fecha: <strong class="font-mono">${fecha}</strong></p></div></li>`; }); },
+        toggleInventarioLog() { const lista = document.getElementById('listaInventarioLog'); if (lista) { lista.style.display = lista.style.display === 'none' ? 'block' : 'none'; } },
+        
+        addMessageToChat(content, sender) {
+            const container = document.getElementById('chatbot-messages');
+            if (!container) return;
+            const msgElem = document.createElement('div');
+            msgElem.classList.add('chat-message', `${sender}-message`);
+            msgElem.innerHTML = content;
+            container.appendChild(msgElem);
+            container.scrollTop = container.scrollHeight;
+            return msgElem;
+        },
+        async handleSendMessage() {
+            const chatbotInput = document.getElementById('chatbot-input');
+            const messageText = chatbotInput.value.trim();
+            const files = this.state.chatFiles;
+            const currentUser = sessionStorage.getItem('currentUser');
+
+            if (!messageText && files.length === 0) return;
+
+            let messageHTML = messageText ? `<p>${messageText.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</p>` : '';
+            chatbotInput.value = '';
+
+            if (files.length > 0) {
+                const tempId = `msg-${Date.now()}`;
+                let previewHTML = messageHTML;
+                files.forEach(file => {
+                    previewHTML += `<img src="${URL.createObjectURL(file)}" alt="Cargando..." style="opacity: 0.5; max-width: 100%; border-radius: 10px; margin-top: 5px;">`;
+                });
+                const tempMessage = this.addMessageToChat(previewHTML, 'user');
+                tempMessage.id = tempId;
+
+                try {
+                    const uploadPromises = files.map(file => {
+                        const filePath = `chat_uploads/${Date.now()}_${file.name}`;
+                        const storageRef = Firebase.ref(storage, filePath);
+                        return Firebase.uploadBytes(storageRef, file).then(snapshot => Firebase.getDownloadURL(snapshot.ref));
+                    });
+                    const imageUrls = await Promise.all(uploadPromises);
+                    
+                    let finalHTML = messageText ? `<p>${messageText.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</p>` : '';
+                    imageUrls.forEach(url => {
+                        finalHTML += `<img src="${url}" alt="Imagen subida" class="chat-message-image cursor-pointer" onclick="VanillaApp.mostrarImagenAmpliada('${url}')">`;
+                    });
+                    document.getElementById(tempId).innerHTML = finalHTML;
+                } catch (e) {
+                    console.error("Error subiendo imágenes al chat:", e);
+                    document.getElementById(tempId).innerHTML += "<p class='text-red-400 text-xs'>Error al subir imágenes.</p>";
+                }
+            } else {
+                this.addMessageToChat(messageHTML, 'user');
+            }
+            
+            this.state.chatFiles = [];
+            this.renderChatPreviews();
+
+            setTimeout(() => {
+                let mockReply = "Lo siento, cariño, no te he entendido. ¿Puedes repetirlo?";
+                const userMsg = messageText.toLowerCase();
+
+                const keywords = {
+                    fichar: ["fichar", "entrar", "inicio", "trabajar"],
+                    empleado: ["empleado", "panel", "área", "zona"],
+                    producto: ["producto", "vender", "catálogo", "precios"],
+                    habitacion: ["habitacion", "cuarto", "suite", "reservar"],
+                    hola: ["hola", "buenas", "buenos", "ey"]
+                };
+
+                if (!messageText) {
+                    this.addMessageToChat("¡Qué buena pinta tiene eso, amor!", 'bot');
+                    return;
+                }
+
+                if (keywords.fichar.some(k => userMsg.includes(k))) {
+                    if(currentUser) {
+                        this.fichar(currentUser);
+                        mockReply = "¡A trabajar! Fichaje de entrada registrado, bombón.";
+                    } else {
+                        mockReply = "Necesitas iniciar sesión para poder fichar, cielo.";
+                    }
+                } else if (keywords.empleado.some(k => userMsg.includes(k))) {
+                    mockReply = "Claro, te llevo ahora mismo a tu zona, amor.";
+                    this.irAPanelEmpleado();
+                } else if (keywords.producto.some(k => userMsg.includes(k))) {
+                    mockReply = "¡Marchando un vistazo a nuestros tesoros!";
+                    this.mostrarPanelProductos();
+                } else if (keywords.habitacion.some(k => userMsg.includes(k))) {
+                    mockReply = "Te enseño ahora mismo nuestras suites del placer...";
+                    this.mostrarPanelHabitaciones();
+                } else if (keywords.hola.some(k => userMsg.includes(k))) {
+                    mockReply = `¡Hola, ${currentUser || 'cielo'}! Soy Luna, ¿en qué puedo ayudarte hoy?`;
+                }
+                
+                this.addMessageToChat(mockReply, 'bot');
+            }, 1000);
+        },
+        handleChatPaste(e) {
+            const file = e.clipboardData.files[0];
+            if (file && file.type.startsWith('image/')) {
+                e.preventDefault();
+                if (this.state.chatFiles.length < 3) {
+                    this.state.chatFiles.push(file);
+                    this.renderChatPreviews();
+                } else {
+                    alert("Puedes adjuntar un máximo de 3 imágenes.");
+                }
+            }
+        },
+        renderChatPreviews() {
+            const container = document.getElementById('chatbot-image-previews');
+            container.innerHTML = '';
+            this.state.chatFiles.forEach((file, index) => {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'chat-preview-item';
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.className = 'chat-preview-img';
+                const removeBtn = document.createElement('button');
+                removeBtn.innerHTML = '&times;';
+                removeBtn.className = 'chat-preview-remove';
+                removeBtn.onclick = () => this.removeChatFile(index);
+                previewItem.appendChild(img);
+                previewItem.appendChild(removeBtn);
+                container.appendChild(previewItem);
+            });
+        },
+        removeChatFile(index) {
+            this.state.chatFiles.splice(index, 1);
+            this.renderChatPreviews();
+        },
+        ajustarPosicionChatbot(visible) { const bubble = document.getElementById('chatbot-bubble'); if (bubble) { if (visible) bubble.classList.add('visible'); else bubble.classList.remove('visible'); } },
+
+        async publicarAnuncio() {
+            const texto = document.getElementById('anuncioTexto').value;
+            const duracionHoras = parseInt(document.getElementById('anuncioDuracion').value);
+            const esEncuesta = document.getElementById('anuncioEsEncuesta').checked;
+            if (!texto) return alert("El anuncio no puede estar vacío.");
+            
+            const ahora = Date.now();
+            const expiraEn = duracionHoras === 0 ? ahora + (10 * 365 * 24 * 60 * 60 * 1000) : ahora + (duracionHoras * 60 * 60 * 1000);
+            
+            const anuncioData = { texto, expiraEn, publicadoEn: ahora, esEncuesta };
+            if (esEncuesta) {
+                anuncioData.votos = {};
+            }
+
+            try {
+                const anuncioRef = Firebase.doc(db, "configuracion", "anuncio_global");
+                await Firebase.setDoc(anuncioRef, anuncioData);
+                alert("Anuncio publicado con éxito.");
+                document.getElementById('anuncioTexto').value = '';
+                document.getElementById('anuncioEsEncuesta').checked = false;
+            } catch (e) { console.error("Error al publicar anuncio:", e); alert("No se pudo publicar el anuncio."); }
+        },
+        iniciarListenerAnuncios() {
+            const anuncioRef = Firebase.doc(db, "configuracion", "anuncio_global");
+            Firebase.onSnapshot(anuncioRef, (doc) => {
+                const container = document.getElementById('anuncio-panel-lateral');
+                if (doc.exists()) {
+                    const anuncio = doc.data();
+                    const ahora = Date.now();
+                    
+                    if (anuncio.expiraEn > ahora) {
+                        const currentUser = sessionStorage.getItem('currentUser');
+                        let contenidoHTML = `<h3 class="text-xl text-purple-300 border-b-2 border-purple-700 pb-2 mb-4">Anuncio</h3><p class="text-base flex-grow">${anuncio.texto}</p>`;
+                        if (anuncio.esEncuesta) {
+                            const haVotado = currentUser && anuncio.votos && anuncio.votos[currentUser];
+                            contenidoHTML += `
+                                <div class="mt-4">
+                                    <h4 class="text-md font-semibold mb-2">¿Confirmas?</h4>
+                                    <div class="flex justify-between gap-2">
+                                        <button class="votacion-btn" onclick="VanillaApp.votarEnAnuncio('si')" ${haVotado ? 'disabled' : ''}>✅ Sí</button>
+                                        <button class="votacion-btn" onclick="VanillaApp.votarEnAnuncio('no')" ${haVotado ? 'disabled' : ''}>❌ No</button>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                        container.innerHTML = `${contenidoHTML}<button id="anuncio-cerrar">&times;</button>`;
+                        container.classList.add('visible');
+                        
+                        document.getElementById('anuncio-cerrar').onclick = () => container.classList.remove('visible');
+
+                        if (this.state.ultimoAnuncioMostrado !== anuncio.publicadoEn) {
+                            document.getElementById('notification-sound').play().catch(e => console.warn("Interacción del usuario necesaria para reproducir audio."));
+                            this.state.ultimoAnuncioMostrado = anuncio.publicadoEn;
+                        }
+                    } else {
+                        container.classList.remove('visible');
+                    }
+                } else {
+                    container.classList.remove('visible');
+                }
+            });
+        },
+        async votarEnAnuncio(voto) {
+            const currentUser = sessionStorage.getItem('currentUser');
+            if (!currentUser) return alert("Debes iniciar sesión para poder votar.");
+            
+            const anuncioRef = Firebase.doc(db, "configuracion", "anuncio_global");
+            try {
+                await Firebase.updateDoc(anuncioRef, {
+                    [`votos.${currentUser}`]: voto
+                });
+            } catch (e) {
+                console.error("Error al registrar el voto:", e);
+                alert("No se pudo registrar tu voto.");
+            }
+        },
+        async mostrarResultadosEncuesta() {
+            const anuncioRef = Firebase.doc(db, "configuracion", "anuncio_global");
+            const docSnap = await Firebase.getDoc(anuncioRef);
+
+            if (!docSnap.exists() || !docSnap.data().esEncuesta) {
+                return alert("No hay ninguna encuesta activa en este momento.");
+            }
+
+            const anuncio = docSnap.data();
+            const votos = anuncio.votos || {};
+            const votosSi = [];
+            const votosNo = [];
+
+            for (const empleado in votos) {
+                if (votos[empleado] === 'si') {
+                    votosSi.push(empleado);
+                } else {
+                    votosNo.push(empleado);
+                }
+            }
+
+            let resultadosHTML = `
+                <h3 class="text-xl font-bold mb-4">Resultados para: "${anuncio.texto}"</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <h4 class="font-semibold text-green-400 mb-2">Han votado SÍ (✅):</h4>
+                        <ul class="list-disc list-inside">${votosSi.map(e => `<li class="capitalize">${e}</li>`).join('') || '<li>Nadie ha votado sí.</li>'}</ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-red-400 mb-2">Han votado NO (❌):</h4>
+                        <ul class="list-disc list-inside">${votosNo.map(e => `<li class="capitalize">${e}</li>`).join('') || '<li>Nadie ha votado no.</li>'}</ul>
+                    </div>
+                </div>
+            `;
+            
+            const overlay = document.getElementById('image-overlay');
+            overlay.innerHTML = `<div class="bg-purple-900 p-8 rounded-lg max-w-2xl w-full relative">${resultadosHTML}<span id="overlay-close-btn-resultados" class="cursor-pointer absolute top-2 right-4 text-2xl">&times;</span></div>`;
+            overlay.style.display = 'flex';
+            overlay.querySelector('#overlay-close-btn-resultados').onclick = () => {
+                overlay.style.display = 'none';
+                overlay.innerHTML = '<span id="overlay-close-btn">&times;</span><img id="overlay-image" src="" alt="Imagen ampliada">';
+                document.getElementById('overlay-close-btn').onclick = () => document.getElementById('image-overlay').style.display = 'none';
+            };
+        },
+
+        iniciarListenerHabitaciones() {
+            const q = Firebase.query(Firebase.collection(db, "habitaciones"), Firebase.orderBy("id"));
+            this.state.unsubscribeHabitaciones = Firebase.onSnapshot(q, (snapshot) => {
+                const habitacionesNuevas = [];
+                snapshot.forEach(doc => habitacionesNuevas.push(doc.data()));
+                this.state.habitaciones = habitacionesNuevas;
+
+                const panelHabitaciones = document.getElementById('panel-habitaciones');
+                if (panelHabitaciones) {
+                    const currentUser = sessionStorage.getItem('currentUser');
+                    let habitacionesHTML = this.state.habitaciones.map(hab => {
+                        const estadoActual = this.getEstadoHabitacion(hab);
+                        let controles = (estadoActual.estado === 'disponible') 
+                            ? `<button class="btn text-sm py-2 w-full" onclick="VanillaApp.ocuparHabitacionAhora(${hab.id}, '${currentUser}')">Ocupar (30 min)</button>` 
+                            : `<div class="font-mono text-xl mb-2" id="timer-hab-${hab.id}">--:--:--</div><div class="flex gap-2"><button class="btn text-xs py-1 flex-grow" onclick="VanillaApp.anadirTiempoHabitacion(${hab.id}, '${currentUser}')">+30 min</button><button class="btn text-xs py-1 flex-grow" style="background-color:#c44" onclick="VanillaApp.liberarHabitacion(${hab.id}, '${currentUser}')">Liberar</button></div>`;
+                        return `<div class="bg-purple-800 p-4 rounded-lg text-center flex flex-col justify-between"><div><p class="font-bold text-lg">${hab.nombre}</p><p class="text-sm ${estadoActual.estado === 'ocupada' ? 'text-red-400' : 'text-green-400'} mb-2">${estadoActual.texto}</p></div><div>${controles}</div></div>`;
+                    }).join('');
+                    panelHabitaciones.innerHTML = habitacionesHTML;
+                }
+            });
+        },
+        async init() {
+            console.log("Iniciando aplicación Vanilla...");
+            this.iniciarListenerAnuncios();
+            this.iniciarListenerHabitaciones();
+            await this.cargarTodosLosEmpleados();
+            await this.cargarTodosLosFichajes();
+            
+            const chatButtonWrapper = document.getElementById('chatbot-button-wrapper');
+            const chatContainer = document.getElementById('chatbot-container');
+            const closeButton = document.getElementById('chatbot-close');
+            const minimizeButton = document.getElementById('chatbot-minimize');
+            chatButtonWrapper.addEventListener('click', () => {
+                chatContainer.style.display = 'flex';
+                chatButtonWrapper.style.display = 'none';
+            });
+            const closeChat = () => {
+                chatContainer.style.display = 'none';
+                chatButtonWrapper.style.display = 'block';
+            };
+            closeButton.addEventListener('click', closeChat);
+            minimizeButton.addEventListener('click', closeChat);
+            
+            document.getElementById('overlay-close-btn').addEventListener('click', () => { document.getElementById('image-overlay').style.display = 'none'; });
+            document.getElementById('chatbot-send').addEventListener('click', () => this.handleSendMessage());
+            document.getElementById('chatbot-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') this.handleSendMessage(); });
+            document.getElementById('chatbot-input-container').addEventListener('paste', (e) => this.handleChatPaste(e));
+
+            this.addMessageToChat('¡Hola! Soy Luna, tu asistente en Vanilla. ¿En qué puedo ayudarte?', 'bot');
+
+            const currentUser = sessionStorage.getItem('currentUser');
+            if (currentUser) {
+                await this.irAPanelEmpleado();
+            } else {
+                this.mostrarInicio();
+            }
+        },
+
+        async descargarInformeExcel() {
+            alert("Preparando los informes. La descarga comenzará en breve.");
+            
+            await this.cargarTodosLosEmpleados();
+            await this.cargarTodosLosFichajes();
+            await this.cargarTodasLasVentas();
+            await this.cargarInventarioLog();
+
+            const wb = XLSX.utils.book_new();
+
+            const datosHorarios = this.state.empleados.map(e => {
+                const f = this.state.fichajes[e.id] || { hoy: 0, semana: 0, total: 0 };
+                return { Empleado: e.nombre, Horas_Hoy: this.formatearTiempo(f.hoy), Horas_Semana: this.formatearTiempo(f.semana), Horas_Total: this.formatearTiempo(f.total) };
+            });
+            if (datosHorarios.length > 0) {
+                const wsHorarios = XLSX.utils.json_to_sheet(datosHorarios);
+                XLSX.utils.book_append_sheet(wb, wsHorarios, "Horarios Empleados");
+            }
+
+            const datosVentas = [];
+            for (const empleado in this.state.ventas) {
+                for (const productoId in this.state.ventas[empleado].productos) {
+                    const productoInfo = this.state.productos.find(p => p.id === productoId);
+                    datosVentas.push({ Empleado: empleado, Producto: productoInfo ? productoInfo.nombre : productoId, Ventas_Hoy: this.state.ventas[empleado].productos[productoId].hoy || 0, Ventas_Total: this.state.ventas[empleado].productos[productoId].total || 0 });
+                }
+            }
+            if (datosVentas.length > 0) {
+                const wsVentas = XLSX.utils.json_to_sheet(datosVentas);
+                XLSX.utils.book_append_sheet(wb, wsVentas, "Ventas");
+            }
+
+            const datosAusencias = [];
+            this.state.empleados.forEach(e => {
+                if (e.ausencias && e.ausencias.length > 0) {
+                    e.ausencias.forEach(a => {
+                        datosAusencias.push({ Empleado: e.nombre, Inicio_Ausencia: new Date(a.inicio).toLocaleDateString('es-ES'), Fin_Ausencia: new Date(a.fin).toLocaleDateString('es-ES') });
+                    });
+                }
+            });
+            if (datosAusencias.length > 0) {
+                const wsAusencias = XLSX.utils.json_to_sheet(datosAusencias);
+                XLSX.utils.book_append_sheet(wb, wsAusencias, "Ausencias");
+            }
+            
+            const datosInventario = this.state.inventarioLog.map(log => ({
+                Subido_Por: log.subidoPor,
+                Fecha: log.timestamp.toDate().toLocaleString('es-ES'),
+                Imagenes: (log.imagenes && Array.isArray(log.imagenes)) ? log.imagenes.map(url => `=HIPERVINCULO("${url}"; "Ver Imagen")`).join(' | ') : ""
+            }));
+            if (datosInventario.length > 0) {
+                const wsInventario = XLSX.utils.json_to_sheet(datosInventario);
+                XLSX.utils.book_append_sheet(wb, wsInventario, "Inventario");
+            }
+
+            const datosReservas = [];
+            this.state.habitaciones.forEach(h => {
+                if (h.reservas && h.reservas.length > 0) {
+                    h.reservas.forEach(r => {
+                        datosReservas.push({ Habitacion: h.nombre, Cliente: r.cliente, Inicio_Reserva: new Date(r.inicio).toLocaleString('es-ES'), Fin_Reserva: new Date(r.fin).toLocaleString('es-ES') });
+                    });
+                }
+            });
+            if (datosReservas.length > 0) {
+                const wsReservas = XLSX.utils.json_to_sheet(datosReservas);
+                XLSX.utils.book_append_sheet(wb, wsReservas, "Reservas Habitaciones");
+            }
+
+            const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([wbout], { type: 'application/octet-stream' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'Informe_General_Vanilla.xlsx';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    };
+
+    window.VanillaApp = VanillaApp;
+    VanillaApp.init();
+
+});
+</script>
+
+</body>
+</html>
