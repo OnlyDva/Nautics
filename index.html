@@ -11,21 +11,17 @@
 <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 
 <style>
-    /* Reset de márgenes y paddings por defecto del navegador */
     body { margin: 0; padding: 0; }
-
-    /* Definición de colores personalizados para Tailwind */
     :root {
-        --color-nautics-primary-blue: #0D47A1; /* Azul profundo */
-        --color-nautics-secondary-pink: #FF4081; /* Rosado vibrante (más prominente) */
-        --color-nautics-dark: #0A1C2C; /* Azul oscuro naval, casi negro */
-        --color-nautics-mid: #1E3A59; /* Medium Blue-Grey */
-        --color-nautics-light: #B0D3F5; /* Azul claro */
-        --color-nautics-accent-pink: #F8C8DC; /* Rosa claro para acentos suaves */
-        --color-nautics-text: #F0F8FF; /* Blanco roto para texto general */
-        --color-nautics-chat-bg: #2A3A4A; /* Un azul más claro para el fondo del chat */
+        --color-nautics-primary-blue: #0D47A1;
+        --color-nautics-secondary-pink: #FF4081;
+        --color-nautics-dark: #0A1C2C;
+        --color-nautics-mid: #1E3A59;
+        --color-nautics-light: #B0D3F5;
+        --color-nautics-accent-pink: #F8C8DC;
+        --color-nautics-text: #F0F8FF;
+        --color-nautics-chat-bg: #2A3A4A;
     }
-
     .bg-nautics-dark { background-color: var(--color-nautics-dark); }
     .bg-nautics-mid { background-color: var(--color-nautics-mid); }
     .bg-nautics-accent { background-color: var(--color-nautics-accent); } 
@@ -37,11 +33,9 @@
     .border-nautics-mid { border-color: var(--color-nautics-mid); }
     .border-nautics-primary-blue { border-color: var(--color-nautics-primary-blue); }
     .border-nautics-secondary-pink { border-color: var(--color-nautics-secondary-pink); }
-
-
     body { 
         font-family: 'Inter', sans-serif; 
-        background: url('Fondo.png') center top no-repeat; /* Usando Fondo.png */
+        background: url('Fondo.png') center top no-repeat;
         background-size: cover; 
         background-attachment: fixed; 
         color: var(--color-nautics-text); 
@@ -97,7 +91,7 @@
         border-radius: 0.5rem; 
         height: 96px; 
         width: 96px; 
-        object-fit: cover; /* Asegura que la imagen cubra el área, "zoom" */
+        object-fit: cover;
         margin: auto; 
     }
     #contenido { min-height: 60vh; }
@@ -119,7 +113,7 @@
     @keyframes pulse-small{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
     #chatbot-bubble{position:absolute;bottom:150px;right:0;background-color:var(--color-nautics-secondary-pink);color:#fff;padding:12px 18px;border-radius:20px;border-bottom-right-radius:2px;box-shadow:0 4px 8px rgba(0,0,0,.3);white-space:nowrap;font-weight:600;cursor:pointer;opacity:0;visibility:hidden;transform:translateY(20px);transition:opacity .4s ease,transform .4s ease}#chatbot-bubble.visible{opacity:1;visibility:visible;transform:translateY(0)}
     #chatbot-container{position:fixed;bottom:40px;right:40px;width:450px;height:600px;background-color:var(--color-nautics-dark);border-radius:10px;box-shadow:0 8px 20px rgba(0,0,0,.5);display:none;flex-direction:column;z-index:999;overflow:hidden;border:2px solid var(--color-nautics-primary-blue);box-sizing:border-box}#chatbot-header{background-color:var(--color-nautics-primary-blue);color:#fff;padding:10px 15px;font-weight:700;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;box-sizing:border-box;width:100%}#chatbot-close,#chatbot-minimize{background:0 0;border:none;color:#fff;font-size:1.2em;cursor:pointer;margin-left:10px;padding:0;line-height:1}
-    #chatbot-messages{flex-grow:1;padding:15px;overflow-y:auto;background-color:var(--color-nautics-chat-bg);display:flex;flex-direction:column;min-height:0;box-sizing:border-box; background-image: url('Jack_Sparrow.png'); background-repeat: no-repeat; background-position: bottom 10px right 10px; background-size: 120px; background-blend-mode: luminosity; opacity: 0.8;}
+    #chatbot-messages{flex-grow:1;padding:15px;overflow-y:auto;background-color:var(--color-nautics-chat-bg);background-image: url('Jack_Sparrow.png'); background-repeat: no-repeat; background-position: bottom 10px right 10px; background-size: 120px; background-blend-mode: luminosity; opacity: 0.8;}
     .chat-message{margin-bottom:10px;padding:8px 12px;border-radius:15px;max-width:80%;line-height:1.4;word-wrap:break-word;box-sizing:border-box; position: relative; z-index: 2;}.user-message{background-color:var(--color-nautics-secondary-pink);align-self:flex-end;border-bottom-right-radius:2px}.bot-message{background-color:var(--color-nautics-mid);align-self:flex-start;border-bottom-left-radius:2px}#chatbot-input-container{padding:10px 15px;display:flex;align-items:center;gap:10px;background-color:var(--color-nautics-dark);flex-shrink:0;box-sizing:border-box;width:100%; position: relative; z-index: 1002;}
     #chatbot-input{flex-grow:1;padding:10px;border-radius:20px;border:1px solid var(--color-nautics-primary-blue);background-color:#333355;color:#fff;box-sizing:border-box;min-width:0}
     .chatbot-action-btn{background-color:transparent;color:#fff;border:none;border-radius:50%;width:40px;height:40px;display:flex;justify-content:center;align-items:center;cursor:pointer;font-size:1.5em;transition:background-color .3s;flex-shrink:0}.chatbot-action-btn:hover{background-color:var(--color-nautics-primary-blue)}
@@ -131,10 +125,9 @@
     .chat-preview-item.has-image .remove-btn { display: block; }
     .chat-message img { max-width: 100%; border-radius: 10px; margin-top: 5px; }
 
-    /* Estilo para la tabla de precios */
     .prices-table th, .prices-table td {
-        padding: 0.75rem; /* Espaciado interno */
-        border-bottom: 1px solid var(--color-nautics-mid); /* Separador de fila */
+        padding: 0.75rem;
+        border-bottom: 1px solid var(--color-nautics-mid);
         text-align: left;
     }
     .prices-table th {
@@ -142,17 +135,14 @@
         font-weight: bold;
     }
     .prices-table tr:last-child td {
-        border-bottom: none; /* No hay borde en la última fila */
+        border-bottom: none;
     }
 </style>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, query, orderBy, addDoc, serverTimestamp, where, writeBatch, onSnapshot, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"; 
     import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-    // Si estás SEGURO de NO usar Firebase Authentication, asegúrate de que la siguiente línea esté COMENTADA:
-    // import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     
-    // Configuración de Firebase para el proyecto Nautics
     const firebaseConfig = {
       apiKey: "AIzaSyA7pg9vtqsPNGu3EGEEZ8hGnQJTkTBVjss",
       authDomain: "nautics-78bf2.firebaseapp.com",
@@ -166,8 +156,6 @@
     const firebaseApp = initializeApp(firebaseConfig);
     window.db = getFirestore(firebaseApp);
     window.storage = getStorage(firebaseApp);
-    // Si estás SEGURO de NO usar Firebase Authentication, asegúrate de que la siguiente línea esté COMENTADA:
-    // window.auth = getAuth(firebaseApp);
     
     window.Firebase = {
         collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, query, orderBy, addDoc, serverTimestamp, where, writeBatch, onSnapshot, arrayUnion
@@ -214,14 +202,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const VanillaApp = { 
         state: {
-            // Productos individuales para Nautics
             productos: [ 
                 { id: 'pescanova', nombre: 'PescAnova', imagen: 'PescAnova.png', precio: 50 }, 
-                { id: 'cana', nombre: 'Caña de Pescar', imagen: 'Caña.png', precio: 750 }, /* Usando Caña.png */
-                { id: 'cebo', nombre: 'Cebo Marino', imagen: 'Cebo.png', precio: 1000 }, /* Usando Cebo.png */
-                { id: 'yonkayate', nombre: 'WonkaYate', imagen: 'WonkaYate.png', precio: 50 } /* Usando WonkaYate.png */
+                { id: 'cana', nombre: 'Caña de Pescar', imagen: 'Caña.png', precio: 750 }, 
+                { id: 'cebo', nombre: 'Cebo Marino', imagen: 'Cebo.png', precio: 1000 }, 
+                { id: 'yonkayate', nombre: 'WonkaYate', imagen: 'WonkaYate.png', precio: 50 } 
             ],
-            // Barcos disponibles para Nautics (se corresponden con las imágenes que tienes)
             datosBarcosBase: [ 
                 { id: 1, nombre: 'La Perla Negra', imagen: 'Jack_Sparrow.png', reservas: [] }, 
                 { id: 2, nombre: 'El Jet Max', imagen: 'JetMax.png', reservas: [] },
@@ -234,11 +220,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 { id: 9, nombre: 'El Sun Trap', imagen: 'SunTrap.png', reservas: [] },
                 { id: 10, nombre: 'El Toro', imagen: 'Toro.png', reservas: [] },
                 { id: 11, nombre: 'El Tropic', imagen: 'Tropic.png', reservas: [] },
-                { id: 12, nombre: 'La Dhingy', imagen: 'Dhingy.png', reservas: [] }, /* Nueva adición */
+                { id: 12, nombre: 'La Dhingy', imagen: 'Dhingy.png', reservas: [] }, 
             ],
             empleados: [], fichajes: {}, ventas: {}, barcos: [], 
             inventarioLog: [], libroNegro: [], listaNegra: [], 
-            clientesVentas: {}, // Nueva propiedad para almacenar ventas de clientes
+            clientesVentas: {},
             timers: { fichaje: null, barcos: null, dashboard: null, localOpen: null }, 
             inventoryFiles: [null, null, null],
             chatFiles: [],
@@ -294,72 +280,58 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         async cargarTodosLosEmpleados() { 
-            console.log("Cargando empleados...");
             try { 
                 const snapshot = await Firebase.getDocs(Firebase.query(Firebase.collection(db, 'empleados'), Firebase.orderBy('nombre'))); 
                 this.state.empleados = []; 
                 snapshot.forEach(doc => this.state.empleados.push({ id: doc.id, ...doc.data() })); 
-                console.log("Empleados cargados:", this.state.empleados.map(e => e.id));
             } catch (e) { console.error("Error cargando empleados:", e); } 
         },
         async cargarTodosLosFichajes() { 
-            console.log("Cargando fichajes...");
             try { 
                 const snapshot = await Firebase.getDocs(Firebase.collection(db, 'fichajes')); 
                 let fichajesData = {}; 
                 snapshot.forEach(doc => { fichajesData[doc.id] = doc.data(); }); 
                 this.state.fichajes = fichajesData; 
-                console.log("Fichajes cargados.");
             } catch (e) { console.error("Error cargando fichajes:", e); } 
         },
         async cargarTodasLasVentas() { 
-            console.log("Cargando ventas...");
             try { 
                 const snapshot = await Firebase.getDocs(Firebase.collection(db, 'ventas')); 
                 this.state.ventas = {}; 
                 snapshot.forEach(doc => { this.state.ventas[doc.id] = doc.data(); }); 
                 this.state.productos.forEach(p => { for(const emp in this.state.ventas) { if(!this.state.ventas[emp].productos) this.state.ventas[emp].productos = {}; if(!this.state.ventas[emp].productos[p.id]) this.state.ventas[emp].productos[p.id] = { hoy: 0, total: 0 }; } }); 
-                console.log("Ventas cargadas.");
             } catch (e) { console.error("Error cargando ventas:", e); } 
         },
         async cargarInventarioLog() { 
-            console.log("Cargando log de inventario...");
             try { 
                 const q = Firebase.query(Firebase.collection(db, 'inventario_log'), Firebase.orderBy('timestamp', 'desc')); 
                 const snapshot = await Firebase.getDocs(q); 
                 this.state.inventarioLog = []; 
                 snapshot.forEach(doc => this.state.inventarioLog.push(doc.data())); 
-                console.log("Log de inventario cargado.");
             } catch (e) { console.error("Error cargando log de inventario:", e); } 
         },
         async cargarLibroNegro() { 
-            console.log("Cargando Libro Negro...");
             try { 
                 const snapshot = await Firebase.getDocs(Firebase.collection(db, 'libroNegro')); 
                 this.state.libroNegro = []; 
                 snapshot.forEach(doc => this.state.libroNegro.push({docId: doc.id, ...doc.data()})); 
-                console.log("Libro Negro cargado.");
             } catch (e) { console.error("Error cargando Libro Negro:", e); } 
         },
         async cargarListaNegra() { 
-            console.log("Cargando Lista Negra...");
             try { 
                 const snapshot = await Firebase.getDocs(Firebase.collection(db, 'listaNegra')); 
                 this.state.listaNegra = []; 
                 snapshot.forEach(doc => this.state.listaNegra.push({docId: doc.id, ...doc.data()})); 
-                console.log("Lista Negra cargada.");
             } catch (e) { console.error("Error cargando Lista Negra:", e); } 
         },
         
         async cargarClienteVentas() {
-            console.log("Cargando ventas de clientes...");
             try {
                 const snapshot = await Firebase.getDocs(Firebase.collection(db, 'clientesVentas'));
                 this.state.clientesVentas = {};
                 snapshot.forEach(doc => {
                     this.state.clientesVentas[doc.id] = doc.data();
                 });
-                console.log("Ventas de clientes cargadas.");
             } catch (e) {
                 console.error("Error cargando ventas de clientes:", e);
             }
@@ -483,7 +455,6 @@ document.addEventListener('DOMContentLoaded', () => {
                      ${desc}
                    </div>`
                 : `<p class="text-nautics-light text-lg font-bold mt-2">$${productoPrecio}</p>`; 
-            // Eliminada referencia a placeholder.png y placeholderSVG
             const imagenHTML = producto.imagen ? `<img src="${producto.imagen}" alt="${producto.nombre}" class="mx-auto mb-2 w-24 h-24 object-cover rounded" onerror="this.style.display='none'"/>` : '';
             return `<div class="producto-card bg-nautics-mid rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div>${imagenHTML}<h3 class="text-white font-semibold leading-tight uppercase">${producto.nombre}</h3></div><div>${inputVentasHTML}</div></div>`;
         },
@@ -495,7 +466,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const productosBaseHTML = this.state.productos.map(p => this.crearTarjetaProducto(p, false)).join(''); 
             
-            // --- Nuevas categorías de productos ---
             const categoriaBajaHTML = `
                 <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
                     <div><img src="small_boat_category.png" alt="Categoría Baja" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
@@ -583,37 +553,37 @@ document.addEventListener('DOMContentLoaded', () => {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td colspan="3"><hr class="border-t border-nautics-primary-blue my-2"/></td></tr> {/* Separador */}
+                            <tr><td colspan="3"><hr class="border-t border-nautics-primary-blue my-2"/></td></tr>
                             <tr>
                                 <td class="p-3">Categoría Baja</td>
                                 <td class="p-3">$1000</td>
                                 <td class="p-3">$1100</td>
                             </tr>
-                            <tr><td colspan="3"><hr class="border-t border-nautics-mid my-2"/></td></tr> {/* Separador */}
+                            <tr><td colspan="3"><hr class="border-t border-nautics-mid my-2"/></td></tr>
                             <tr>
                                 <td class="p-3">Categoría Estándar</td>
                                 <td class="p-3">$1430</td>
                                 <td class="p-3">$1570</td>
                             </tr>
-                            <tr><td colspan="3"><hr class="border-t border-nautics-mid my-2"/></td></tr> {/* Separador */}
+                            <tr><td colspan="3"><hr class="border-t border-nautics-mid my-2"/></td></tr>
                             <tr>
                                 <td class="p-3">Categoría Media</td>
                                 <td class="p-3">$1860</td>
                                 <td class="p-3">$2050</td>
                             </tr>
-                            <tr><td colspan="3"><hr class="border-t border-nautics-mid my-2"/></td></tr> {/* Separador */}
+                            <tr><td colspan="3"><hr class="border-t border-nautics-mid my-2"/></td></tr>
                             <tr>
                                 <td class="p-3">Categoría Gold</td>
                                 <td class="p-3">$2290</td>
                                 <td class="p-3">$2520</td>
                             </tr>
-                            <tr><td colspan="3"><hr class="border-t border-nautics-mid my-2"/></td></tr> {/* Separador */}
+                            <tr><td colspan="3"><hr class="border-t border-nautics-mid my-2"/></td></tr>
                             <tr>
                                 <td class="p-3">Categoría Aventura</td>
                                 <td class="p-3">$2720</td>
                                 <td class="p-3">$3000</td>
                             </tr>
-                            <tr><td colspan="3"><hr class="border-t border-nautics-mid my-2"/></td></tr> {/* Separador */}
+                            <tr><td colspan="3"><hr class="border-t border-nautics-mid my-2"/></td></tr>
                             <tr>
                                 <td class="p-3">Motos de Agua</td>
                                 <td class="p-3">$500</td>
@@ -646,15 +616,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h4 class="text-xl font-semibold mb-3 mt-6 text-nautics-primary-blue">Motos de Agua</h4>
                 <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-6">${categoriaMotosAguaHTML}</div>
 
-                {/* Secciones de Víveres, Packs, etc., eliminadas como se solicitó */}
-                
                 <div class="text-center"><button onclick="VanillaApp.mostrarInicio()" class="btn mt-8">Volver al Inicio</button></div>`; 
         },
         async mostrarPanelBarcos() { 
             this.stopAllTimers(); 
             if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); } 
             let html = `<div class="max-w-7xl mx-auto text-center"><h1 class="text-4xl font-bold mb-8">Nuestra Flota de Barcos</h1><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`; 
-            // Genera los paneles para cada barco con sus formularios de reserva
             this.state.barcos.forEach(boat => { 
                 const estadoActual = this.getEstadoBarco(boat); 
                 const imagenHTML = `<img src="${boat.imagen}" alt="${boat.nombre}" class="barco-img mb-4" onerror="this.style.display='none'"/>`; 
@@ -670,9 +637,7 @@ document.addEventListener('DOMContentLoaded', () => {
         async mostrarPanelEmpleados(nombre) {
             this.stopAllTimers();
             this.ajustarPosicionChatbot(false);
-            // Asegurarse de recargar los datos del empleado para ver posibles ausencias actualizadas
             await this.cargarTodosLosEmpleados(); 
-            // Buscar el empleado por nombre, ya que ahora es el ID del documento
             const empleadoData = this.state.empleados.find(emp => emp.id === nombre) || {};
             
             const datosFichaje = await this.gestionarReseteoDatos(nombre); await this.gestionarReseteoDatos(nombre, true);
@@ -703,7 +668,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         async mostrarModalAusencias(nombreEmpleado, esJefe = false) {
             this.stopAllTimers();
-            // Recargar empleados para asegurar que las ausencias estén actualizadas
             await this.cargarTodosLosEmpleados();
             const empleadoData = this.state.empleados.find(emp => emp.id === nombreEmpleado) || {};
             const ausencias = empleadoData.ausencias || [];
@@ -755,8 +719,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); } 
             this.ajustarPosicionChatbot(false);
 
-            // Asegurarse de recargar TODOS los datos necesarios para el panel de admin
-            console.log("Cargando todos los datos para el panel de Administrador...");
             await this.cargarTodosLosEmpleados(); 
             await this.cargarTodosLosFichajes(); 
             await this.cargarTodasLasVentas(); 
@@ -764,7 +726,6 @@ document.addEventListener('DOMContentLoaded', () => {
             await this.cargarLibroNegro(); 
             await this.cargarListaNegra(); 
             await this.cargarClienteVentas(); 
-            console.log("Todos los datos cargados para el panel de Administrador.");
 
             const dashboardHTML = `<div class="mb-8 p-6 bg-nautics-mid bg-opacity-50 rounded-lg border border-nautics-primary-blue"><h2 class="text-2xl font-bold mb-4">Dashboard de Flota en Tiempo Real</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div><h3 class="font-semibold mb-2 text-nautics-light">Tripulación de Guardia</h3><ul id="dashboard-empleados" class="space-y-1 text-sm"><li>Cargando...</li></ul></div><div><h3 class="font-semibold mb-2 text-nautics-light">Barcos Ocupados</h3><ul id="dashboard-barcos" class="space-y-1 text-sm"><li>Cargando...</li></ul></div></div></div>`; 
             const anunciosHTML = `
@@ -793,7 +754,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>`;
             
             let tablaEmpleadosHTML = '';
-            // Asegurarse de usar la lista de empleados actualizada para construir la tabla
             this.state.empleados.forEach(e => {
                 const f = this.state.fichajes[e.id] || {}; 
                 const v = this.state.ventas[e.id] || {};
@@ -828,21 +788,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             document.getElementById('contenido').innerHTML = `<div class="max-w-7xl mx-auto"><h1 class="text-4xl font-bold text-center mb-8">Panel de Jefes de Flota</h1>${dashboardHTML}${anunciosHTML}${gestionHTML}${tablaHTML}${informesHTML}${libroNegroHTML}${listaNegraHTML}${inventarioLogHTML}<div class="text-center mt-8"><button onclick="VanillaApp.cerrarSesion()" class="btn">Regresar a Puerto Base</button></div></div>`;
             this.actualizarLibroNegro(); this.actualizarListaNegra(); this.actualizarInventarioLog();
-            this.startDashboardTimer(); // Iniciar/reiniciar el temporizador del dashboard
+            this.startDashboardTimer(); 
         },
         
         async actualizarDashboard() {
             try {
-                // Asegúrate de cargar todos los empleados para que el dashboard tenga la lista completa
                 await this.cargarTodosLosEmpleados();
-                await this.cargarTodosLosFichajes(); // También refresca los fichajes
+                await this.cargarTodosLosFichajes(); 
 
                 const empleadosElem = document.getElementById('dashboard-empleados');
                 const barcosElem = document.getElementById('dashboard-barcos'); 
                 if (empleadosElem) {
                     const empleadosFichados = Object.entries(this.state.fichajes).filter(([_, data]) => data.fichado).map(([id, data]) => ({ id, ...data }));
                     if (empleadosFichados.length > 0) {
-                        empleadosElem.innerHTML = empleadosFichados.map(e => `<li class="capitalize text-green-400">${e.id} (Desde: ${new Date(e.inicio).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})})</li>`).join('');
+                        empleadosElem.innerHTML = empleadosFichados.map(e => `<li class="capitalize text-green-400">${e.id} (Desde: ${new Date(e.inicio).toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'})})</li>`).join('');
                     } else {
                         empleadosElem.innerHTML = '<li class="text-nautics-light">Nadie de guardia.</li>';
                     }
@@ -852,7 +811,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (barcosOcupados.length > 0) {
                         barcosElem.innerHTML = barcosOcupados.map(h => {
                             const estado = this.getEstadoBarco(h); 
-                            const finReserva = new Date(estado.reservaActual.fin.toMillis ? estado.reservaActual.fin.toMillis() : estado.reservaActual.fin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                            const finReserva = new Date(estado.reservaActual.fin.toMillis ? estado.reservaActual.fin.toMillis() : estado.reservaActual.fin).toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
                             return `<li class="text-nautics-accent-pink">${h.nombre} - Alquilado por: <span class="capitalize">${estado.reservaActual.cliente}</span> (hasta ${finReserva})</li>`; 
                         }).join('');
                     } else {
@@ -862,8 +821,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch(e) { console.error("Error actualizando el dashboard:", e); }
         },
         async verificarAccesoAdmin() { 
-            // Nombre de jefe predefinido (Tito Giovanni)
-            const adminName = "tito giovanni"; 
             const adminPass = document.getElementById('adminPassInput')?.value;
 
             if (!adminPass) {
@@ -872,36 +829,30 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                await this.cargarTodosLosEmpleados(); // Cargar la lista de empleados para verificar el hash y directiva
-                const adminEmpleado = this.state.empleados.find(e => e.id === adminName);
+                const adminPassDoc = await Firebase.getDoc(Firebase.doc(db, 'configuracion', 'admin_pass'));
+                
+                // console.log("Admin Pass Input:", adminPass); // Removido para optimización
+                // console.log("Hashed Admin Pass Input:", this.hashPassword(adminPass)); // Removido para optimización
 
-                if (adminEmpleado && this.hashPassword(adminPass) === adminEmpleado.passHash) {
-                    if (adminEmpleado.directiva) { // Verificar si el empleado predefinido es un jefe
-                        console.log("Jefe autenticado:", adminName);
-                        sessionStorage.setItem('currentUser', adminName); // Guardar el nombre de usuario
-                        
-                        // Cargar todos los datos antes de mostrar el panel de administración
-                        console.log("Verificando acceso Admin y cargando todos los datos...");
-                        await this.cargarTodosLosEmpleados(); 
-                        await this.cargarTodosLosFichajes(); 
-                        await this.cargarTodasLasVentas(); 
-                        await this.cargarInventarioLog(); 
-                        await this.cargarLibroNegro(); 
-                        await this.cargarListaNegra(); 
-                        await this.cargarClienteVentas(); 
-                        console.log("Datos cargados. Mostrando panel Admin.");
-                        await this.mostrarPanelAdmin(); 
-                    } else {
-                        alert('No tienes permisos de jefe de flota. Contacta a un administrador.');
-                        console.warn("Intento de acceso a panel de jefe sin directiva:", adminName);
-                    }
+                if (adminPassDoc.exists() && this.hashPassword(adminPass) === adminPassDoc.data().passHash) {
+                    // console.log("Contraseña de jefe maestra correcta."); // Removido para optimización
+                    sessionStorage.setItem('currentUser', "admin-maestro"); 
+                    
+                    await this.cargarTodosLosEmpleados(); 
+                    await this.cargarTodosLosFichajes(); 
+                    await this.cargarTodasLasVentas(); 
+                    await this.cargarInventarioLog(); 
+                    await this.cargarLibroNegro(); 
+                    await this.cargarListaNegra(); 
+                    await this.cargarClienteVentas(); 
+                    this.mostrarPanelAdmin(); 
                 } else {
                     alert('Contraseña de jefe incorrecta.');
-                    console.warn("Contraseña de jefe incorrecta para:", adminName);
+                    // console.warn("Contraseña de jefe incorrecta."); // Removido para optimización
                 }
             } catch (error) {
                 console.error("Error en el acceso de jefe:", error);
-                alert(`Error de acceso para jefes: ${error.message}.`);
+                alert(`Error de acceso para jefes: ${error.message}. Asegúrate de que el documento 'configuracion/admin_pass' exista en Firestore.`);
             }
         }, 
         async verificarAccesoVIP() { 
@@ -914,24 +865,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             try { 
-                console.log("Intentando verificar acceso VIP para:", nombre); 
-                // Cargar todos los empleados para poder verificar credenciales
                 await this.cargarTodosLosEmpleados(); 
                 const empleado = this.state.empleados.find(e => e.id === nombre);
 
                 if (empleado) { 
-                    console.log("Empleado encontrado:", empleado.nombre); 
                     if (this.hashPassword(pass) === empleado.passHash) { 
-                        sessionStorage.setItem('currentUser', nombre); // Guardar el nombre
-                        console.log("Acceso VIP exitoso, mostrando panel."); 
+                        sessionStorage.setItem('currentUser', nombre); 
                         await this.mostrarPanelEmpleados(nombre); 
                     } else { 
                         alert('Contraseña incorrecta.'); 
-                        console.warn("Contraseña incorrecta para:", nombre); 
                     } 
                 } else { 
                     alert('Nombre de tripulante no encontrado.'); 
-                    console.warn("Nombre de usuario no encontrado:", nombre); 
                 } 
             } catch(error) { 
                 console.error("Error en el acceso VIP:", error); 
@@ -939,10 +884,9 @@ document.addEventListener('DOMContentLoaded', () => {
             } 
         },
         cerrarSesion() { 
-            console.log("Cerrando sesión local.");
             this.stopAllTimers(); 
             if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); } 
-            sessionStorage.removeItem('currentUser'); // Limpiar el nombre de usuario
+            sessionStorage.removeItem('currentUser'); 
             this.mostrarInicio(); 
         },
         async gestionarReseteoDatos(nombre, esVenta = false) { 
@@ -980,13 +924,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            console.log("Fichando:", nombre); 
             let d = await this.gestionarReseteoDatos(nombre); 
             if (!d.fichado) { 
                 d.fichado = true; d.inicio = Date.now(); this.state.fichajes[nombre] = d; 
                 try { 
                     await Firebase.setDoc(Firebase.doc(db, 'fichajes', nombre), d, { merge: true }); 
-                    console.log("Fichaje guardado en Firebase."); 
                     await this.mostrarPanelEmpleados(nombre); 
                 } catch (e) { 
                     console.error("Error al fichar:", e); 
@@ -1003,7 +945,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            console.log("Desfichando:", nombre); 
             this.stopPanelTimers(); 
             let d = await this.gestionarReseteoDatos(nombre); 
             if (d.fichado) { 
@@ -1012,7 +953,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 d.fichado = false; d.inicio = null; this.state.fichajes[nombre] = d; 
                 try { 
                     await Firebase.setDoc(Firebase.doc(db, 'fichajes', nombre), d, { merge: true }); 
-                    console.log("Desfichaje guardado en Firebase."); 
                     if (!silent) await this.mostrarPanelEmpleados(nombre); 
                 } catch (e) { 
                     console.error("Error al desfichar:", e); 
@@ -1113,7 +1053,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 boat.reservas.push({ id: ahora, cliente: nombreEmpleado, inicio: ahora, fin: ahora + durationMinutes * 60 * 1000 }); 
                 try { 
                     await Firebase.setDoc(Firebase.doc(db, 'barcos', String(boat.id)), boat); 
-                    console.log(`Barco ${id} alquilado exitosamente por ${durationMinutes} minutos.`); 
                 } catch (e) { 
                     console.error("Error al alquilar barco:", e); 
                     alert("Error al alquilar barco: " + e.message); 
@@ -1133,7 +1072,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 r.fin = (r.fin.toMillis ? r.fin.toMillis() : r.fin) + addMinutes * 60 * 1000; 
                 try { 
                     await Firebase.setDoc(Firebase.doc(db, 'barcos', String(boat.id)), boat); 
-                    console.log(`Tiempo añadido al barco ${id} en Firebase.`); 
                 } catch (e) { 
                     console.error("Error al añadir tiempo:", e); 
                     alert("Error al añadir tiempo al barco: " + e.message); 
@@ -1154,7 +1092,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     boat.reservas.splice(index, 1); 
                     try { 
                         await Firebase.setDoc(Firebase.doc(db, 'barcos', String(boat.id)), boat); 
-                        console.log("Barco liberado exitosamente en Firebase."); 
                     } catch (e) { 
                         console.error("Error al liberar barco:", e); 
                         alert("Error al liberar barco: " + e.message); 
@@ -1192,7 +1129,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert("Error al reservar barco: " + e.message);
             } 
         }, 
-        // Revertido a la creación de empleado manual (sin Firebase Auth)
         async anadirEmpleado() { 
             const nombreInput = document.getElementById('newEmployeeName'); 
             const passInput = document.getElementById('newEmployeePass'); 
@@ -1202,9 +1138,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!nombre || !pass) { 
                 return alert('El nombre y la contraseña del tripulante son obligatorios.'); 
             } 
-            console.log("Intentando añadir tripulante:", nombre); 
             try { 
-                // Guardar los datos del empleado en Firestore, usando el nombre como ID de documento
                 await Firebase.setDoc(Firebase.doc(db, 'empleados', nombre), { 
                     nombre: nombre, 
                     passHash: this.hashPassword(pass), 
@@ -1213,7 +1147,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }); 
                 alert(`Tripulante ${nombre} añadido correctamente.`); 
                 
-                // Limpiar campos y refrescar el panel
                 nombreInput.value = ''; 
                 passInput.value = ''; 
                 await this.cargarTodosLosEmpleados(); 
@@ -1259,10 +1192,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     await Firebase.deleteDoc(Firebase.doc(db, 'empleados', nombre)); 
                     await Firebase.deleteDoc(Firebase.doc(db, 'fichajes', nombre)); 
                     await Firebase.deleteDoc(Firebase.doc(db, 'ventas', nombre)); 
-                    // Opcional: Eliminar compras de clientes si se vinculan por nombre
-                    // const clienteVentasDoc = await Firebase.getDoc(Firebase.doc(db, 'clientesVentas', nombre));
-                    // if (clienteVentasDoc.exists()) { await Firebase.deleteDoc(clienteVentasDoc.ref); }
-
                     alert(`${nombre} ha sido eliminado de la tripulación.`); 
                     await this.cargarTodosLosEmpleados(); 
                     await this.cargarTodosLosFichajes(); 
@@ -1272,9 +1201,8 @@ document.addEventListener('DOMContentLoaded', () => {
             } 
         },
         async actualizarControlesLocal() { 
-            // Esto requiere que un usuario esté en sesión para leer control_local
             const currentUser = sessionStorage.getItem('currentUser');
-            if (!currentUser) { /* No alert, podría ser al cargar la página sin login */ return; }
+            if (!currentUser) { return; }
 
             const abrirBtn = document.getElementById('abrirLocalBtn'); 
             const cerrarBtn = document.getElementById('cerrarLocalBtn'); 
@@ -1485,149 +1413,124 @@ document.addEventListener('DOMContentLoaded', () => {
 
             setTimeout(async () => {
                 let mockReply = "Lo siento, almirante, mi brújula no me indica esa dirección. ¿Puedes ser más específico?"; 
-                // Normalizar el mensaje para el regex y la comparación de palabras clave
-                const normalizedUserMsg = messageText.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Eliminar acentos
+                const normalizedUserMsg = messageText.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); 
                 
-                // Regex para capturar:
-                // Opcional: "vender a ", "vender ", "comprar ", "dar "
-                // Obligatorio: Nombre y Apellido (dos o más palabras, pueden tener espacios)
-                // Obligatorio: Cantidad (números)
-                // Obligatorio: Tipo de producto (cebos o cañas)
-                // Opcional: " y Cantidad Tipo"
-                // El grupo de captura para el nombre es ([a-z\s]+) para permitir múltiples palabras
                 const salesRegex = /(?:vender(?:\s+a)?\s+|comprar\s+|dar\s+)?([a-z\s]+)\s+(\d+)\s*(cebos|cañas)(?:(?:\s+y\s+)(\d+)\s*(cebos|cañas))?/i;
                 const match = normalizedUserMsg.match(salesRegex);
 
                 if (match) { 
-                    console.log("Patrón de venta detectado:", match);
                     const clientFullName = match[1].trim(); 
                     let item1Quantity = parseInt(match[2]);
                     let item1Type = match[3]; 
                     let item2Quantity = match[4] ? parseInt(match[4]) : 0;
                     let item2Type = match[5]; 
                     
-                    // Simple check for at least two words in client name
                     if (clientFullName.split(' ').length < 2) { 
                         mockReply = "¡Almirante! Para registrar la venta, necesito el nombre y **apellido** del cliente (dos palabras).";
                     } else if (!currentUser) { 
                         mockReply = "¡Capitán, solo la tripulación autorizada puede registrar ventas! Por favor, inicia sesión.";
                     }
                     else {
-                        const salesPromises = [];
-                        let ceboSoldToday = false;
-                        let responseMessages = [];
-
-                        // Normalize item types to 'cebo' and 'cana' for internal use
-                        item1Type = item1Type.includes('cebo') ? 'cebo' : 'cana';
-                        if (item2Type) {
-                            item2Type = item2Type.includes('cebo') ? 'cebo' : 'cana';
-                        }
+                        const clientDocRef = Firebase.doc(db, 'clientesVentas', clientFullName);
+                        const clientDoc = await Firebase.getDoc(clientDocRef);
+                        const clientData = clientDoc.exists() ? clientDoc.data() : { ultimaCompraCebos: null, compras: [] };
                         
-                        // Process first item
-                        if (item1Type === 'cebo') {
-                            const clientDocRef = Firebase.doc(db, 'clientesVentas', clientFullName);
-                            const clientDoc = await Firebase.getDoc(clientDocRef);
-                            const clientData = clientDoc.exists() ? clientDoc.data() : { ultimaCompraCebos: null, compras: [] };
-                            
-                            const lastCeboPurchaseTimestamp = clientData.ultimaCompraCebos;
-                            let lastCeboPurchaseDate = null;
+                        const lastCeboPurchaseTimestamp = clientData.ultimaCompraCebos;
+                        let hasBoughtCebosToday = false;
 
-                            if (lastCeboPurchaseTimestamp) {
-                                if (typeof lastCeboPurchaseTimestamp.toDate === 'function') {
-                                    lastCeboPurchaseDate = lastCeboPurchaseTimestamp.toDate().toDateString();
-                                } else {
-                                    lastCeboPurchaseDate = new Date(lastCeboPurchaseTimestamp).toDateString();
-                                }
+                        if (lastCeboPurchaseTimestamp) {
+                            let lastPurchaseDate = null;
+                            if (typeof lastCeboPurchaseTimestamp.toDate === 'function') {
+                                lastPurchaseDate = lastCeboPurchaseTimestamp.toDate();
+                            } else {
+                                lastPurchaseDate = new Date(lastCeboPurchaseTimestamp);
                             }
-                            const todayDate = new Date().toDateString();
+                            const todayStart = new Date();
+                            todayStart.setHours(0,0,0,0);
 
-                            console.log(`Cliente: ${clientFullName}, Última compra cebos: ${lastCeboPurchaseDate}, Hoy: ${todayDate}`);
+                            if (lastPurchaseDate >= todayStart) { 
+                                hasBoughtCebosToday = true;
+                            }
+                        }
 
-                            if (lastCeboPurchaseDate === todayDate) {
-                                responseMessages.push(`¡Almirante! El cliente ${clientFullName} ya compró cebos hoy. No podemos venderle más hasta mañana.`);
-                                ceboSoldToday = true;
+                        const salesPromises = [];
+                        let responseMessages = [];
+                        let actualSalesMade = [];
+
+                        // Process first item
+                        if (item1Type.toLowerCase().includes('cebo')) {
+                            if (hasBoughtCebosToday) {
+                                responseMessages.push(`¡Almirante! ${clientFullName} ya compró ${item1Type} hoy. No podemos venderle más ${item1Type}.`);
                             } else {
                                 salesPromises.push(Firebase.setDoc(clientDocRef, {
-                                    ultimaCompraCebos: Firebase.serverTimestamp(), // ESTO ESTÁ BIEN AQUÍ (a nivel de campo del documento)
+                                    ultimaCompraCebos: Firebase.serverTimestamp(), 
                                     compras: Firebase.arrayUnion({ 
                                         producto: 'cebo',
                                         cantidad: item1Quantity,
-                                        timestamp: Date.now(), // Usar Date.now() para elementos dentro del array
+                                        timestamp: Date.now(), 
                                         empleado: currentUser
                                     })
                                 }, { merge: true }));
-                                responseMessages.push(`¡${item1Quantity} cebos registrados para ${clientFullName}!`);
+                                actualSalesMade.push(`${item1Quantity} ${item1Type}`);
+                                hasBoughtCebosToday = true; 
                             }
-                        } else if (item1Type === 'cana') {
-                            const clientDocRef = Firebase.doc(db, 'clientesVentas', clientFullName);
+                        } else if (item1Type.toLowerCase().includes('caña')) {
                             salesPromises.push(Firebase.setDoc(clientDocRef, {
                                 compras: Firebase.arrayUnion({ 
                                     producto: 'cana',
                                     cantidad: item1Quantity,
-                                    timestamp: Date.now(), // Usar Date.now() para elementos dentro del array
+                                    timestamp: Date.now(), 
                                     empleado: currentUser
                                 })
                             }, { merge: true }));
-                            responseMessages.push(`¡${item1Quantity} cañas registradas para ${clientFullName}!`);
+                            actualSalesMade.push(`${item1Quantity} ${item1Type}`);
                         }
 
                         // Process second item if present
                         if (item2Quantity > 0 && item2Type) {
-                            if (item2Type === 'cebo') {
-                                if (ceboSoldToday) { 
-                                    responseMessages.push(`¡Atención! ${clientFullName} ya compró cebos hoy (segunda mención), no puedo registrar más cebos.`);
+                            if (item2Type.toLowerCase().includes('cebo')) {
+                                if (hasBoughtCebosToday) { 
+                                    responseMessages.push(`¡Almirante! ${clientFullName} ya compró ${item2Type} hoy (segunda mención).`); 
                                 } else {
-                                    const clientDocRef = Firebase.doc(db, 'clientesVentas', clientFullName);
-                                    const clientDoc = await Firebase.getDoc(clientDocRef);
-                                    const clientData = clientDoc.exists() ? clientDoc.data() : { ultimaCompraCebos: null, compras: [] };
-                                    
-                                    const lastCeboPurchaseTimestamp = clientData.ultimaCompraCebos;
-                                    let lastCeboPurchaseDate = null;
-                                    if (lastCeboPurchaseTimestamp) {
-                                        if (typeof lastCeboPurchaseTimestamp.toDate === 'function') {
-                                            lastCeboPurchaseDate = lastCeboPurchaseTimestamp.toDate().toDateString();
-                                        } else {
-                                            lastCeboPurchaseDate = new Date(lastCeboPurchaseTimestamp).toDateString();
-                                        }
-                                    }
-                                    const todayDate = new Date().toDateString();
-
-                                    if (lastCeboPurchaseDate === todayDate) { 
-                                        responseMessages.push(`¡Atención! ${clientFullName} ya compró cebos hoy (segunda mención), no puedo registrar más cebos.`);
-                                    } else {
-                                        salesPromises.push(Firebase.setDoc(clientDocRef, {
-                                            ultimaCompraCebos: Firebase.serverTimestamp(), // ESTO ESTÁ BIEN AQUÍ (a nivel de campo del documento)
-                                            compras: Firebase.arrayUnion({ 
-                                                producto: 'cebo',
-                                                cantidad: item2Quantity,
-                                                timestamp: Date.now(), // Usar Date.now() para elementos dentro del array
-                                                empleado: currentUser
-                                            })
-                                        }, { merge: true }));
-                                        responseMessages.push(`¡${item2Quantity} cebos también registrados para ${clientFullName}.`);
-                                    }
+                                    salesPromises.push(Firebase.setDoc(clientDocRef, {
+                                        ultimaCompraCebos: Firebase.serverTimestamp(), 
+                                        compras: Firebase.arrayUnion({ 
+                                            producto: 'cebo',
+                                            cantidad: item2Quantity,
+                                            timestamp: Date.now(), 
+                                            empleado: currentUser
+                                        })
+                                    }, { merge: true }));
+                                    actualSalesMade.push(`${item2Quantity} ${item2Type}`);
+                                    hasBoughtCebosToday = true; 
                                 }
-                            } else if (item2Type === 'cana') {
-                                const clientDocRef = Firebase.doc(db, 'clientesVentas', clientFullName);
+                            } else if (item2Type.toLowerCase().includes('caña')) {
                                 salesPromises.push(Firebase.setDoc(clientDocRef, {
                                     compras: Firebase.arrayUnion({ 
                                         producto: 'cana',
                                         cantidad: item2Quantity,
-                                        timestamp: Date.now(), // Usar Date.now() para elementos dentro del array
+                                        timestamp: Date.now(), 
                                         empleado: currentUser
                                     })
                                 }, { merge: true }));
-                                responseMessages.push(`¡${item2Quantity} cañas también registradas para ${clientFullName}.`);
+                                actualSalesMade.push(`${item2Quantity} ${item2Type}`);
                             }
                         }
 
                         try {
                             if (salesPromises.length > 0) {
                                 await Promise.all(salesPromises);
+                                if (actualSalesMade.length > 0) {
+                                    responseMessages.unshift(`¡Venta registrada para ${clientFullName}: ${actualSalesMade.join(' y ')}!`); 
+                                } else {
+                                    responseMessages.unshift(`¡Operación completada para ${clientFullName}!`);
+                                }
                                 mockReply = responseMessages.join(" ");
-                                this.cargarClienteVentas(); // Refresh client sales data
-                            } else {
+                                this.cargarClienteVentas(); 
+                            } else if (responseMessages.length > 0) {
                                 mockReply = responseMessages.join(" "); 
+                            } else {
+                                mockReply = `No se pudo registrar la venta para ${clientFullName}. Por favor, verifica el formato o las condiciones.`;
                             }
                         } catch (e) {
                             console.error("Error al registrar venta de cliente:", e);
@@ -1635,8 +1538,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
                 }
-                // General keyword responses (only if no sales pattern was matched)
-                else {
+                else { 
                     const keywords = {
                         fichar: ["fichar", "entrar", "inicio", "guardia", "trabajar"],
                         empleado: ["empleado", "tripulacion", "panel", "area", "zona"], 
@@ -1645,7 +1547,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         hola: ["hola", "buenas", "buenos", "ey", "ahoy"]
                     };
 
-                    const userMsgLower = normalizedUserMsg; // Ya normalizado y en minúsculas
+                    const userMsgLower = normalizedUserMsg; 
 
                     if (keywords.fichar.some(k => userMsgLower.includes(k))) {
                         if(currentUser) { 
@@ -1871,10 +1773,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         },
         async init() {
-            console.log("Iniciando aplicación Nautics...");
             this.iniciarListenerAnuncios();
             this.iniciarListenerBarcos(); 
-            // Cargar datos iniciales al arrancar la aplicación.
             await this.cargarTodosLosEmpleados();
             await this.cargarTodosLosFichajes();
             await this.cargarTodasLasVentas();
@@ -1916,31 +1816,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
             this.addMessageToChat('¡Ahoy! Soy Jack Sparrow, tu asistente en Nautics. ¿En qué puedo ayudarte?', 'bot'); 
 
-            // Verificar si hay una sesión activa al cargar la página
             const currentUser = sessionStorage.getItem('currentUser');
             if (currentUser) {
-                // Si hay un usuario en sessionStorage, intentar mostrar su panel
                 await this.irAPanelEmpleado(); 
             } else {
-                this.mostrarInicio(); // Mostrar la pantalla de inicio si no hay sesión
+                this.mostrarInicio(); 
             }
 
-            // Set up interval to reset cebo purchase restrictions daily
             setInterval(async () => {
                 const now = new Date();
                 const currentHour = now.getHours();
                 const currentMinute = now.getMinutes();
 
-                // Check if it's midnight (00:00)
                 if (currentHour === 0 && currentMinute === 0) { 
-                    console.log(`Reseteando restricciones de compra de cebos para el nuevo día...`);
                     const clientsSnapshot = await Firebase.getDocs(Firebase.collection(db, 'clientesVentas'));
                     const batch = Firebase.writeBatch(db);
                     clientsSnapshot.forEach(doc => {
                         const clientData = doc.data();
                         const lastCeboPurchaseTimestamp = clientData.ultimaCompraCebos;
                         
-                        // Solo resetear si la última compra fue en un día diferente al actual
                         if (lastCeboPurchaseTimestamp) {
                             let lastPurchaseDate = null;
                             if (typeof lastCeboPurchaseTimestamp.toDate === 'function') {
@@ -1951,26 +1845,24 @@ document.addEventListener('DOMContentLoaded', () => {
                             
                             const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
                             
-                            if (lastPurchaseDate < todayStart) { // Si la última compra fue antes del inicio de hoy
+                            if (lastPurchaseDate < todayStart) { 
                                  batch.update(doc.ref, { ultimaCompraCebos: null }); 
                             }
                         }
                     });
                     try {
                         await batch.commit();
-                        console.log("Restricciones de compra de cebos reseteadas para todos los clientes.");
-                        this.cargarClienteVentas(); // Refresh local state
+                        this.cargarClienteVentas(); 
                     } catch (e) {
                         console.error("Error al resetear restricciones de cebos:", e);
                     }
                 }
-            }, 1000 * 60); // Check every minute, should trigger once at 00:00
+            }, 1000 * 60); 
         },
 
         async descargarInformeExcel() {
             alert("Preparando los informes de la flota. La descarga comenzará en breve.");
             
-            // Asegúrate de recargar todos los datos antes de generar el informe
             await this.cargarTodosLosEmpleados();
             await this.cargarTodosLosFichajes();
             await this.cargarTodasLasVentas();
@@ -1991,11 +1883,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const datosVentas = [];
             for (const empleadoNombre in this.state.ventas) { 
                 const empleado = this.state.empleados.find(e => e.id === empleadoNombre);
-                const empleadoName = empleado ? empleado.nombre : empleadoNombre; 
+                const employeeName = empleado ? empleado.nombre : empleadoNombre; 
 
                 for (const productoId in this.state.ventas[empleadoNombre].productos) {
                     const productoInfo = this.state.productos.find(p => p.id === productoId);
-                    datosVentas.push({ Empleado: empleadoName, Producto: productoInfo ? productoInfo.nombre : productoId, Ventas_Hoy: this.state.ventas[empleadoNombre].productos[productoId].hoy || 0, Ventas_Total: this.state.ventas[empleadoNombre].productos[productoId].total || 0 });
+                    datosVentas.push({ Empleado: employeeName, Producto: productoInfo ? productoInfo.nombre : productoId, Ventas_Hoy: this.state.ventas[empleadoNombre].productos[productoId].hoy || 0, Ventas_Total: this.state.ventas[empleadoNombre].productos[productoId].total || 0 });
                 }
             }
             if (datosVentas.length > 0) {
@@ -2003,7 +1895,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 XLSX.utils.book_append_sheet(wb, wsVentas, "Transacciones");
             }
 
-            // New: Add client sales to Excel report
             const datosClienteVentas = [];
             for (const clientName in this.state.clientesVentas) {
                 const clientData = this.state.clientesVentas[clientName];
@@ -2013,7 +1904,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             Cliente: clientName,
                             Producto: compra.producto,
                             Cantidad: compra.cantidad,
-                            // Convertir el timestamp del array correctamente
                             Fecha_Compra: compra.timestamp ? new Date(compra.timestamp).toLocaleString('es-ES') : 'N/A', 
                             Empleado: compra.empleado || 'N/A'
                         });
