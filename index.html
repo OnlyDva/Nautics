@@ -466,7 +466,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         crearTarjetaProducto(producto, esPanelVenta = false, nombreEmpleado = '') {
             let totalVentasHoy = 0, totalVentasHist = 0;
-            // Asegura que el producto.precio esté definido, si no, usa el valor por defecto (50) para el cálculo
             const productoPrecio = producto.precio !== undefined ? producto.precio : 50; 
 
             if (this.state.ventas[nombreEmpleado] && this.state.ventas[nombreEmpleado].productos && this.state.ventas[nombreEmpleado].productos[producto.id]) {
@@ -483,8 +482,8 @@ document.addEventListener('DOMContentLoaded', () => {
                      </div>
                      ${desc}
                    </div>`
-                : `<p class="text-nautics-light text-lg font-bold mt-2">$${productoPrecio}</p>`; // Usa el precio del producto
-            // Eliminada referencia a placeholder.png y placeholderSVG, solo se muestra la imagen o nada.
+                : `<p class="text-nautics-light text-lg font-bold mt-2">$${productoPrecio}</p>`; 
+            // Eliminada referencia a placeholder.png y placeholderSVG
             const imagenHTML = producto.imagen ? `<img src="${producto.imagen}" alt="${producto.nombre}" class="mx-auto mb-2 w-24 h-24 object-cover rounded" onerror="this.style.display='none'"/>` : '';
             return `<div class="producto-card bg-nautics-mid rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div>${imagenHTML}<h3 class="text-white font-semibold leading-tight uppercase">${producto.nombre}</h3></div><div>${inputVentasHTML}</div></div>`;
         },
@@ -658,6 +657,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Genera los paneles para cada barco con sus formularios de reserva
             this.state.barcos.forEach(boat => { 
                 const estadoActual = this.getEstadoBarco(boat); 
+                // Eliminada la referencia a placeholder.png
                 const imagenHTML = `<img src="${boat.imagen}" alt="${boat.nombre}" class="barco-img mb-4" onerror="this.style.display='none'"/>`; 
                 html += `<div class="border-2 ${estadoActual.estado === 'disponible' ? 'border-green-600' : 'border-red-600'} p-4 rounded-lg bg-nautics-dark bg-opacity-70 flex flex-col">${imagenHTML}<div class="text-left flex-grow"><h2 class="text-2xl font-bold">${boat.nombre}</h2><p class="text-lg ${estadoActual.estado === 'disponible' ? 'text-green-400' : 'text-red-400'}">${estadoActual.texto}</p><div class="mt-2 text-sm"><p class="font-bold mb-1">Reservas para hoy:</p><ul class="list-disc list-inside space-y-1 h-20 overflow-y-auto text-xs">${boat.reservas.filter(r => new Date(r.inicio.toMillis ? r.inicio.toMillis() : r.inicio).toDateString() === new Date().toDateString()).sort((a,b)=>(a.inicio.toMillis ? a.inicio.toMillis() : a.inicio)-(b.inicio.toMillis ? b.inicio.toMillis() : b.inicio)).map(r => `<li>${new Date(r.inicio.toMillis ? r.inicio.toMillis() : r.inicio).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} - ${new Date(r.fin.toMillis ? r.fin.toMillis() : r.fin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} (${r.cliente})</li>`).join('') || '<li>Ninguna reserva hoy.</li>'}</ul></div></div><div id="form-boat-${boat.id}" class="mt-3 text-left border-t border-nautics-mid pt-3"><h4 class="font-bold mb-2 text-center">Hacer una nueva reserva:</h4><input type="text" id="cliente-boat-${boat.id}" placeholder="Nombre del Alquilador" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><input type="date" id="fecha-boat-${boat.id}" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><input type="time" id="hora-boat-${boat.id}" step="1800" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><select id="duracion-boat-${boat.id}" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><option value="30">30 Minutos (Paseo)</option><option value="45">45 Minutos (Alquiler)</option><option value="60">1 Hora</option><option value="120">2 Horas</option><option value="180">3 Horas</option></select><button class="btn w-full mt-2" onclick="VanillaApp.reservarBarco(${boat.id})">Confirmar Alquiler</button></div></div>`; 
             }); 
@@ -1338,7 +1338,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const currentUser = sessionStorage.getItem('currentUser'); 
             if (!currentUser) { alert("No hay usuario en sesión."); return; }
             
-            this.state.inventoryFiles = [null, null, null]; let uploadBoxesHTML = ''; for (let i = 0; i < 3; i++) { uploadBoxesHTML += `<div id="inventory-box-${i}" class="inventory-upload-box" tabindex="0"><span class="placeholder-text text-nautics-light text-center">Haz clic aquí y pega una imagen con<br/><strong>Ctrl+V</strong></span><img id="inventory-img-${i}" class="hidden"></div>`; /* Eliminado remove-btn, si se necesita se puede reintroducir con lógica */ } document.getElementById('contenido').innerHTML = `<div class="max-w-4xl mx-auto p-6 bg-nautics-dark bg-opacity-90 rounded-lg shadow-lg"><div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-bold">Inventario de Provisión</h2><button class="btn" onclick="VanillaApp.mostrarPanelEmpleados('${currentUser}')">Volver al Panel de Tripulación</button></div><div class="bg-nautics-mid p-6 rounded-lg text-center"><h3 class="text-xl font-semibold mb-4">Añadir Nuevo Inventario (hasta 3 imágenes)</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">${uploadBoxesHTML}</div><button id="upload-inventory-btn" class="btn text-lg py-2 px-6" style="background-color: var(--color-nautics-secondary-pink);">Guardar Inventario</button><div id="upload-status" class="mt-4 text-nautics-accent-pink"></div></div></div>`; for (let i = 0; i < 3; i++) { const box = document.getElementById(`inventory-box-${i}`); const img = document.getElementById(`inventory-img-${i}`); const handleFile = (file) => { if (file && file.type.startsWith('image/')) { this.state.inventoryFiles[i] = file; img.src = URL.createObjectURL(file); img.classList.remove('hidden'); box.classList.add('has-image'); }}; box.addEventListener('paste', e => { e.preventDefault(); handleFile(e.clipboardData.files[0]); }); /* Eliminado remove-btn listener */ } document.getElementById('upload-inventory-btn').onclick = () => this.subirInventario(); 
+            this.state.inventoryFiles = [null, null, null]; let uploadBoxesHTML = ''; for (let i = 0; i < 3; i++) { uploadBoxesHTML += `<div id="inventory-box-${i}" class="inventory-upload-box" tabindex="0"><span class="placeholder-text text-nautics-light text-center">Haz clic aquí y pega una imagen con<br/><strong>Ctrl+V</strong></span><img id="inventory-img-${i}" class="hidden"></div>`; } document.getElementById('contenido').innerHTML = `<div class="max-w-4xl mx-auto p-6 bg-nautics-dark bg-opacity-90 rounded-lg shadow-lg"><div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-bold">Inventario de Provisión</h2><button class="btn" onclick="VanillaApp.mostrarPanelEmpleados('${currentUser}')">Volver al Panel de Tripulación</button></div><div class="bg-nautics-mid p-6 rounded-lg text-center"><h3 class="text-xl font-semibold mb-4">Añadir Nuevo Inventario (hasta 3 imágenes)</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">${uploadBoxesHTML}</div><button id="upload-inventory-btn" class="btn text-lg py-2 px-6" style="background-color: var(--color-nautics-secondary-pink);">Guardar Inventario</button><div id="upload-status" class="mt-4 text-nautics-accent-pink"></div></div></div>`; for (let i = 0; i < 3; i++) { const box = document.getElementById(`inventory-box-${i}`); const img = document.getElementById(`inventory-img-${i}`); const handleFile = (file) => { if (file && file.type.startsWith('image/')) { this.state.inventoryFiles[i] = file; img.src = URL.createObjectURL(file); img.classList.remove('hidden'); box.classList.add('has-image'); }}; box.addEventListener('paste', e => { e.preventDefault(); handleFile(e.clipboardData.files[0]); }); } document.getElementById('upload-inventory-btn').onclick = () => this.subirInventario(); 
         },
         async subirInventario() { 
             const currentUser = sessionStorage.getItem('currentUser'); 
@@ -1442,7 +1442,8 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         async handleSendMessage() {
             const chatbotInput = document.getElementById('chatbot-input');
-            let messageText = chatbotInput.value.trim(); // No toLowerCase aquí para el regex
+            // IMPORTANTE: No toLowerCase() aquí para el mensaje completo que se usa en el regex
+            let messageText = chatbotInput.value.trim(); 
             const files = this.state.chatFiles;
             const currentUser = sessionStorage.getItem('currentUser'); 
 
@@ -1486,34 +1487,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
             setTimeout(async () => {
                 let mockReply = "Lo siento, almirante, mi brújula no me indica esa dirección. ¿Puedes ser más específico?"; 
-                const cleanedMessageText = messageText.toLowerCase().replace(/á/g, 'a').replace(/é/g, 'e').replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ú/g, 'u').replace(/ñ/g, 'n'); // Normalizar para coincidencia
+                // Normalizar el mensaje para el regex y la comparación de palabras clave
+                const normalizedUserMsg = messageText.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Eliminar acentos
                 
                 // Regex para capturar:
-                // Opcional: "vender a ", "vender ", "comprar "
-                // Obligatorio: Nombre y Apellido (dos palabras)
+                // Opcional: "vender a ", "vender ", "comprar ", "dar "
+                // Obligatorio: Nombre y Apellido (dos o más palabras, pueden tener espacios)
                 // Obligatorio: Cantidad (números)
                 // Obligatorio: Tipo de producto (cebos o cañas)
                 // Opcional: " y Cantidad Tipo"
-                const salesRegex = /(?:vender(?:\s+a)?\s+|comprar\s+)?([a-zñáéíóú]+\s[a-zñáéíóú]+)\s+(\d+)\s*(cebos|cañas)(?:(?:\s+y\s+)(\d+)\s*(cebos|cañas))?/i;
-                const match = cleanedMessageText.match(salesRegex);
+                // El grupo de captura para el nombre es ([a-z\s]+) para permitir múltiples palabras
+                const salesRegex = /(?:vender(?:\s+a)?\s+|comprar\s+|dar\s+)?([a-z\s]+)\s+(\d+)\s*(cebos|cañas)(?:(?:\s+y\s+)(\d+)\s*(cebos|cañas))?/i;
+                const match = normalizedUserMsg.match(salesRegex);
 
                 if (match) { 
                     console.log("Patrón de venta detectado:", match);
-                    // match[1] = nombre y apellido del cliente
-                    // match[2] = cantidad del primer artículo
-                    // match[3] = tipo del primer artículo
-                    // match[4] = cantidad del segundo artículo (si existe)
-                    // match[5] = tipo del segundo artículo (si existe)
-
-                    const clientName = match[1].trim(); 
+                    const clientFullName = match[1].trim(); 
                     let item1Quantity = parseInt(match[2]);
-                    let item1Type = match[3];
+                    let item1Type = match[3]; // 'cebos' or 'cañas'
                     let item2Quantity = match[4] ? parseInt(match[4]) : 0;
-                    let item2Type = match[5];
+                    let item2Type = match[5]; // 'cebos' or 'cañas'
                     
-                    if (!clientName.includes(' ')) { 
-                        mockReply = "¡Almirante! Para registrar la venta, necesito el nombre y **apellido** del cliente.";
-                    } else if (!currentUser) { // Si no hay usuario logueado en sessionStorage
+                    // Simple check for at least two words in client name
+                    if (clientFullName.split(' ').length < 2) { 
+                        mockReply = "¡Almirante! Para registrar la venta, necesito el nombre y **apellido** del cliente (dos palabras).";
+                    } else if (!currentUser) { 
                         mockReply = "¡Capitán, solo la tripulación autorizada puede registrar ventas! Por favor, inicia sesión.";
                     }
                     else {
@@ -1522,66 +1520,84 @@ document.addEventListener('DOMContentLoaded', () => {
                         let responseMessages = [];
 
                         // Normalize item types to 'cebo' and 'cana' for internal use
-                        item1Type = item1Type === 'cebos' ? 'cebo' : 'cana';
+                        item1Type = item1Type.includes('cebo') ? 'cebo' : 'cana';
                         if (item2Type) {
-                            item2Type = item2Type === 'cebos' ? 'cebo' : 'cana';
+                            item2Type = item2Type.includes('cebo') ? 'cebo' : 'cana';
                         }
                         
                         // Process first item
                         if (item1Type === 'cebo') {
-                            const clientDocRef = Firebase.doc(db, 'clientesVentas', clientName);
+                            const clientDocRef = Firebase.doc(db, 'clientesVentas', clientFullName);
                             const clientDoc = await Firebase.getDoc(clientDocRef);
                             const clientData = clientDoc.exists() ? clientDoc.data() : { ultimaCompraCebos: null, compras: [] };
                             
-                            // Comparar solo la fecha (día, mes, año)
-                            const lastCeboPurchaseDate = clientData.ultimaCompraCebos && typeof clientData.ultimaCompraCebos.toDate === 'function' ? clientData.ultimaCompraCebos.toDate().toDateString() : null;
+                            const lastCeboPurchaseTimestamp = clientData.ultimaCompraCebos;
+                            let lastCeboPurchaseDate = null;
+
+                            if (lastCeboPurchaseTimestamp) {
+                                // Asegurarse de que el Timestamp de Firebase se convierte a Date
+                                if (typeof lastCeboPurchaseTimestamp.toDate === 'function') {
+                                    lastCeboPurchaseDate = lastCeboPurchaseTimestamp.toDate().toDateString();
+                                } else {
+                                    // Si es un número (Date.now()), convertir directamente
+                                    lastCeboPurchaseDate = new Date(lastCeboPurchaseTimestamp).toDateString();
+                                }
+                            }
                             const todayDate = new Date().toDateString();
 
-                            console.log(`Cliente: ${clientName}, Última compra cebos: ${lastCeboPurchaseDate}, Hoy: ${todayDate}`);
+                            console.log(`Cliente: ${clientFullName}, Última compra cebos: ${lastCeboPurchaseDate}, Hoy: ${todayDate}`);
 
                             if (lastCeboPurchaseDate === todayDate) {
-                                responseMessages.push(`¡Almirante! El cliente ${clientName} ya compró cebos hoy. No podemos venderle más hasta mañana.`);
+                                responseMessages.push(`¡Almirante! El cliente ${clientFullName} ya compró cebos hoy. No podemos venderle más hasta mañana.`);
                                 ceboSoldToday = true;
                             } else {
                                 salesPromises.push(Firebase.setDoc(clientDocRef, {
-                                    ultimaCompraCebos: Firebase.serverTimestamp(),
+                                    ultimaCompraCebos: Firebase.serverTimestamp(), // Almacenar como Timestamp de servidor
                                     compras: Firebase.arrayUnion({ 
                                         producto: 'cebo',
                                         cantidad: item1Quantity,
-                                        timestamp: Firebase.serverTimestamp(),
+                                        timestamp: Firebase.serverTimestamp(), // Usar serverTimestamp para los elementos del array
                                         empleado: currentUser
                                     })
                                 }, { merge: true }));
-                                responseMessages.push(`¡${item1Quantity} cebos registrados para ${clientName}!`);
+                                responseMessages.push(`¡${item1Quantity} cebos registrados para ${clientFullName}!`);
                             }
                         } else if (item1Type === 'cana') {
-                            const clientDocRef = Firebase.doc(db, 'clientesVentas', clientName);
+                            const clientDocRef = Firebase.doc(db, 'clientesVentas', clientFullName);
                             salesPromises.push(Firebase.setDoc(clientDocRef, {
                                 compras: Firebase.arrayUnion({ 
                                     producto: 'cana',
                                     cantidad: item1Quantity,
-                                    timestamp: Firebase.serverTimestamp(),
+                                    timestamp: Firebase.serverTimestamp(), 
                                     empleado: currentUser
                                 })
                             }, { merge: true }));
-                            responseMessages.push(`¡${item1Quantity} cañas registradas para ${clientName}!`);
+                            responseMessages.push(`¡${item1Quantity} cañas registradas para ${clientFullName}!`);
                         }
 
                         // Process second item if present
                         if (item2Quantity > 0 && item2Type) {
                             if (item2Type === 'cebo') {
                                 if (ceboSoldToday) { 
-                                    responseMessages.push(`¡Atención! ${clientName} ya compró cebos hoy (segunda mención), no puedo registrar más cebos.`);
+                                    responseMessages.push(`¡Atención! ${clientFullName} ya compró cebos hoy (segunda mención), no puedo registrar más cebos.`);
                                 } else {
-                                    const clientDocRef = Firebase.doc(db, 'clientesVentas', clientName);
+                                    const clientDocRef = Firebase.doc(db, 'clientesVentas', clientFullName);
                                     const clientDoc = await Firebase.getDoc(clientDocRef);
                                     const clientData = clientDoc.exists() ? clientDoc.data() : { ultimaCompraCebos: null, compras: [] };
                                     
-                                    const lastCeboPurchaseDate = clientData.ultimaCompraCebos && typeof clientData.ultimaCompraCebos.toDate === 'function' ? clientData.ultimaCompraCebos.toDate().toDateString() : null;
+                                    const lastCeboPurchaseTimestamp = clientData.ultimaCompraCebos;
+                                    let lastCeboPurchaseDate = null;
+                                    if (lastCeboPurchaseTimestamp) {
+                                        if (typeof lastCeboPurchaseTimestamp.toDate === 'function') {
+                                            lastCeboPurchaseDate = lastCeboPurchaseTimestamp.toDate().toDateString();
+                                        } else {
+                                            lastCeboPurchaseDate = new Date(lastCeboPurchaseTimestamp).toDateString();
+                                        }
+                                    }
                                     const todayDate = new Date().toDateString();
 
-                                    if (lastCeboPurchaseDate === todayDate) { // Double check if first item was not cebo but second is
-                                        responseMessages.push(`¡Atención! ${clientName} ya compró cebos hoy (segunda mención), no puedo registrar más cebos.`);
+                                    if (lastCeboPurchaseDate === todayDate) { 
+                                        responseMessages.push(`¡Atención! ${clientFullName} ya compró cebos hoy (segunda mención), no puedo registrar más cebos.`);
                                     } else {
                                         salesPromises.push(Firebase.setDoc(clientDocRef, {
                                             ultimaCompraCebos: Firebase.serverTimestamp(),
@@ -1592,11 +1608,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                                 empleado: currentUser
                                             })
                                         }, { merge: true }));
-                                        responseMessages.push(`¡${item2Quantity} cebos también registrados para ${clientName}.`);
+                                        responseMessages.push(`¡${item2Quantity} cebos también registrados para ${clientFullName}.`);
                                     }
                                 }
                             } else if (item2Type === 'cana') {
-                                const clientDocRef = Firebase.doc(db, 'clientesVentas', clientName);
+                                const clientDocRef = Firebase.doc(db, 'clientesVentas', clientFullName);
                                 salesPromises.push(Firebase.setDoc(clientDocRef, {
                                     compras: Firebase.arrayUnion({ 
                                         producto: 'cana',
@@ -1605,7 +1621,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                         empleado: currentUser
                                     })
                                 }, { merge: true }));
-                                responseMessages.push(`¡${item2Quantity} cañas también registradas para ${clientName}.`);
+                                responseMessages.push(`¡${item2Quantity} cañas también registradas para ${clientFullName}.`);
                             }
                         }
 
@@ -1627,13 +1643,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 else {
                     const keywords = {
                         fichar: ["fichar", "entrar", "inicio", "guardia", "trabajar"],
-                        empleado: ["empleado", "tripulacion", "panel", "área", "zona"],
-                        producto: ["producto", "provisiones", "vender", "catálogo", "precios"],
+                        empleado: ["empleado", "tripulacion", "panel", "area", "zona"], // Normalizado sin acento
+                        producto: ["producto", "provisiones", "vender", "catalogo", "precios"], // Normalizado sin acento
                         barco: ["barco", "flota", "navio", "submarino", "alquilar"],
                         hola: ["hola", "buenas", "buenos", "ey", "ahoy"]
                     };
 
-                    const userMsgLower = userMsg.toLowerCase(); // Usar la versión en minúsculas para las palabras clave
+                    const userMsgLower = normalizedUserMsg; // Ya normalizado y en minúsculas
 
                     if (keywords.fichar.some(k => userMsgLower.includes(k))) {
                         if(currentUser) { 
@@ -1917,13 +1933,31 @@ document.addEventListener('DOMContentLoaded', () => {
             // Set up interval to reset cebo purchase restrictions daily
             setInterval(async () => {
                 const now = new Date();
+                // Usamos toLocaleDateString con un formato específico para asegurar que la fecha sea consistente
+                // y se compare solo el día. En España sería 'dd/mm/yyyy'.
+                const todayFormatted = new Date().toLocaleDateString('es-ES'); 
+
                 if (now.getHours() === 0 && now.getMinutes() === 0 && now.getSeconds() >= 0 && now.getSeconds() < 10) { 
-                    console.log("Reseteando restricciones de compra de cebos...");
+                    console.log(`Reseteando restricciones de compra de cebos para el día ${todayFormatted}...`);
                     const clientsSnapshot = await Firebase.getDocs(Firebase.collection(db, 'clientesVentas'));
                     const batch = Firebase.writeBatch(db);
                     clientsSnapshot.forEach(doc => {
-                        if (doc.data().ultimaCompraCebos) {
-                            batch.update(doc.ref, { ultimaCompraCebos: null }); 
+                        const clientData = doc.data();
+                        const lastCeboPurchaseTimestamp = clientData.ultimaCompraCebos;
+                        let lastPurchaseDateFormatted = null;
+
+                        if (lastCeboPurchaseTimestamp) {
+                            if (typeof lastCeboPurchaseTimestamp.toDate === 'function') {
+                                lastPurchaseDateFormatted = lastCeboPurchaseTimestamp.toDate().toLocaleDateString('es-ES');
+                            } else {
+                                lastPurchaseDateFormatted = new Date(lastCeboPurchaseTimestamp).toLocaleDateString('es-ES');
+                            }
+                        }
+                        
+                        // Solo resetear si la última compra fue en el día anterior (o cualquier día que no sea el actual)
+                        // Para evitar resetear si ya se ha reseteado o si es la primera compra
+                        if (lastPurchaseDateFormatted && lastPurchaseDateFormatted !== todayFormatted) {
+                             batch.update(doc.ref, { ultimaCompraCebos: null }); 
                         }
                     });
                     try {
