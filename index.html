@@ -203,9 +203,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const VanillaApp = { 
         state: {
             productos: [ 
-                { id: 'pescanova', nombre: 'PescAnova', imagen: 'PescAnova.png', precio: 50 }, 
+                { id: 'pescanova', nombre: 'Pescanova', imagen: 'Pescanova.png', precio: 50 }, 
                 { id: 'cana', nombre: 'Caña de Pescar', imagen: 'Caña.png', precio: 750 }, 
-                { id: 'cebo', nombre: 'Cebo Marino', imagen: 'Cebo.png', precio: 1000 }, 
+                { id: 'cebo', nombre: 'Cebo Marino', imagen: 'cebo.png', precio: 1000 }, 
                 { id: 'yonkayate', nombre: 'WonkaYate', imagen: 'WonkaYate.png', precio: 50 } 
             ],
             datosBarcosBase: [ 
@@ -447,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const desc = `<p class="text-xs mt-1" id="desc-${producto.id}">Hoy: ${totalVentasHoy} | Total: ${totalVentasHist}</p>`;
             const inputVentasHTML = esPanelVenta 
                 ? `<div class="mt-2">
-                    <div class="flex items-center justify-center gap-2">
+                     <div class="flex items-center justify-center gap-2">
                        <button onclick="VanillaApp.modificarVenta('${producto.id}', '${nombreEmpleado}', -1)" class="btn text-lg py-1 px-3">-</button>
                        <span class="font-bold text-lg w-8 text-center" id="ventas-hoy-${producto.id}">${totalVentasHoy}</span>
                        <button onclick="VanillaApp.modificarVenta('${producto.id}', '${nombreEmpleado}', 1)" class="btn text-lg py-1 px-3">+</button>
@@ -455,7 +455,7 @@ document.addEventListener('DOMContentLoaded', () => {
                      ${desc}
                    </div>`
                 : `<p class="text-nautics-light text-lg font-bold mt-2">$${productoPrecio}</p>`; 
-            const imagenHTML = producto.imagen ? `<img src="${producto.imagen}" alt="${producto.nombre}" class="mx-auto mb-2 w-24 h-24 object-cover rounded" onerror="this.style.display='none'"/>` : '';
+            const imagenHTML = producto.imagen ? `<img src="${producto.imagen}" alt="${producto.nombre}" class="mx-auto mb-2 w-24 h-24 object-cover rounded" onerror="this.src='placeholder.png'"/>` : '';
             return `<div class="producto-card bg-nautics-mid rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div>${imagenHTML}<h3 class="text-white font-semibold leading-tight uppercase">${producto.nombre}</h3></div><div>${inputVentasHTML}</div></div>`;
         },
 
@@ -468,72 +468,72 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const categoriaBajaHTML = `
                 <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
-                    <div><img src="small_boat_category.png" alt="Categoría Baja" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
-                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">Dhingy (Categoría Baja)</h3></div>
+                    <div><img src="Dhingy.png" alt="Dhingy" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">Dhingy</h3></div>
                     <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $1000 | Paseo: $1100</p></div>
                 </div>
                 <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
                     <div><img src="SunTrap.png" alt="El Sun Trap" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
-                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Sun Trap (Categoría Baja)</h3></div>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Sun Trap</h3></div>
                     <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $1000 | Paseo: $1100</p></div>
                 </div>
             `;
             const categoriaEstandarHTML = `
                 <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
-                    <div><img src="big_yacht_category.png" alt="Categoría Estándar" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
-                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">Squalo (Categoría Estándar)</h3></div>
+                    <div><img src="Squalo.png" alt="Squalo" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">Squalo</h3></div>
                     <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $1430 | Paseo: $1570</p></div>
                 </div>
                 <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
                     <div><img src="Tropic.png" alt="El Tropic" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
-                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Tropic (Categoría Estándar)</h3></div>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Tropic</h3></div>
                     <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $1430 | Paseo: $1570</p></div>
                 </div>
             `;
             const categoriaMediaHTML = `
                 <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
-                    <div><img src="jet_ski_category.png" alt="Categoría Media" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
-                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El JetMax (Categoría Media)</h3></div>
+                    <div><img src="JetMax.png" alt="El JetMax" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El JetMax</h3></div>
                     <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $1860 | Paseo: $2050</p></div>
                 </div>
             `;
             const categoriaGoldHTML = `
                 <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
-                    <div><img src="luxury_yacht_category.jpg" alt="Yate de Lujo" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
-                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Marquis (Categoría Gold)</h3></div>
+                    <div><img src="pirate_ship_category.png" alt="Marquis" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">Marquis</h3></div>
                     <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $2290 | Paseo: $2520</p></div>
                 </div>
                 <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
                     <div><img src="LongFin.png" alt="El Long Fin" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
-                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Long Fin (Categoría Gold)</h3></div>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Long Fin</h3></div>
                     <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $2290 | Paseo: $2520</p></div>
                 </div>
                    <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
                     <div><img src="Speeder.png" alt="El Speeder" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
-                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Speeder (Categoría Gold)</h3></div>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Speeder</h3></div>
                     <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $2290 | Paseo: $2520</p></div>
                 </div>
                 <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
                     <div><img src="Toro.png" alt="El Toro" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
-                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Toro (Categoría Gold)</h3></div>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Toro</h3></div>
                     <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $2290 | Paseo: $2520</p></div>
                 </div>
             `;
             const categoriaAventuraHTML = `
                 <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
                     <div><img src="Avisa.png" alt="La Avisa" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
-                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">La Avisa (Categoría Aventura)</h3></div>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">La Avisa</h3></div>
                     <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $2720 | Paseo: $3000</p></div>
                 </div>
                 <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
                     <div><img src="Submarino.png" alt="El Submarino" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
-                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Submarino (Categoría Aventura)</h3></div>
+                    <h3 class="text-white font-semibold leading-tight mt-2 uppercase">El Submarino</h3></div>
                     <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $2720 | Paseo: $3000</p></div>
                 </div>
             `;
             const categoriaMotosAguaHTML = `
                 <div class="producto-card bg-nautics-mid rounded-lg p-4 text-center shadow-md flex flex-col justify-between">
-                    <div><img src="jet_ski_category.png" alt="Moto de Agua" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
+                    <div><img src="Moto_de_agua.png" alt="Moto de Agua" class="mx-auto mb-2 w-full h-24 object-cover rounded"/>
                     <h3 class="text-white font-semibold leading-tight mt-2 uppercase">Moto de Agua</h3></div>
                     <div><p class="text-nautics-light text-lg font-bold mt-2">Alquiler: $500 | Paseo: $500</p></div>
                 </div>
@@ -553,37 +553,31 @@ document.addEventListener('DOMContentLoaded', () => {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td colspan="3"><hr class="border-t border-nautics-primary-blue my-2"/></td></tr>
                             <tr>
                                 <td class="p-3">Categoría Baja</td>
                                 <td class="p-3">$1000</td>
                                 <td class="p-3">$1100</td>
                             </tr>
-                            <tr><td colspan="3"><hr class="border-t border-nautics-mid my-2"/></td></tr>
                             <tr>
                                 <td class="p-3">Categoría Estándar</td>
                                 <td class="p-3">$1430</td>
                                 <td class="p-3">$1570</td>
                             </tr>
-                            <tr><td colspan="3"><hr class="border-t border-nautics-mid my-2"/></td></tr>
                             <tr>
                                 <td class="p-3">Categoría Media</td>
                                 <td class="p-3">$1860</td>
                                 <td class="p-3">$2050</td>
                             </tr>
-                            <tr><td colspan="3"><hr class="border-t border-nautics-mid my-2"/></td></tr>
                             <tr>
                                 <td class="p-3">Categoría Gold</td>
                                 <td class="p-3">$2290</td>
                                 <td class="p-3">$2520</td>
                             </tr>
-                            <tr><td colspan="3"><hr class="border-t border-nautics-mid my-2"/></td></tr>
                             <tr>
                                 <td class="p-3">Categoría Aventura</td>
                                 <td class="p-3">$2720</td>
                                 <td class="p-3">$3000</td>
                             </tr>
-                            <tr><td colspan="3"><hr class="border-t border-nautics-mid my-2"/></td></tr>
                             <tr>
                                 <td class="p-3">Motos de Agua</td>
                                 <td class="p-3">$500</td>
@@ -621,15 +615,51 @@ document.addEventListener('DOMContentLoaded', () => {
         async mostrarPanelBarcos() { 
             this.stopAllTimers(); 
             if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); } 
-            let html = `<div class="max-w-7xl mx-auto text-center"><h1 class="text-4xl font-bold mb-8">Nuestra Flota de Barcos</h1><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`; 
+            
+            let html = `<div class="max-w-7xl mx-auto text-center">
+                            <h1 class="text-4xl font-bold mb-8">Nuestra Flota de Barcos</h1>
+                            <p class="text-nautics-light mb-8 max-w-3xl mx-auto">Selecciona tu navío y prepárate para la aventura. Rellena el formulario para asegurar tu travesía en los siete mares.</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">`; 
+            
             this.state.barcos.forEach(boat => { 
-                const estadoActual = this.getEstadoBarco(boat); 
-                const imagenHTML = `<img src="${boat.imagen}" alt="${boat.nombre}" class="barco-img mb-4" onerror="this.style.display='none'"/>`; 
-                html += `<div class="border-2 ${estadoActual.estado === 'disponible' ? 'border-green-600' : 'border-red-600'} p-4 rounded-lg bg-nautics-dark bg-opacity-70 flex flex-col">${imagenHTML}<div class="text-left flex-grow"><h2 class="text-2xl font-bold">${boat.nombre}</h2><p class="text-lg ${estadoActual.estado === 'disponible' ? 'text-green-400' : 'text-red-400'}">${estadoActual.texto}</p><div class="mt-2 text-sm"><p class="font-bold mb-1">Reservas para hoy:</p><ul class="list-disc list-inside space-y-1 h-20 overflow-y-auto text-xs">${boat.reservas.filter(r => new Date(r.inicio.toMillis ? r.inicio.toMillis() : r.inicio).toDateString() === new Date().toDateString()).sort((a,b)=>(a.inicio.toMillis ? a.inicio.toMillis() : a.inicio)-(b.inicio.toMillis ? b.inicio.toMillis() : b.inicio)).map(r => `<li>${new Date(r.inicio.toMillis ? r.inicio.toMillis() : r.inicio).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} - ${new Date(r.fin.toMillis ? r.fin.toMillis() : r.fin).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} (${r.cliente})</li>`).join('') || '<li>Ninguna reserva hoy.</li>'}</ul></div></div><div id="form-boat-${boat.id}" class="mt-3 text-left border-t border-nautics-mid pt-3"><h4 class="font-bold mb-2 text-center">Hacer una nueva reserva:</h4><input type="text" id="cliente-boat-${boat.id}" placeholder="Nombre del Alquilador" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><input type="date" id="fecha-boat-${boat.id}" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><input type="time" id="hora-boat-${boat.id}" step="1800" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><select id="duracion-boat-${boat.id}" class="w-full p-2 rounded bg-gray-800 text-white mb-2 text-sm"><option value="30">30 Minutos (Paseo)</option><option value="45">45 Minutos (Alquiler)</option><option value="60">1 Hora</option><option value="120">2 Horas</option><option value="180">3 Horas</option></select><button class="btn w-full mt-2" onclick="VanillaApp.reservarBarco(${boat.id})">Confirmar Alquiler</button></div></div>`; 
+                html += `
+                <div class="bg-nautics-mid rounded-lg shadow-lg overflow-hidden flex flex-col border border-nautics-primary-blue">
+                    <img src="${boat.imagen}" alt="${boat.nombre}" class="w-full h-64 object-cover" onerror="this.src='placeholder.png'; this.classList.add('p-4', 'bg-nautics-dark');">
+                    <div class="p-6 flex-grow flex flex-col">
+                        <h2 class="text-2xl font-bold mb-4 text-nautics-light">${boat.nombre}</h2>
+                        <div class="flex-grow space-y-4">
+                            <input type="text" id="cliente-boat-${boat.id}" placeholder="Nombre del Capitán (Alquilador)" class="w-full p-2 rounded bg-nautics-light text-gray-900 text-sm placeholder-gray-500">
+                            <div class="grid grid-cols-2 gap-4">
+                                <input type="date" id="fecha-boat-${boat.id}" class="w-full p-2 rounded bg-nautics-light text-gray-900 text-sm">
+                                <input type="time" id="hora-boat-${boat.id}" step="1800" class="w-full p-2 rounded bg-nautics-light text-gray-900 text-sm">
+                            </div>
+                            <select id="duracion-boat-${boat.id}" class="w-full p-2 rounded bg-nautics-light text-gray-900 text-sm">
+                                <optgroup label="Paseo">
+                                    <option value="30">Paseo (30 Minutos)</option>
+                                    <option value="60">Paseo (60 Minutos)</option>
+                                    <option value="90">Paseo (90 Minutos)</option>
+                                </optgroup>
+                                <optgroup label="Alquiler">
+                                    <option value="45">Alquiler (45 Minutos)</option>
+                                    <option value="90">Alquiler (90 Minutos)</option>
+                                    <option value="135">Alquiler (135 Minutos)</option>
+                                    <option value="180">Alquiler (180 Minutos)</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <button class="btn w-full mt-6 py-3 text-lg" style="background-color: var(--color-nautics-secondary-pink);" onclick="VanillaApp.reservarBarco(${boat.id})">Confirmar Reserva</button>
+                    </div>
+                </div>`;
             }); 
+            
             html += `</div><div class="text-center"><button onclick="VanillaApp.mostrarInicio()" class="btn mt-8">Volver al Inicio</button></div></div>`; 
             document.getElementById('contenido').innerHTML = html; 
-            const hoy = new Date(); const unaSemana = new Date(); unaSemana.setDate(hoy.getDate() + 7); const minDate = hoy.toISOString().split('T')[0]; const maxDate = unaSemana.toISOString().split('T')[0]; 
+            
+            const hoy = new Date(); 
+            const dosSemanas = new Date(); 
+            dosSemanas.setDate(hoy.getDate() + 14);
+            const minDate = hoy.toISOString().split('T')[0]; 
+            const maxDate = dosSemanas.toISOString().split('T')[0]; 
             document.querySelectorAll('input[type="date"]').forEach(input => { input.min = minDate; input.max = maxDate; input.value = minDate; }); 
             this.ajustarPosicionChatbot(false);
         },
@@ -648,7 +678,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let barcosHTML = this.state.barcos.map(boat => { 
                 const estadoActual = this.getEstadoBarco(boat); 
                 let controles = (estadoActual.estado === 'disponible') 
-                    ? `<button class="btn text-sm py-2 w-full" onclick="VanillaApp.ocuparBarcoAhora(${boat.id}, '${nombre}', 30)">Alquilar (30 min)</button>` /* Paseo */
+                    ? `<button class="btn text-sm py-2 w-full" onclick="VanillaApp.ocuparBarcoAhora(${boat.id}, '${nombre}', 30)">Alquilar (30 min)</button>`
                     : `<div class="font-mono text-xl mb-2" id="timer-boat-${boat.id}">--:--:--</div><div class="flex gap-2"><button class="btn text-xs py-1 flex-grow" onclick="VanillaApp.anadirTiempoBarco(${boat.id}, '${nombre}', 30)">+30 min</button><button class="btn text-xs py-1 flex-grow" style="background-color:#dc2626" onclick="VanillaApp.liberarBarco(${boat.id}, '${nombre}')">Liberar</button></div>`; 
                 return `<div class="bg-nautics-mid p-4 rounded-lg text-center flex flex-col justify-between"><div><p class="font-bold text-lg">${boat.nombre}</p><p class="text-sm ${estadoActual.estado === 'ocupada' ? 'text-red-400' : 'text-green-400'} mb-2">${estadoActual.texto}</p></div><div>${controles}</div></div>`;
             }).join('');
@@ -831,11 +861,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const adminPassDoc = await Firebase.getDoc(Firebase.doc(db, 'configuracion', 'admin_pass'));
                 
-                // console.log("Admin Pass Input:", adminPass); // Removido para optimización
-                // console.log("Hashed Admin Pass Input:", this.hashPassword(adminPass)); // Removido para optimización
-
                 if (adminPassDoc.exists() && this.hashPassword(adminPass) === adminPassDoc.data().passHash) {
-                    // console.log("Contraseña de jefe maestra correcta."); // Removido para optimización
                     sessionStorage.setItem('currentUser', "admin-maestro"); 
                     
                     await this.cargarTodosLosEmpleados(); 
@@ -848,7 +874,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.mostrarPanelAdmin(); 
                 } else {
                     alert('Contraseña de jefe incorrecta.');
-                    // console.warn("Contraseña de jefe incorrecta."); // Removido para optimización
                 }
             } catch (error) {
                 console.error("Error en el acceso de jefe:", error);
@@ -1922,7 +1947,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         datosAusencias.push({ Empleado: e.nombre, Inicio_Ausencia: new Date(a.inicio).toLocaleDateString('es-ES'), Fin_Ausencia: new Date(a.fin).toLocaleDateString('es-ES') });
                     });
                 }
-                });
+            });
             if (datosAusencias.length > 0) {
                 const wsAusencias = XLSX.utils.json_to_sheet(datosAusencias);
                 XLSX.utils.book_append_sheet(wb, wsAusencias, "Permisos de Ausencia");
