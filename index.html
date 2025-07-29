@@ -212,7 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 { id: 1, nombre: 'La Perla Negra', imagen: 'Jack_Sparrow.png', reservas: [] }, 
                 { id: 2, nombre: 'El Jet Max', imagen: 'JetMax.png', reservas: [] },
                 { id: 3, nombre: 'El Long Fin', imagen: 'LongFin.png', reservas: [] },
-                { id: 4, nombre: 'El Marquis', imagen: 'Marquis.png', reservas: [] },
+                { id: 4, nombre: 'El Marquis', imagen: 'pirate_ship_category.png', reservas: [] },
                 { id: 5, nombre: 'La Avisa', imagen: 'Avisa.png', reservas: [] },
                 { id: 6, nombre: 'El Speeder', imagen: 'Speeder.png', reservas: [] },
                 { id: 7, nombre: 'El Squalo', imagen: 'Squalo.png', reservas: [] },
@@ -220,7 +220,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 { id: 9, nombre: 'El Sun Trap', imagen: 'SunTrap.png', reservas: [] },
                 { id: 10, nombre: 'El Toro', imagen: 'Toro.png', reservas: [] },
                 { id: 11, nombre: 'El Tropic', imagen: 'Tropic.png', reservas: [] },
-                { id: 12, nombre: 'La Dhingy', imagen: 'Dhingy.png', reservas: [] }, 
+                { id: 12, nombre: 'La Dhingy', imagen: 'Dhingy.png', reservas: [] },
+                { id: 13, nombre: 'Moto de Agua', imagen: 'Moto_de_agua.png', reservas: [] },
             ],
             empleados: [], fichajes: {}, ventas: {}, barcos: [], 
             inventarioLog: [], libroNegro: [], listaNegra: [], 
@@ -1767,37 +1768,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
         iniciarListenerBarcos() { 
             const q = Firebase.query(Firebase.collection(db, "barcos"), Firebase.orderBy("id")); 
-            Firebase.onSnapshot(q, (snapshot) => { 
-                const barcosNuevos = []; 
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const reservasConvertidas = data.reservas ? data.reservas.map(res => ({
-                        ...res,
-                        inicio: res.inicio && typeof res.inicio.toMillis === 'function' ? res.inicio.toMillis() : res.inicio,
-                        fin: res.fin && typeof res.fin.toMillis === 'function' ? res.fin.toMillis() : res.fin
-                    })) : [];
-                    barcosNuevos.push({ ...data, reservas: reservasConvertidas }); 
-                });
-                this.state.barcos = barcosNuevos; 
-
-                const panelBarcos = document.getElementById('panel-barcos'); 
-                if (panelBarcos) {
-                    const currentUser = sessionStorage.getItem('currentUser'); 
-                    let barcosHTML = this.state.barcos.map(boat => { 
-                        const estadoActual = this.getEstadoBarco(boat); 
-                        const imagenHTML = `<img src="${boat.imagen}" alt="${boat.nombre}" class="barco-img mb-4" onerror="this.style.display='none'"/>`; 
-                        let controles = (estadoActual.estado === 'disponible') 
-                            ? `<div class="flex flex-col gap-2"><button class="btn text-sm py-2 w-full" onclick="VanillaApp.ocuparBarcoAhora(${boat.id}, '${currentUser}')">Paseo (30 min)</button><button class="btn text-sm py-2 w-full" onclick="VanillaApp.ocuparBarcoAhora(${boat.id}, '${currentUser}')" style="background-color: var(--color-nautics-secondary-pink);">Alquiler (45 min)</button></div>` 
-                            : `<div class="font-mono text-xl mb-2" id="timer-boat-${boat.id}">--:--:--</div><div class="flex gap-2"><button class="btn text-xs py-1 flex-grow" onclick="VanillaApp.anadirTiempoBarco(${boat.id}, '${currentUser}', 30)">+30 min</button><button class="btn text-xs py-1 flex-grow" style="background-color:#dc2626" onclick="VanillaApp.liberarBarco(${boat.id}, '${currentUser}')">Liberar</button></div>`;
-                        return `<div class="bg-nautics-mid p-4 rounded-lg text-center flex flex-col justify-between"><div><p class="font-bold text-lg">${boat.nombre}</p><p class="text-sm ${estadoActual.estado === 'ocupada' ? 'text-red-400' : 'text-green-400'} mb-2">${estadoActual.texto}</p></div><div>${controles}</div></div>`;
-                    }).join('');
-                    panelBarcos.innerHTML = barcosHTML; 
+            this.state.unsubscribeBarcos = Firebase.onSnapshot(q, (snapshot) => { 
+                if (!snapshot.empty) {
+                    const barcosNuevos = []; 
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const reservasConvertidas = data.reservas ? data.reservas.map(res => ({
+                            ...res,
+                            inicio: res.inicio && typeof res.inicio.toMillis === 'function' ? res.inicio.toMillis() : res.inicio,
+                            fin: res.fin && typeof res.fin.toMillis === 'function' ? res.fin.toMillis() : res.fin
+                        })) : [];
+                        barcosNuevos.push({ ...data, reservas: reservasConvertidas }); 
+                    });
+                    this.state.barcos = barcosNuevos; 
                 }
+
+                const panelBarcosEmpleados = document.getElementById('panel-barcos'); 
+                if (panelBarcosEmpleados) {
+                    const currentUser = sessionStorage.getItem('currentUser'); 
+                    if (currentUser) {
+                        this.mostrarPanelEmpleados(currentUser); 
+                    }
+                }
+                const h1Element = document.querySelector('#contenido h1');
+                if (h1Element && h1Element.textContent.includes("Nuestra Flota de Barcos")) {
+                    this.mostrarPanelBarcos();
+                }
+
             }, (error) => {
                 console.error("Error al escuchar cambios en barcos:", error);
             });
         },
         async init() {
+            this.state.barcos = this.state.datosBarcosBase; 
             this.iniciarListenerAnuncios();
             this.iniciarListenerBarcos(); 
             await this.cargarTodosLosEmpleados();
