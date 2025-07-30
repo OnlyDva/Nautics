@@ -208,20 +208,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 { id: 'cebo', nombre: 'Cebo Marino', imagen: 'cebo.png', precio: 1000 }, 
                 { id: 'yonkayate', nombre: 'WonkaYate', imagen: 'WonkaYate.png', precio: 50 } 
             ],
-            datosBarcosBase: [ 
-                { id: 1, nombre: 'La Perla Negra', imagen: 'Jack_Sparrow.png', reservas: [] }, 
-                { id: 2, nombre: 'El Jet Max', imagen: 'JetMax.png', reservas: [] },
-                { id: 3, nombre: 'El Long Fin', imagen: 'LongFin.png', reservas: [] },
-                { id: 4, nombre: 'El Marquis', imagen: 'pirate_ship_category.png', reservas: [] },
-                { id: 5, nombre: 'La Avisa', imagen: 'Avisa.png', reservas: [] },
-                { id: 6, nombre: 'El Speeder', imagen: 'Speeder.png', reservas: [] },
-                { id: 7, nombre: 'El Squalo', imagen: 'Squalo.png', reservas: [] },
-                { id: 8, nombre: 'El Submarino', imagen: 'Submarino.png', reservas: [] },
-                { id: 9, nombre: 'El Sun Trap', imagen: 'SunTrap.png', reservas: [] },
-                { id: 10, nombre: 'El Toro', imagen: 'Toro.png', reservas: [] },
-                { id: 11, nombre: 'El Tropic', imagen: 'Tropic.png', reservas: [] },
-                { id: 12, nombre: 'La Dhingy', imagen: 'Dhingy.png', reservas: [] },
-                { id: 13, nombre: 'Moto de Agua', imagen: 'Moto_de_agua.png', reservas: [] },
+            datosBarcosBase: [
+                { id: 12, nombre: 'La Dhingy', imagen: 'Dhingy.png', reservas: [], category: 'baja', categoryTitle: 'Categoría Baja (Barcos Pequeños)' },
+                { id: 9, nombre: 'El Sun Trap', imagen: 'SunTrap.png', reservas: [], category: 'baja', categoryTitle: 'Categoría Baja (Barcos Pequeños)' },
+                { id: 7, nombre: 'El Squalo', imagen: 'Squalo.png', reservas: [], category: 'estandar', categoryTitle: 'Categoría Estándar (Barcos Medianos)' },
+                { id: 11, nombre: 'El Tropic', imagen: 'Tropic.png', reservas: [], category: 'estandar', categoryTitle: 'Categoría Estándar (Barcos Medianos)' },
+                { id: 2, nombre: 'El Jet Max', imagen: 'JetMax.png', reservas: [], category: 'media', categoryTitle: 'Categoría Media (Lanchas Rápidas)' },
+                { id: 4, nombre: 'El Marquis', imagen: 'pirate_ship_category.png', reservas: [], category: 'gold', categoryTitle: 'Categoría Gold (Yates de Lujo)' },
+                { id: 3, nombre: 'El Long Fin', imagen: 'LongFin.png', reservas: [], category: 'gold', categoryTitle: 'Categoría Gold (Yates de Lujo)' },
+                { id: 6, nombre: 'El Speeder', imagen: 'Speeder.png', reservas: [], category: 'gold', categoryTitle: 'Categoría Gold (Yates de Lujo)' },
+                { id: 10, nombre: 'El Toro', imagen: 'Toro.png', reservas: [], category: 'gold', categoryTitle: 'Categoría Gold (Yates de Lujo)' },
+                { id: 5, nombre: 'La Avisa', imagen: 'Avisa.png', reservas: [], category: 'aventura', categoryTitle: 'Categoría Aventura (Exploración y Submarinismo)' },
+                { id: 8, nombre: 'El Submarino', imagen: 'Submarino.png', reservas: [], category: 'aventura', categoryTitle: 'Categoría Aventura (Exploración y Submarinismo)' },
+                { id: 13, nombre: 'Moto de Agua', imagen: 'Moto_de_agua.png', reservas: [], category: 'motos', categoryTitle: 'Motos de Agua' },
             ],
             empleados: [], fichajes: {}, ventas: {}, barcos: [], 
             inventarioLog: [], libroNegro: [], listaNegra: [], 
@@ -615,45 +614,63 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         async mostrarPanelBarcos() { 
             this.stopAllTimers(); 
-            if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); } 
+            if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); }
             
-            let html = `<div class="max-w-7xl mx-auto text-center">
-                            <h1 class="text-4xl font-bold mb-8">Nuestra Flota de Barcos</h1>
-                            <p class="text-nautics-light mb-8 max-w-3xl mx-auto">Selecciona tu navío y prepárate para la aventura. Rellena el formulario para asegurar tu travesía en los siete mares.</p>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">`; 
+            let html = `<div class="max-w-7xl mx-auto">
+                            <div class="text-center">
+                                <h1 class="text-4xl font-bold mb-4">Nuestra Flota de Barcos</h1>
+                                <p class="text-nautics-light mb-8 max-w-3xl mx-auto">Selecciona tu navío y prepárate para la aventura. Rellena el formulario para asegurar tu travesía en los siete mares.</p>
+                            </div>`;
             
-            this.state.barcos.forEach(boat => { 
-                html += `
-                <div class="bg-nautics-mid rounded-lg shadow-lg overflow-hidden flex flex-col border border-nautics-primary-blue">
-                    <img src="${boat.imagen}" alt="${boat.nombre}" class="w-full h-64 object-cover" onerror="this.src='placeholder.png'; this.classList.add('p-4', 'bg-nautics-dark');">
-                    <div class="p-6 flex-grow flex flex-col">
-                        <h2 class="text-2xl font-bold mb-4 text-nautics-light">${boat.nombre}</h2>
-                        <div class="flex-grow space-y-4">
-                            <input type="text" id="cliente-boat-${boat.id}" placeholder="Nombre del Capitán (Alquilador)" class="w-full p-2 rounded bg-nautics-light text-gray-900 text-sm placeholder-gray-500">
-                            <div class="grid grid-cols-2 gap-4">
-                                <input type="date" id="fecha-boat-${boat.id}" class="w-full p-2 rounded bg-nautics-light text-gray-900 text-sm">
-                                <input type="time" id="hora-boat-${boat.id}" step="1800" class="w-full p-2 rounded bg-nautics-light text-gray-900 text-sm">
+            const boatsByCategory = this.state.barcos.reduce((acc, boat) => {
+                (acc[boat.category] = acc[boat.category] || []).push(boat);
+                return acc;
+            }, {});
+
+            const categoryOrder = ['baja', 'estandar', 'media', 'gold', 'aventura', 'motos'];
+
+            for (const categoryKey of categoryOrder) {
+                const boats = boatsByCategory[categoryKey];
+                if (boats && boats.length > 0) {
+                    html += `<h3 class="text-2xl font-bold mt-8 mb-4 text-nautics-light border-b-2 border-nautics-primary-blue pb-2">${boats[0].categoryTitle}</h3>
+                             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">`;
+                    
+                    boats.forEach(boat => {
+                        html += `
+                        <div class="bg-nautics-mid rounded-lg shadow-lg overflow-hidden flex flex-col border border-nautics-primary-blue">
+                            <img src="${boat.imagen}" alt="${boat.nombre}" class="w-full h-64 object-cover" onerror="this.src='placeholder.png'; this.classList.add('p-4', 'bg-nautics-dark');">
+                            <div class="p-6 flex-grow flex flex-col">
+                                <h2 class="text-2xl font-bold mb-4 text-nautics-light">${boat.nombre}</h2>
+                                <div class="flex-grow space-y-4">
+                                    <input type="text" id="cliente-boat-${boat.id}" placeholder="Nombre del Capitán (Alquilador)" class="w-full p-2 rounded bg-nautics-light text-gray-900 text-sm placeholder-gray-500">
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <input type="date" id="fecha-boat-${boat.id}" class="w-full p-2 rounded bg-nautics-light text-gray-900 text-sm">
+                                        <input type="time" id="hora-boat-${boat.id}" step="1800" class="w-full p-2 rounded bg-nautics-light text-gray-900 text-sm">
+                                    </div>
+                                    <select id="duracion-boat-${boat.id}" class="w-full p-2 rounded bg-nautics-light text-gray-900 text-sm">
+                                        <optgroup label="Paseo">
+                                            <option value="30">Paseo (30 Minutos)</option>
+                                            <option value="60">Paseo (60 Minutos)</option>
+                                            <option value="90">Paseo (90 Minutos)</option>
+                                        </optgroup>
+                                        <optgroup label="Alquiler">
+                                            <option value="45">Alquiler (45 Minutos)</option>
+                                            <option value="90">Alquiler (90 Minutos)</option>
+                                            <option value="135">Alquiler (135 Minutos)</option>
+                                            <option value="180">Alquiler (180 Minutos)</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
+                                <button class="btn w-full mt-6 py-3 text-lg" style="background-color: var(--color-nautics-secondary-pink);" onclick="VanillaApp.reservarBarco(${boat.id})">Confirmar Reserva</button>
                             </div>
-                            <select id="duracion-boat-${boat.id}" class="w-full p-2 rounded bg-nautics-light text-gray-900 text-sm">
-                                <optgroup label="Paseo">
-                                    <option value="30">Paseo (30 Minutos)</option>
-                                    <option value="60">Paseo (60 Minutos)</option>
-                                    <option value="90">Paseo (90 Minutos)</option>
-                                </optgroup>
-                                <optgroup label="Alquiler">
-                                    <option value="45">Alquiler (45 Minutos)</option>
-                                    <option value="90">Alquiler (90 Minutos)</option>
-                                    <option value="135">Alquiler (135 Minutos)</option>
-                                    <option value="180">Alquiler (180 Minutos)</option>
-                                </optgroup>
-                            </select>
-                        </div>
-                        <button class="btn w-full mt-6 py-3 text-lg" style="background-color: var(--color-nautics-secondary-pink);" onclick="VanillaApp.reservarBarco(${boat.id})">Confirmar Reserva</button>
-                    </div>
-                </div>`;
-            }); 
-            
-            html += `</div><div class="text-center"><button onclick="VanillaApp.mostrarInicio()" class="btn mt-8">Volver al Inicio</button></div></div>`; 
+                        </div>`;
+                    });
+                    
+                    html += `</div>`;
+                }
+            }
+
+            html += `<div class="text-center"><button onclick="VanillaApp.mostrarInicio()" class="btn mt-12">Volver al Inicio</button></div></div>`; 
             document.getElementById('contenido').innerHTML = html; 
             
             const hoy = new Date(); 
