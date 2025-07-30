@@ -158,7 +158,8 @@
     window.storage = getStorage(firebaseApp);
     
     window.Firebase = {
-        collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, query, orderBy, addDoc, serverTimestamp, where, writeBatch, onSnapshot, arrayUnion, arrayRemove
+        collection, getDocs, doc, setDoc, updateDoc, deleteDoc, getDoc, query, orderBy, addDoc, serverTimestamp, where, writeBatch, onSnapshot, arrayUnion, arrayRemove,
+        ref, uploadBytes, getDownloadURL, deleteObject
     };
 </script>
 </head>
@@ -262,7 +263,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }, 1000);
         },
-        startDashboardTimer() { this.stopAllTimers(); this.actualizarDashboard(); this.state.timers.dashboard = setInterval(() => this.actualizarDashboard(), 5000); },
+        startDashboardTimer() { 
+            if(this.state.timers.dashboard) clearInterval(this.state.timers.dashboard);
+            if(this.state.timers.barcos) clearInterval(this.state.timers.barcos);
+            this.actualizarDashboard(); 
+            this.state.timers.dashboard = setInterval(() => this.actualizarDashboard(), 5000); 
+        },
         startLocalOpenTimer(horaInicio) { if (this.state.timers.localOpen) clearInterval(this.state.timers.localOpen); this.state.timers.localOpen = setInterval(() => { const timerElem = document.getElementById('tiempoAbiertoLocal'); if(timerElem) { const tiempoAbierto = Date.now() - horaInicio; timerElem.textContent = this.formatearTiempo(tiempoAbierto); } }, 1000);},
         
         hashPassword(str) { let hash = 0; if (typeof str !== 'string' || str.length === 0) return "hash_0"; for (let i = 0; i < str.length; i++) { const char = str.charCodeAt(i); hash = ((hash << 5) - hash) + char; hash |= 0; } return "hash_" + Math.abs(hash); },
@@ -782,7 +788,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         
         async mostrarPanelAdmin() {
-            this.stopAllTimers(); 
+            this.startDashboardTimer(); 
             if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); } 
             this.ajustarPosicionChatbot(false);
 
@@ -855,7 +861,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             document.getElementById('contenido').innerHTML = `<div class="max-w-7xl mx-auto"><h1 class="text-4xl font-bold text-center mb-8">Panel de Jefes de Flota</h1>${dashboardHTML}${anunciosHTML}${gestionHTML}${tablaHTML}${informesHTML}${libroNegroHTML}${listaNegraHTML}${inventarioLogHTML}<div class="text-center mt-8"><button onclick="VanillaApp.cerrarSesion()" class="btn">Regresar a Puerto Base</button></div></div>`;
             this.actualizarLibroNegro(); this.actualizarListaNegra(); this.actualizarInventarioLog();
-            this.startDashboardTimer(); 
         },
         
         async actualizarDashboard() {
@@ -899,16 +904,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const adminPassDoc = await Firebase.getDoc(Firebase.doc(db, 'configuracion', 'admin_pass'));
                 
                 if (adminPassDoc.exists() && this.hashPassword(adminPass) === adminPassDoc.data().passHash) {
-                    sessionStorage.setItem('currentUser', "admin-maestro"); 
-                    
-                    await this.cargarTodosLosEmpleados(); 
-                    await this.cargarTodosLosFichajes(); 
-                    await this.cargarTodasLasVentas(); 
-                    await this.cargarInventarioLog(); 
-                    await this.cargarLibroNegro(); 
-                    await this.cargarListaNegra(); 
-                    await this.cargarClienteVentas(); 
-                    this.mostrarPanelAdmin(); 
+                    await this.mostrarPanelAdmin(); 
                 } else {
                     alert('Contraseña de jefe incorrecta.');
                 }
@@ -1072,7 +1068,7 @@ document.addEventListener('DOMContentLoaded', () => {
             datosVenta.productos[productoId].valorTotal = (datosVenta.productos[productoId].valorTotal || 0) + (cantNum * precioProducto); 
             this.state.ventas[nombreEmpleado] = datosVenta; 
             try {
-                await Firebase.setDoc(Firebase.doc(db, 'ventas', nombreEmpleado), datosVenta); 
+                await Firebase.setDoc(Firebase.doc(db, 'ventas', nombreEmpleado), datosVenta, { merge: true }); 
                 if(document.getElementById('productosVenta')) {
                     const descElem = document.getElementById(`desc-${productoId}`);
                     const totalHoyElem = document.getElementById(`ventas-hoy-${productoId}`);
@@ -1799,7 +1795,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         },
         async init() {
-            this.state.barcos = [...this.state.datosBarcosBase]; 
+            this.state.barcos = JSON.parse(JSON.stringify(this.state.datosBarcosBase)); 
             this.iniciarListenerAnuncios();
             this.iniciarListenerBarcos(); 
             await this.cargarTodosLosEmpleados();
