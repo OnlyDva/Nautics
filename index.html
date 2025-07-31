@@ -476,7 +476,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         mostrarPanelProductos() { 
             this.stopAllTimers(); 
-            if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); } 
+            if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); this.state.unsubscribeBarcos = null; } 
             this.ajustarPosicionChatbot(false); 
             
             const productosBaseHTML = this.state.productos.map(p => this.crearTarjetaProducto(p, false)).join(''); 
@@ -629,7 +629,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         async mostrarPanelBarcos() { 
             this.stopAllTimers(); 
-            if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); }
+            if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); this.state.unsubscribeBarcos = null; }
             
             let html = `<div class="max-w-7xl mx-auto">
                             <div class="text-center">
@@ -965,7 +965,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return datosV;
             } else {
                 let datosFichajeDoc = await Firebase.getDoc(Firebase.doc(db, 'fichajes', nombre)); 
-                let datosF = datosFichajeDoc.exists() ? datosF.data() : { total: 0, hoy: 0, semana: 0, fecha: hoyStr, numSemana: semanaNum, fichado: false, inicio: null };
+                let datosF = datosFichajeDoc.exists() ? datosFichajeDoc.data() : { total: 0, hoy: 0, semana: 0, fecha: hoyStr, numSemana: semanaNum, fichado: false, inicio: null };
                 if (datosF.fecha !== hoyStr) {
                     datosF.hoy = 0;
                     datosF.fecha = hoyStr;
@@ -1750,7 +1750,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         
         async inicializarBarcosEnFirestore() {
-            console.log("La colección 'barcos' está vacía. Inicializando desde datos base...");
+            console.log("INICIANDO ESCRITURA INICIAL DE BARCOS EN FIRESTORE");
             const batch = Firebase.writeBatch(db);
             this.state.datosBarcosBase.forEach(boat => {
                 const boatRef = Firebase.doc(db, "barcos", String(boat.id));
@@ -1758,19 +1758,27 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             try {
                 await batch.commit();
-                console.log("Barcos inicializados en Firestore.");
+                console.log("Barcos inicializados en Firestore con éxito.");
             } catch (e) {
-                console.error("Error al inicializar barcos en Firestore:", e);
+                console.error("FALLO CRÍTICO: No se pudieron escribir los barcos iniciales.", e);
+            }
+        },
+        async verificarEInicializarBarcos() {
+            const q = Firebase.query(Firebase.collection(db, "barcos"));
+            const snapshot = await Firebase.getDocs(q);
+            console.log(`Verificación inicial: ${snapshot.size} barcos encontrados en Firestore.`);
+            if (snapshot.empty || snapshot.size < this.state.datosBarcosBase.length) {
+                await this.inicializarBarcosEnFirestore();
             }
         },
         iniciarListenerBarcos() { 
+            console.log("Activando listener de barcos...");
             const q = Firebase.query(Firebase.collection(db, "barcos"), Firebase.orderBy("id")); 
             this.state.unsubscribeBarcos = Firebase.onSnapshot(q, (snapshot) => { 
                 console.log(`Listener de barcos activado. Snapshot recibido. ¿Vacío?: ${snapshot.empty}. Tamaño: ${snapshot.size}`);
                 if (!snapshot.empty) {
                     const barcosNuevos = []; 
                     snapshot.forEach(doc => {
-                        console.log('Añadiendo barco del D.B.:', doc.data().nombre);
                         const data = doc.data();
                         const reservasConvertidas = data.reservas ? data.reservas.map(res => ({
                             ...res,
@@ -1780,9 +1788,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         barcosNuevos.push({ ...data, reservas: reservasConvertidas }); 
                     });
                     this.state.barcos = barcosNuevos;
-                    console.log('Estado final de this.state.barcos:', JSON.parse(JSON.stringify(this.state.barcos)));
-                } else {
-                    this.inicializarBarcosEnFirestore();
                 }
 
                 const panelBarcosEmpleados = document.getElementById('panel-barcos'); 
@@ -1801,6 +1806,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         async init() {
             this.state.barcos = JSON.parse(JSON.stringify(this.state.datosBarcosBase)); 
+            await this.verificarEInicializarBarcos();
             this.iniciarListenerAnuncios();
             this.iniciarListenerBarcos(); 
             await this.cargarTodosLosEmpleados();
