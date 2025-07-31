@@ -52,8 +52,8 @@
         margin-right: 0.5rem; 
         border: 1px solid var(--color-nautics-light);
     }
-    .btn:hover { background-color: var(--color-nautics-mid); }
-    .btn:disabled { background-color: #3b0764; cursor: not-allowed; }
+    .btn:hover:not(:disabled) { background-color: var(--color-nautics-mid); }
+    .btn:disabled { background-color: #3b0764; color: #aaa; cursor: not-allowed; border-color: #555; }
     
     #anuncio-panel-lateral { 
         position: fixed; 
@@ -231,6 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
             chatFiles: [],
             ultimoAnuncioMostrado: null,
             unsubscribeBarcos: null, 
+            unsubscribeVentas: null,
         },
 
         stopAllTimers() { Object.keys(this.state.timers).forEach(t => { if(this.state.timers[t]) clearInterval(this.state.timers[t]); this.state.timers[t] = null; }); },
@@ -358,6 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mostrarInicio() { 
             this.stopAllTimers(); 
             if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); } 
+            if (typeof this.state.unsubscribeVentas === 'function') { this.state.unsubscribeVentas(); }
             document.getElementById('contenido').innerHTML = `
                 <div class="p-4 md:p-8 max-w-7xl mx-auto rounded-lg bg-nautics-dark bg-opacity-90 shadow-lg border border-nautics-primary-blue">
                     <header class="mb-8 text-center">
@@ -407,6 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mostrarLoginVIP() {
             this.stopAllTimers();
             if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); }
+            if (typeof this.state.unsubscribeVentas === 'function') { this.state.unsubscribeVentas(); }
             document.getElementById('contenido').innerHTML = `
                 <div class="max-w-md mx-auto bg-nautics-dark bg-opacity-70 p-8 rounded-lg shadow-lg border-2 border-nautics-mid">
                     <h2 class="text-2xl font-bold mb-4 text-center text-nautics-text">Acceso de la Tripulación</h2>
@@ -430,6 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (this.state.timers.dashboard) clearInterval(this.state.timers.dashboard);
             if (this.state.timers.barcos) clearInterval(this.state.timers.barcos);
             if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); }
+            if (typeof this.state.unsubscribeVentas === 'function') { this.state.unsubscribeVentas(); }
             document.getElementById('contenido').innerHTML = `
                 <div class="max-w-md mx-auto bg-nautics-dark bg-opacity-70 p-8 rounded-lg shadow-lg border-2 border-nautics-secondary-pink">
                     <h2 class="text-3xl font-bold mb-4 text-center text-nautics-text">Acceso Privado - Jefes de Flota</h2>
@@ -448,28 +452,28 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         
         crearTarjetaProducto(producto, esPanelVenta = false, nombreEmpleado = '') {
-            let totalVentasHoy = 0, totalVentasHist = 0;
-            const productoPrecio = producto.precio !== undefined ? producto.precio : 50; 
-
+            let totalVentasHoy = 0;
             if (this.state.ventas[nombreEmpleado] && this.state.ventas[nombreEmpleado].productos && this.state.ventas[nombreEmpleado].productos[producto.id]) {
                 totalVentasHoy = this.state.ventas[nombreEmpleado].productos[producto.id].hoy || 0;
-                totalVentasHist = this.state.ventas[nombreEmpleado].productos[producto.id].total || 0;
             }
+            const totalVentasHist = (this.state.ventas[nombreEmpleado]?.productos?.[producto.id]?.total) || 0;
+
             const desc = `<p class="text-xs mt-1" id="desc-${producto.id}">Hoy: ${totalVentasHoy} | Total: ${totalVentasHist}</p>`;
             let infoExtra = '';
             if (producto.id === 'cebo' && !esPanelVenta) {
                 infoExtra = `<p class="text-xs text-nautics-accent-pink mt-1">(Pack de 50 Unidades)</p>`;
             }
+            const subtractButtonDisabled = totalVentasHoy <= 0 ? 'disabled' : '';
             const inputVentasHTML = esPanelVenta 
                 ? `<div class="mt-2">
                      <div class="flex items-center justify-center gap-2">
-                       <button onclick="VanillaApp.modificarVenta('${producto.id}', '${nombreEmpleado}', -1)" class="btn text-lg py-1 px-3">-</button>
+                       <button onclick="VanillaApp.modificarVenta('${producto.id}', '${nombreEmpleado}', -1)" class="btn text-lg py-1 px-3" ${subtractButtonDisabled}>-</button>
                        <span class="font-bold text-lg w-8 text-center" id="ventas-hoy-${producto.id}">${totalVentasHoy}</span>
                        <button onclick="VanillaApp.modificarVenta('${producto.id}', '${nombreEmpleado}', 1)" class="btn text-lg py-1 px-3">+</button>
                      </div>
                      ${desc}
                    </div>`
-                : `<p class="text-nautics-light text-lg font-bold mt-2">$${productoPrecio}</p>`; 
+                : `<p class="text-nautics-light text-lg font-bold mt-2">$${producto.precio}</p>`; 
             const imagenHTML = producto.imagen ? `<img src="${producto.imagen}" alt="${producto.nombre}" class="mx-auto mb-2 w-24 h-24 object-cover rounded" onerror="this.src='placeholder.png'"/>` : '';
             return `<div class="producto-card bg-nautics-mid rounded-lg p-2 text-center shadow-md flex flex-col justify-between text-sm"><div>${imagenHTML}<h3 class="text-white font-semibold leading-tight uppercase">${producto.nombre}</h3>${infoExtra}</div><div>${inputVentasHTML}</div></div>`;
         },
@@ -477,6 +481,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mostrarPanelProductos() { 
             this.stopAllTimers(); 
             if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); this.state.unsubscribeBarcos = null; } 
+            if (typeof this.state.unsubscribeVentas === 'function') { this.state.unsubscribeVentas(); this.state.unsubscribeVentas = null; }
             this.ajustarPosicionChatbot(false); 
             
             const productosBaseHTML = this.state.productos.map(p => this.crearTarjetaProducto(p, false)).join(''); 
@@ -630,6 +635,7 @@ document.addEventListener('DOMContentLoaded', () => {
         async mostrarPanelBarcos() { 
             this.stopAllTimers(); 
             if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); this.state.unsubscribeBarcos = null; }
+            if (typeof this.state.unsubscribeVentas === 'function') { this.state.unsubscribeVentas(); this.state.unsubscribeVentas = null; }
             
             let html = `<div class="max-w-7xl mx-auto">
                             <div class="text-center">
@@ -956,6 +962,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cerrarSesion() { 
             this.stopAllTimers(); 
             if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); } 
+            if (typeof this.state.unsubscribeVentas === 'function') { this.state.unsubscribeVentas(); }
             sessionStorage.removeItem('currentUser'); 
             this.mostrarInicio(); 
         },
@@ -1081,11 +1088,10 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.ventas[nombreEmpleado] = datosVenta; 
             try {
                 await Firebase.setDoc(Firebase.doc(db, 'ventas', nombreEmpleado), datosVenta, { merge: true }); 
-                if(document.getElementById('productosVenta')) {
-                    const descElem = document.getElementById(`desc-${productoId}`);
-                    const totalHoyElem = document.getElementById(`ventas-hoy-${productoId}`);
-                    if(descElem) descElem.textContent = `Hoy: ${datosVenta.productos[productoId].hoy} | Total: ${datosVenta.productos[productoId].total}`;
-                    if(totalHoyElem) totalHoyElem.textContent = datosVenta.productos[productoId].hoy;
+                
+                const subtractButton = document.querySelector(`#productosVenta button[onclick*="'${productoId}', '${nombreEmpleado}', -1"]`);
+                if(subtractButton){
+                    subtractButton.disabled = datosVenta.productos[productoId].hoy <= 0;
                 }
             } catch (e) { console.error("Error al modificar venta:", e); alert("Error al modificar venta: " + e.message); }
         },
@@ -1784,10 +1790,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
         iniciarListenerBarcos() { 
-            console.log("Activando listener de barcos...");
             const q = Firebase.query(Firebase.collection(db, "barcos"), Firebase.orderBy("id")); 
             this.state.unsubscribeBarcos = Firebase.onSnapshot(q, (snapshot) => { 
-                console.log(`Listener de barcos activado. Snapshot recibido. ¿Vacío?: ${snapshot.empty}. Tamaño: ${snapshot.size}`);
                 if (!snapshot.empty) {
                     const barcosNuevos = []; 
                     snapshot.forEach(doc => {
@@ -1816,11 +1820,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error("Error al escuchar cambios en barcos:", error);
             });
         },
+        actualizarVistaVentas() {
+            const panelVenta = document.getElementById('productosVenta');
+            const currentUser = sessionStorage.getItem('currentUser');
+            if (!panelVenta || !currentUser || !this.state.ventas[currentUser]) return;
+
+            this.state.productos.forEach(producto => {
+                const ventasProducto = this.state.ventas[currentUser].productos[producto.id] || { hoy: 0, total: 0 };
+                const ventasHoyElem = document.getElementById(`ventas-hoy-${producto.id}`);
+                const descElem = document.getElementById(`desc-${producto.id}`);
+                if (ventasHoyElem) ventasHoyElem.textContent = ventasProducto.hoy;
+                if (descElem) descElem.textContent = `Hoy: ${ventasProducto.hoy} | Total: ${ventasProducto.total}`;
+                
+                const subtractButton = document.querySelector(`#productosVenta button[onclick*="'${producto.id}', '${currentUser}', -1"]`);
+                if(subtractButton){
+                    subtractButton.disabled = ventasProducto.hoy <= 0;
+                }
+            });
+        },
+        iniciarListenerVentas() {
+            const q = Firebase.query(Firebase.collection(db, "ventas"));
+            this.state.unsubscribeVentas = Firebase.onSnapshot(q, (snapshot) => {
+                snapshot.forEach(doc => {
+                    this.state.ventas[doc.id] = doc.data();
+                });
+                this.actualizarVistaVentas();
+            });
+        },
         async init() {
             this.state.barcos = JSON.parse(JSON.stringify(this.state.datosBarcosBase)); 
             await this.verificarEInicializarBarcos();
             this.iniciarListenerAnuncios();
             this.iniciarListenerBarcos(); 
+            this.iniciarListenerVentas();
             await this.cargarTodosLosEmpleados();
             await this.cargarTodosLosFichajes();
             await this.cargarTodasLasVentas();
