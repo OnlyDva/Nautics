@@ -264,8 +264,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 1000);
         },
         startDashboardTimer() { 
-            if(this.state.timers.dashboard) clearInterval(this.state.timers.dashboard);
-            if(this.state.timers.barcos) clearInterval(this.state.timers.barcos);
+            Object.keys(this.state.timers).forEach(t => { 
+                if (t !== 'fichaje' && this.state.timers[t]) {
+                    clearInterval(this.state.timers[t]);
+                    this.state.timers[t] = null;
+                }
+            });
             this.actualizarDashboard(); 
             this.state.timers.dashboard = setInterval(() => this.actualizarDashboard(), 5000); 
         },
@@ -423,7 +427,8 @@ document.addEventListener('DOMContentLoaded', () => {
             this.ajustarPosicionChatbot(false);
         },
         mostrarLoginAdmin() {
-            this.stopAllTimers();
+            if (this.state.timers.dashboard) clearInterval(this.state.timers.dashboard);
+            if (this.state.timers.barcos) clearInterval(this.state.timers.barcos);
             if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); }
             document.getElementById('contenido').innerHTML = `
                 <div class="max-w-md mx-auto bg-nautics-dark bg-opacity-70 p-8 rounded-lg shadow-lg border-2 border-nautics-secondary-pink">
@@ -789,7 +794,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         async mostrarPanelAdmin() {
             this.startDashboardTimer(); 
-            if (typeof this.state.unsubscribeBarcos === 'function') { this.state.unsubscribeBarcos(); } 
             this.ajustarPosicionChatbot(false);
 
             await this.cargarTodosLosEmpleados(); 
@@ -961,7 +965,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return datosV;
             } else {
                 let datosFichajeDoc = await Firebase.getDoc(Firebase.doc(db, 'fichajes', nombre)); 
-                let datosF = datosFichajeDoc.exists() ? datosFichajeDoc.data() : { total: 0, hoy: 0, semana: 0, fecha: hoyStr, numSemana: semanaNum, fichado: false, inicio: null };
+                let datosF = datosFichajeDoc.exists() ? datosF.data() : { total: 0, hoy: 0, semana: 0, fecha: hoyStr, numSemana: semanaNum, fichado: false, inicio: null };
                 if (datosF.fecha !== hoyStr) {
                     datosF.hoy = 0;
                     datosF.fecha = hoyStr;
@@ -1320,7 +1324,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const statusElem = document.getElementById('upload-status'); 
             const uploadBtn = document.getElementById('upload-inventory-btn'); 
             if (filesToUpload.length === 0 || !currentUser) { statusElem.textContent = "Añade al menos una imagen."; return; } 
-            statusElem.textContent = `Subiendo ${filesToUpload.length} imagen(es)...`; uploadBtn.disabled = true; try { const uploadPromises = filesToUpload.map(file => { const filePath = `inventario/${Date.now()}_${file.name}`; const storageRef = Firebase.ref(storage, filePath); return Firebase.uploadBytes(storageRef, file).then(snapshot => Firebase.getDownloadURL(snapshot.ref)); }); const imageUrls = await Promise.all(uploadPromises); const datosInventario = { imagenes: imageUrls, subidoPor: currentUser, timestamp: Firebase.serverTimestamp() }; await Firebase.setDoc(Firebase.doc(db, "inventario_actual", "estado"), datosInventario); await Firebase.addDoc(Firebase.collection(db, "inventario_log"), datosInventario); statusElem.textContent = "¡Inventario guardado!"; setTimeout(() => { if (document.getElementById('upload-status')) this.mostrarPanelInventario(); }, 2000); } catch (e) { console.error("Error al subir inventario:", e); statusElem.textContent = "Error al subir: " + e.message; uploadBtn.disabled = false; alert("Error al subir las imágenes: " + e.message); } 
+            statusElem.textContent = `Subiendo ${filesToUpload.length} imagen(es)...`; uploadBtn.disabled = true; try { const uploadPromises = filesToUpload.map(file => { const filePath = `inventario/${Date.now()}_${file.name}`; const storageRef = Firebase.ref(window.storage, filePath); return Firebase.uploadBytes(storageRef, file).then(snapshot => Firebase.getDownloadURL(snapshot.ref)); }); const imageUrls = await Promise.all(uploadPromises); const datosInventario = { imagenes: imageUrls, subidoPor: currentUser, timestamp: Firebase.serverTimestamp() }; await Firebase.setDoc(Firebase.doc(db, "inventario_actual", "estado"), datosInventario); await Firebase.addDoc(Firebase.collection(db, "inventario_log"), datosInventario); statusElem.textContent = "¡Inventario guardado!"; setTimeout(() => { if (document.getElementById('upload-status')) this.mostrarPanelInventario(); }, 2000); } catch (e) { console.error("Error al subir inventario:", e); statusElem.textContent = "Error al subir: " + e.message; uploadBtn.disabled = false; alert("Error al subir las imágenes: " + e.message); } 
         },
         toggleInventarioLog() { const lista = document.getElementById('listaInventarioLog'); if (lista) { lista.style.display = lista.style.display === 'none' ? 'block' : 'none'; } },
         mostrarImagenAmpliada(imageUrl) { const overlay = document.getElementById('image-overlay'); const overlayImage = document.getElementById('overlay-image'); if(overlay && overlayImage) { overlayImage.src = imageUrl; overlay.style.display = 'flex'; }},
@@ -1344,7 +1348,7 @@ document.addEventListener('DOMContentLoaded', () => {
         async eliminarConvenio(id) { 
             const currentUser = sessionStorage.getItem('currentUser');
             if (!currentUser) { alert("No hay usuario en sesión."); return; } 
-            if (confirm("¿Seguro que quieres romper este acuerdo?")) { try { const d = await Firebase.getDoc(Firebase.doc(db, 'convenios', id)); if (d.exists() && d.data().imagenPath) { await Firebase.deleteObject(Firebase.ref(storage, d.data().imagenPath)); } await Firebase.deleteDoc(Firebase.doc(db, 'convenios', id)); await this.cargarConvenios(true); } catch (e) { console.error("Error al eliminar convenio:", e); alert("Error al romper acuerdo naval: " + e.message); } } 
+            if (confirm("¿Seguro que quieres romper este acuerdo?")) { try { const d = await Firebase.getDoc(Firebase.doc(db, 'convenios', id)); if (d.exists() && d.data().imagenPath) { await Firebase.deleteObject(Firebase.ref(window.storage, d.data().imagenPath)); } await Firebase.deleteDoc(Firebase.doc(db, 'convenios', id)); await this.cargarConvenios(true); } catch (e) { console.error("Error al eliminar convenio:", e); alert("Error al romper acuerdo naval: " + e.message); } } 
         },
         async setConvenioStatus(convenioId, newStatus) { 
             const currentUser = sessionStorage.getItem('currentUser');
@@ -1359,7 +1363,7 @@ document.addEventListener('DOMContentLoaded', () => {
         async subirImagenConvenio(id, file) { 
             const currentUser = sessionStorage.getItem('currentUser');
             if (!currentUser) { alert("No hay usuario en sesión."); return; } 
-            if (!file) return; const p = `convenios/${id}/${file.name}`; const s = Firebase.ref(storage, p); try { const docSnap = await Firebase.getDoc(Firebase.doc(db, 'convenios', id)); if (docSnap.exists() && docSnap.data().imagenPath) { await Firebase.deleteObject(Firebase.ref(storage, docSnap.data().imagenPath)); } await Firebase.uploadBytes(s, file); const url = await Firebase.getDownloadURL(s); await Firebase.updateDoc(Firebase.doc(db, 'convenios', id), { imagenURL: url, imagenPath: p }); if (document.getElementById('contenedorConvenios')) this.cargarConvenios(true); } catch (e) { console.error("Error al subir imagen convenio:", e); alert("Error al subir imagen de acuerdo: " + e.message); } 
+            if (!file) return; const p = `convenios/${id}/${file.name}`; const s = Firebase.ref(window.storage, p); try { const docSnap = await Firebase.getDoc(Firebase.doc(db, 'convenios', id)); if (docSnap.exists() && docSnap.data().imagenPath) { await Firebase.deleteObject(Firebase.ref(window.storage, docSnap.data().imagenPath)); } await Firebase.uploadBytes(s, file); const url = await Firebase.getDownloadURL(s); await Firebase.updateDoc(Firebase.doc(db, 'convenios', id), { imagenURL: url, imagenPath: p }); if (document.getElementById('contenedorConvenios')) this.cargarConvenios(true); } catch (e) { console.error("Error al subir imagen convenio:", e); alert("Error al subir imagen de acuerdo: " + e.message); } 
         },
         async mostrarListaNegraPublica() { 
             const currentUser = sessionStorage.getItem('currentUser');
@@ -1436,7 +1440,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 try {
                     const uploadPromises = files.map(file => {
                         const filePath = `chat_uploads/${Date.now()}_${file.name}`;
-                        const storageRef = Firebase.ref(storage, filePath);
+                        const storageRef = Firebase.ref(window.storage, filePath);
                         return Firebase.uploadBytes(storageRef, file).then(snapshot => Firebase.getDownloadURL(snapshot.ref));
                     });
                     const imageUrls = await Promise.all(uploadPromises);
@@ -1762,9 +1766,11 @@ document.addEventListener('DOMContentLoaded', () => {
         iniciarListenerBarcos() { 
             const q = Firebase.query(Firebase.collection(db, "barcos"), Firebase.orderBy("id")); 
             this.state.unsubscribeBarcos = Firebase.onSnapshot(q, (snapshot) => { 
+                console.log(`Listener de barcos activado. Snapshot recibido. ¿Vacío?: ${snapshot.empty}. Tamaño: ${snapshot.size}`);
                 if (!snapshot.empty) {
                     const barcosNuevos = []; 
                     snapshot.forEach(doc => {
+                        console.log('Añadiendo barco del D.B.:', doc.data().nombre);
                         const data = doc.data();
                         const reservasConvertidas = data.reservas ? data.reservas.map(res => ({
                             ...res,
@@ -1773,20 +1779,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         })) : [];
                         barcosNuevos.push({ ...data, reservas: reservasConvertidas }); 
                     });
-                    this.state.barcos = barcosNuevos; 
+                    this.state.barcos = barcosNuevos;
+                    console.log('Estado final de this.state.barcos:', JSON.parse(JSON.stringify(this.state.barcos)));
                 } else {
                     this.inicializarBarcosEnFirestore();
                 }
 
                 const panelBarcosEmpleados = document.getElementById('panel-barcos'); 
+                const h1Element = document.querySelector('#contenido h1');
+                
                 if (panelBarcosEmpleados) {
                     const currentUser = sessionStorage.getItem('currentUser'); 
-                    if (currentUser) {
-                        this.mostrarPanelEmpleados(currentUser); 
-                    }
-                }
-                const h1Element = document.querySelector('#contenido h1');
-                if (h1Element && h1Element.textContent.includes("Nuestra Flota de Barcos")) {
+                    if (currentUser) { this.mostrarPanelEmpleados(currentUser); }
+                } else if (h1Element && h1Element.textContent.includes("Nuestra Flota de Barcos")) {
                     this.mostrarPanelBarcos();
                 }
 
