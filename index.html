@@ -920,8 +920,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 const adminPassDoc = await Firebase.getDoc(Firebase.doc(db, 'configuracion', 'admin_pass'));
+                const hashGenerado = this.hashPassword(adminPass);
+                const hashEnDB = adminPassDoc.exists() ? adminPassDoc.data().passHash : null;
+
+                console.log("DIAGNÓSTICO DE LOGIN DE JEFES:");
+                console.log("Contraseña introducida:", adminPass);
+                console.log("Hash generado:", hashGenerado);
+                console.log("Hash esperado (de DB):", hashEnDB);
                 
-                if (adminPassDoc.exists() && this.hashPassword(adminPass) === adminPassDoc.data().passHash) {
+                if (adminPassDoc.exists() && hashGenerado === hashEnDB) {
                     await this.mostrarPanelAdmin(); 
                 } else {
                     alert('Contraseña de jefe incorrecta.');
