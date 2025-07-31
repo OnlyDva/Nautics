@@ -720,7 +720,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         
         async mostrarPanelEmpleados(nombre) {
-            this.stopAllTimers();
+            // this.stopAllTimers(); // No detener todos para no parar el fichaje
             this.ajustarPosicionChatbot(false);
             await this.cargarTodosLosEmpleados(); 
             const empleadoData = this.state.empleados.find(emp => emp.id === nombre) || {};
@@ -922,11 +922,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const adminPassDoc = await Firebase.getDoc(Firebase.doc(db, 'configuracion', 'admin_pass'));
                 const hashGenerado = this.hashPassword(adminPass);
                 const hashEnDB = adminPassDoc.exists() ? adminPassDoc.data().passHash : null;
-
-                console.log("DIAGNÓSTICO DE LOGIN DE JEFES:");
-                console.log("Contraseña introducida:", adminPass);
-                console.log("Hash generado:", hashGenerado);
-                console.log("Hash esperado (de DB):", hashEnDB);
                 
                 if (adminPassDoc.exists() && hashGenerado === hashEnDB) {
                     await this.mostrarPanelAdmin(); 
@@ -1095,11 +1090,6 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.ventas[nombreEmpleado] = datosVenta; 
             try {
                 await Firebase.setDoc(Firebase.doc(db, 'ventas', nombreEmpleado), datosVenta, { merge: true }); 
-                
-                const subtractButton = document.querySelector(`#productosVenta button[onclick*="'${productoId}', '${nombreEmpleado}', -1"]`);
-                if(subtractButton){
-                    subtractButton.disabled = datosVenta.productos[productoId].hoy <= 0;
-                }
             } catch (e) { console.error("Error al modificar venta:", e); alert("Error al modificar venta: " + e.message); }
         },
         async ocuparBarcoAhora(id, nombreEmpleado, durationMinutes) { 
