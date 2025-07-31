@@ -727,8 +727,16 @@ document.addEventListener('DOMContentLoaded', () => {
             let barcosHTML = this.state.barcos.map(boat => { 
                 const estadoActual = this.getEstadoBarco(boat); 
                 let controles = (estadoActual.estado === 'disponible') 
-                    ? `<button class="btn text-sm py-2 w-full" onclick="VanillaApp.ocuparBarcoAhora(${boat.id}, '${nombre}', 30)">Alquilar (30 min)</button>`
-                    : `<div class="font-mono text-xl mb-2" id="timer-boat-${boat.id}">--:--:--</div><div class="flex gap-2"><button class="btn text-xs py-1 flex-grow" onclick="VanillaApp.anadirTiempoBarco(${boat.id})">+30 min</button><button class="btn text-xs py-1 flex-grow" style="background-color:#dc2626" onclick="VanillaApp.liberarBarco(${boat.id})">Liberar</button></div>`; 
+                    ? `<div class="flex flex-col gap-2">
+                         <button class="btn text-sm py-2 w-full" onclick="VanillaApp.ocuparBarcoAhora(${boat.id}, '${nombre}', 30)">Paseo (30 min)</button>
+                         <button class="btn text-sm py-2 w-full" style="background-color: var(--color-nautics-secondary-pink);" onclick="VanillaApp.ocuparBarcoAhora(${boat.id}, '${nombre}', 45)">Alquilar (45 min)</button>
+                       </div>`
+                    : `<div class="font-mono text-xl mb-2" id="timer-boat-${boat.id}">--:--:--</div>
+                       <div class="flex gap-2">
+                         <button class="btn text-xs py-1 flex-grow" onclick="VanillaApp.anadirTiempoBarco(${boat.id}, 30)">+30m Paseo</button>
+                         <button class="btn text-xs py-1 flex-grow" style="background-color: var(--color-nautics-secondary-pink);" onclick="VanillaApp.anadirTiempoBarco(${boat.id}, 45)">+45m Alquiler</button>
+                       </div>
+                       <button class="btn text-xs py-1 w-full mt-2" style="background-color:#c44" onclick="VanillaApp.liberarBarco(${boat.id})">Liberar</button>`; 
                 return `<div class="bg-nautics-mid p-4 rounded-lg text-center flex flex-col justify-between"><div><p class="font-bold text-lg">${boat.nombre}</p><p class="text-sm ${estadoActual.estado === 'ocupada' ? 'text-red-400' : 'text-green-400'} mb-2">${estadoActual.texto}</p></div><div>${controles}</div></div>`;
             }).join('');
 
@@ -1098,7 +1106,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } 
             }
         }, 
-        async anadirTiempoBarco(id) { 
+        async anadirTiempoBarco(id, minutesToAdd) { 
             const currentUser = sessionStorage.getItem('currentUser'); 
             if (!currentUser) { alert("No hay usuario en sesión."); return; }
             
@@ -1111,7 +1119,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const reservaActualIndex = boatData.reservas.findIndex(r => ahora >= r.inicio && ahora < r.fin);
 
                     if (reservaActualIndex > -1) {
-                        boatData.reservas[reservaActualIndex].fin += 30 * 60 * 1000;
+                        boatData.reservas[reservaActualIndex].fin += minutesToAdd * 60 * 1000;
                         await Firebase.updateDoc(boatRef, { reservas: boatData.reservas });
                     } else {
                         alert("No hay un alquiler activo para añadir tiempo.");
@@ -1765,10 +1773,14 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         async verificarEInicializarBarcos() {
             const q = Firebase.query(Firebase.collection(db, "barcos"));
-            const snapshot = await Firebase.getDocs(q);
-            console.log(`Verificación inicial: ${snapshot.size} barcos encontrados en Firestore.`);
-            if (snapshot.empty || snapshot.size < this.state.datosBarcosBase.length) {
-                await this.inicializarBarcosEnFirestore();
+            try {
+                const snapshot = await Firebase.getDocs(q);
+                console.log(`Verificación inicial: ${snapshot.size} barcos encontrados en Firestore.`);
+                if (snapshot.empty || snapshot.size < this.state.datosBarcosBase.length) {
+                    await this.inicializarBarcosEnFirestore();
+                }
+            } catch(e) {
+                console.error("Error al verificar los barcos:", e);
             }
         },
         iniciarListenerBarcos() { 
